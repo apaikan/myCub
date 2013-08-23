@@ -1,0 +1,91 @@
+#
+# For a description of the syntax of this configuration file,
+# see misc/tools/kconfig-language.txt.
+#
+
+choice
+	prompt "Select target board"
+	default ARCH_BOARD_LM4F120_LAUNCHPAD
+	---help---
+		Select the board hosting the architure.  You must first select the
+		exact MCU part number, then the boards supporting that part will
+		be available for selection.  Use ARCH_BOARD_CUSTOM to create a new
+		board configuration.
+
+config ARCH_BOARD_LM4F120_LAUNCHPAD
+	bool "Stellaris LM4F120 LaunchPad"
+	depends on ARCH_CHIP_LM4F120
+	select ARCH_HAVE_LEDS
+	select ARCH_HAVE_BUTTONS
+	select ARCH_HAVE_IRQBUTTONS
+	---help---
+		Stellaris LM4F120 LaunchPad.
+
+
+endchoice
+
+config ARCH_BOARD
+	string
+	default "lm4f120-launchpad"   if ARCH_BOARD_LM4F120_LAUNCHPAD
+	default ""                    if ARCH_BOARD_CUSTOM
+
+comment "Common Board Options"
+
+config ARCH_HAVE_LEDS
+	bool
+
+config ARCH_LEDS
+	bool "Board LED support"
+	default y
+	depends on ARCH_HAVE_LEDS
+	---help---
+		Use board LEDs to show NuttX execution status state. Unique to boards that have LEDs
+
+config ARCH_HAVE_BUTTONS
+	bool
+
+config ARCH_BUTTONS
+	bool "Board button support"
+	default n
+	depends on ARCH_HAVE_BUTTONS
+	---help---
+		"Support interfaces to use buttons provided by the board."
+
+config ARCH_HAVE_IRQBUTTONS
+	bool
+
+config ARCH_IRQBUTTONS
+	bool "Button interrupt support"
+	default n
+	depends on ARCH_BUTTONS && ARCH_HAVE_IRQBUTTONS
+	---help---
+		"Support interrupts on button presses and releases."
+
+config NSH_MMCSDMINOR
+	int "MMC/SD minor number"
+	default 0
+	depends on NSH_LIBRARY && MMCSD
+	---help---
+		If board-specific NSH start-up logic needs to mount an MMC/SD device, then the setting should be provided to identify the MMC/SD minor device number (i.e., the N in /dev/mmcsdN).  Default 0
+
+config NSH_MMCSDSLOTNO
+	int "MMC/SD slot number"
+	default 0
+	depends on NSH_LIBRARY && MMCSD
+	---help---
+		If board-specific NSH start-up supports more than one MMC/SD slot, then this setting should be provided to indicate which slot should be used.  Default: 0.
+
+config NSH_MMCSDSPIPORTNO
+	int "MMC/SD SPI device number"
+	default 0
+	depends on NSH_LIBRARY && MMCSD && MMCSD_SPI
+	---help---
+		If board-specif NSH start-up logic will mount an SPI-based MMC/SD volume, then this setting may be needed to tell the board logic which SPI bus to use.  Default: 0 (meaning is board-specific).
+
+comment "Board-Specific Options"
+
+if ARCH_BOARD_LM3S8962EK
+source "configs/lm4f120-launchpad/Kconfig"
+endif
+
+

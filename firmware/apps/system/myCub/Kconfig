@@ -1,0 +1,14 @@
+#
+# For a description of the syntax of this configuration file,
+# see misc/tools/kconfig-language.txt.
+#
+
+config SYSTEM_MYCUB
+	bool "myCub software"
+	default n
+	---help---
+		Build mycub robot software
+
+if SYSTEM_MYCUB
+endif
+
