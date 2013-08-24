@@ -1,9 +1,4 @@
 /****************************************************************************
- * apps/system/sysinfo/sysinfo.c
- *
- *   Copyright (C) 2011 Uros Platise. All rights reserved.
- *   Author: Uros Platise <uros.platise@isotel.eu>
- *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -43,44 +38,141 @@
 /****************************************************************************
  * Included Files
  ****************************************************************************/
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include <nuttx/config.h>
 #include <nuttx/version.h>
-#include <time.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <arch/board/board.h>
+#include <arch/board/board.h>
+#include <arch/board/servo.h>
+#include <arch/board/inc/hw_types.h>
+#include <arch/board/inc/hw_memmap.h>
+#include <arch/board/driverlib/pin_map.h>
+#include <arch/board/driverlib/gpio.h>
+#include <arch/board/driverlib/sysctl.h>
+//#include <arch/board/driverlib/rom.h>
+//#include <arch/board/driverlib/rom_map.h>
+
+
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
 
-int mytest_main(int argc, char *argv[])
-{
-    printf("This is my first test for using Nuttx on Stellaris Launchpad\n");  
+servo_t *servo_front;
+servo_t *servo_back;
+servo_t *servo_right;
+servo_t *servo_left;
 
-    int i;  
-    while(1)
-    {
-        printf("testing\n");
-        up_ledon(1);
+void setupServos(void) {
+
+    // PD0, PD1, PD2, PD3
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+    GPIOPinTypeGPIOOutput(GPIO_PORTD_BASE, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
+
+    // Zero out configs
+    servoInit();
+
+    // Bind pads to servo configs
+    servo_front = servoAttach(GPIO_PORTD_BASE, GPIO_PIN_0);
+    servo_back = servoAttach(GPIO_PORTD_BASE, GPIO_PIN_1);
+    servo_right = servoAttach(GPIO_PORTD_BASE, GPIO_PIN_2);
+    servo_left = servoAttach(GPIO_PORTD_BASE, GPIO_PIN_3);
+
+    // Start the servo timers
+    servoStart();
+}
+
+
+int myCub_main(int argc, char *argv[])
+{
+    printf("myCub Demo\n");  
+
+    // Setup servos and start the timer for them
+    setupServos();
+
+    // Continually check which button is pressed and move the servo position that direction
+   // while(1) {
+
+        int i; 
+        int rep;
+
+        servoSet(servo_front, 8);
+        servoSet(servo_back, 8);           
+        servoSet(servo_right, 8);           
+        servoSet(servo_left, 8);           
+                
+        // all streching
+        printf("Streching...\n");  
+        for(i=8; i<160; i+=2)       
+        {
+            servoSet(servo_front, i);
+            servoSet(servo_back, i);           
+            servoSet(servo_right, i);           
+            servoSet(servo_left, i); 
+            usleep(20000);
+        }
+
+        for(i=160; i>8; i-=2)
+        {
+            servoSet(servo_front, i);
+            servoSet(servo_back, i);           
+            servoSet(servo_right, i);           
+            servoSet(servo_left, i); 
+            usleep(20000);
+        }      
+        
+        
+        // moving wings
+        printf("Flying...\n");  
+        servoSet(servo_front, 8);
+        servoSet(servo_back, 8);
+        servoSet(servo_right, 160);
+        servoSet(servo_left, 160);
+
+        for(rep=0; rep<3; rep++)
+        {
+            for(i=160; i>80; i-=1)
+            {
+                servoSet(servo_right, i);           
+                servoSet(servo_left, i); 
+                usleep(5000);
+            }
+
+            for(i=80; i<160; i+=1)
+            {
+                servoSet(servo_right, i);           
+                servoSet(servo_left, i);                
+                usleep(5000);
+            }
+        }
+        
+
+        // walking front
+        printf("Walking forward...\n");  
+        servoSet(servo_back, 140);
+        servoSet(servo_right, 160);
+        servoSet(servo_left, 160);
+
+        for(rep=0; rep<10; rep++)
+        {
+            for(i=80; i>8; i-=2)
+            {
+                servoSet(servo_front, i);
+                usleep(20000);
+            }
+        }
+
+        servoSet(servo_front, 8);
+        servoSet(servo_back, 8);           
+        servoSet(servo_right, 8);           
+        servoSet(servo_left, 8);           
         sleep(1);
-        up_ledoff(1);
-        sleep(1);
-        up_ledon(2);
-        sleep(1);
-        up_ledoff(2);
-        sleep(1);
-        up_ledon(3);
-        sleep(1);
-        up_ledoff(3);
-        sleep(1);
-        up_ledon(4);
-        sleep(1);
-        up_ledoff(4);
-        sleep(1);
-    }
+        printf("-- done! --\n"); 
+
+    //} // end main loop
+
   return 0;
 }
 

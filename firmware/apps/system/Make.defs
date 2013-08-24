@@ -82,7 +82,7 @@ ifeq ($(CONFIG_SYSTEM_ZMODEM),y)
 CONFIGURED_APPS += system/zmodem
 endif
 
-ifeq ($(CONFIG_SYSTEM_MYTEST),y)
-CONFIGURED_APPS += system/mytest
+ifeq ($(CONFIG_SYSTEM_MYCUB),y)
+CONFIGURED_APPS += system/myCub
 endif
 

@@ -35,13 +35,13 @@
 
 -include $(TOPDIR)/Make.defs
 
-CFLAGS		+= -I$(TOPDIR)/sched
+CFLAGS		+= -I$(TOPDIR)/sched -Dgcc
 
 ASRCS		= 
 AOBJS		= $(ASRCS:.S=$(OBJEXT))
 
 ## 3dparty board driver ##
-CFLAGS		+= -I./board_driver
+CFLAGS		+= -I../include
 CSRCS        = board_driver/adc.c
 CSRCS       += board_driver/can.c
 CSRCS       += board_driver/comp.c
@@ -73,7 +73,7 @@ CSRCS       += board_driver/usb.c
 CSRCS       += board_driver/watchdog.c
 
 ## Nuttx relevent board driver ## 
-CSRCS		+= lm4f_boot.c lm4f_ssi.c
+CSRCS		+= lm4f_boot.c lm4f_ssi.c servo.c
 
 ifeq ($(CONFIG_ARCH_LEDS),y)
 CSRCS		+= lm4f_autoleds.c
