@@ -31,3 +31,8 @@ config DEBUG_QENCODER
 	bool "Enable Qencoder Debug"
 	default n
 	depends on QENCODER
+
+config RANGE
+	bool "SRF0-based range finder"
+	default n
+

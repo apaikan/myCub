@@ -69,6 +69,8 @@
 #define _AUDIOIOCBASE   (0x1000) /* Audio ioctl commands */
 #define _SLCDIOCBASE    (0x1100) /* Segment LCD ioctl commands */
 #define _WLIOCBASE      (0x1100) /* Wireless modules ioctl commands */
+#define _SERVOIOCBASE   (0x1300) /* SERVO ioctl commands */
+#define _RANGEIOCBASE   (0x1400) /* SERVO ioctl commands */
 
 /* Macros used to manage ioctl commands */
 
@@ -259,6 +261,18 @@
 
 #define _WLIOCVALID(c)     (_IOC_TYPE(c)==_WLIOCBASE)
 #define _WLIOC(nr)         _IOC(_WLIOCBASE,nr)
+
+/* NuttX SERVO ioctl definitions (see nuttx/servo.h) ***************************/
+
+#define _SERVOIOCVALID(c)   (_IOC_TYPE(c)==_SERVOIOCBASE)
+#define _SERVOIOC(nr)       _IOC(_SERVOIOCBASE,nr)
+
+/* NuttX RANGE ioctl definitions (see nuttx/servo.h) ***************************/
+
+#define _RANGEIOCVALID(c)   (_IOC_TYPE(c)==_RANGEIOCBASE)
+#define _RANGEIOC(nr)       _IOC(_RANGEIOCBASE,nr)
+
+
 
 /****************************************************************************
  * Public Type Definitions

@@ -79,6 +79,10 @@ ifeq ($(CONFIG_CAN),y)
   CSRCS += can.c
 endif
 
+ifeq ($(CONFIG_SERVO),y)
+  CSRCS += servo.c
+endif
+
 ifeq ($(CONFIG_PWM),y)
   CSRCS += pwm.c
 endif

@@ -80,6 +80,21 @@ config CAN_LOOPBACK
 
 endif
 
+menuconfig SERVO
+	bool "Servo Driver Support"
+	default n
+	---help---
+		This selection enables building of the "upper-half" Servo driver.
+		See include/nuttx/servo.h for further Servo driver information.
+
+#if SERVO
+#config SERVO_MAX_COUNT
+#	bool "Maximum number of servo support"
+#	default n
+#	---help---
+#		Maximum number of servo should be controlled by timer
+#endif
+
 menuconfig PWM
 	bool "PWM Driver Support"
 	default n

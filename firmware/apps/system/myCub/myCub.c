@@ -38,141 +38,241 @@
 /****************************************************************************
  * Included Files
  ****************************************************************************/
+#include <sys/types.h>
+#include <sys/ioctl.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <debug.h>
+#include <string.h>
 
-#include <nuttx/config.h>
-#include <nuttx/version.h>
-#include <arch/board/board.h>
-#include <arch/board/board.h>
-#include <arch/board/servo.h>
-#include <arch/board/inc/hw_types.h>
-#include <arch/board/inc/hw_memmap.h>
-#include <arch/board/driverlib/pin_map.h>
-#include <arch/board/driverlib/gpio.h>
-#include <arch/board/driverlib/sysctl.h>
-//#include <arch/board/driverlib/rom.h>
-//#include <arch/board/driverlib/rom_map.h>
 
+#include <nuttx/clock.h>
+#include <nuttx/arch.h>
+#include <nuttx/servo.h>
+#include <nuttx/sensors/range_srf04.h>
+
+//#include "lm_gpio.h"
+
+/* This identifies the GPIO port
+ * .... .... .... .... .... .... .PPP P...
+ */
+
+#define GPIO_PORT_SHIFT               3                          /* Bit 3-6:  Port number */
+#define GPIO_PORT_MASK                (15 << GPIO_PORT_SHIFT)
+#  define GPIO_PORTA                  (0 << GPIO_PORT_SHIFT)     /*   GPIOA */
+#  define GPIO_PORTB                  (1 << GPIO_PORT_SHIFT)     /*   GPIOB */
+#  define GPIO_PORTC                  (2 << GPIO_PORT_SHIFT)     /*   GPIOC */
+#  define GPIO_PORTD                  (3 << GPIO_PORT_SHIFT)     /*   GPIOD */
+#  define GPIO_PORTE                  (4 << GPIO_PORT_SHIFT)     /*   GPIOE */
+#  define GPIO_PORTF                  (5 << GPIO_PORT_SHIFT)     /*   GPIOF */
+#  define GPIO_PORTG                  (6 << GPIO_PORT_SHIFT)     /*   GPIOG */
+#  define GPIO_PORTH                  (7 << GPIO_PORT_SHIFT)     /*   GPIOH */
+#  define GPIO_PORTJ                  (8 << GPIO_PORT_SHIFT)     /*   GPIOJ */
+
+/* This identifies the pin number in the port:
+ * .... .... .... .... .... .... .... .BBB
+ */
+
+#define GPIO_PIN_SHIFT                 0                           /* Bits 0-2: GPIO pin: 0-7 */
+#define GPIO_PIN_MASK                 (7 << GPIO_PIN_SHIFT)
+#  define GPIO_PIN_0                  (0 << GPIO_PIN_SHIFT)
+#  define GPIO_PIN_1                  (1 << GPIO_PIN_SHIFT)
+#  define GPIO_PIN_2                  (2 << GPIO_PIN_SHIFT)
+#  define GPIO_PIN_3                  (3 << GPIO_PIN_SHIFT)
+#  define GPIO_PIN_4                  (4 << GPIO_PIN_SHIFT)
+#  define GPIO_PIN_5                  (5 << GPIO_PIN_SHIFT)
+#  define GPIO_PIN_6                  (6 << GPIO_PIN_SHIFT)
+#  define GPIO_PIN_7                  (7 << GPIO_PIN_SHIFT)
+
+
+int servo_devinit(void);
+int range_devinit(void);
+
+
+unsigned int getRange(int id, const char* str)
+{
+    char dummy[32];
+    sprintf(dummy, "(%d ", id);
+    char* ptr = strstr(str, dummy);
+    if(!ptr)
+        return 0;
+    ptr += strlen(dummy)-1; 
+    char* ptr2 = strchr(ptr, ')');
+    if(!ptr2)
+        return 0;
+    int i = 0;
+    while(ptr++ != ptr2)
+        dummy[i++] = *ptr;
+    dummy[i-1] = NULL;        
+    return atoi(dummy);
+}
 
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
 
-servo_t *servo_front;
-servo_t *servo_back;
-servo_t *servo_right;
-servo_t *servo_left;
-
-void setupServos(void) {
-
-    // PD0, PD1, PD2, PD3
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
-    GPIOPinTypeGPIOOutput(GPIO_PORTD_BASE, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
-
-    // Zero out configs
-    servoInit();
-
-    // Bind pads to servo configs
-    servo_front = servoAttach(GPIO_PORTD_BASE, GPIO_PIN_0);
-    servo_back = servoAttach(GPIO_PORTD_BASE, GPIO_PIN_1);
-    servo_right = servoAttach(GPIO_PORTD_BASE, GPIO_PIN_2);
-    servo_left = servoAttach(GPIO_PORTD_BASE, GPIO_PIN_3);
-
-    // Start the servo timers
-    servoStart();
-}
-
-
 int myCub_main(int argc, char *argv[])
 {
-    printf("myCub Demo\n");  
+    int fd_range, fd_servo;
+    int ret, i;
+    struct servo_info_s srv_front;
+    struct servo_info_s srv_back;
+    struct servo_info_s srv_right;
+    struct servo_info_s srv_left;
 
-    // Setup servos and start the timer for them
-    setupServos();
+    //struct range_info_s range_front;
+    struct range_info_s range_right;
 
-    // Continually check which button is pressed and move the servo position that direction
-   // while(1) {
 
-        int i; 
-        int rep;
+    printf("-- myCub Demo --\n");  
 
-        servoSet(servo_front, 8);
-        servoSet(servo_back, 8);           
-        servoSet(servo_right, 8);           
-        servoSet(servo_left, 8);           
-                
-        // all streching
-        printf("Streching...\n");  
-        for(i=8; i<160; i+=2)       
+    // initializing range finder sensors
+    ret = range_devinit();
+    if (ret != OK)
+    {
+        printf("myCub_main: range_devinit failed: %d\n", ret);
+        return ERROR;
+    }
+
+
+    // Open the PWM device for reading
+    fd_range = open("/dev/range0", O_RDONLY);
+    if (fd_range < 0)
+    {
+        printf("myCub_main: range finder open failed: %d\n", errno);
+        return ERROR;
+    }
+
+    range_right.id = 0;
+    range_right.trig_port = GPIO_PORTE;
+    range_right.trig_pin = GPIO_PIN_2; 
+    range_right.echo_port = GPIO_PORTE;
+    range_right.echo_pin = GPIO_PIN_1; 
+    ioctl(fd_range, RANGEIOC_ATTACHE, (unsigned long)((uintptr_t)&range_right));
+
+
+    ret = servo_devinit();
+    if (ret != OK)
+    {
+        printf("myCub_main: servo_devinit failed: %d\n", ret);
+        return ERROR;
+    }
+
+    // Open the PWM device for reading
+    fd_servo = open("/dev/servo0", O_RDONLY);
+    if (fd_servo < 0)
+    {
+        printf("myCub_main: open failed: %d\n", errno);
+        return ERROR;
+    }
+ 
+    // Configure servo pins
+    srv_front.id   = 0;
+    srv_front.port = GPIO_PORTD;
+    srv_front.pin = GPIO_PIN_0;
+
+    srv_back.id   = 1;
+    srv_back.port = GPIO_PORTD;
+    srv_back.pin = GPIO_PIN_1;
+
+    srv_right.id   = 2;
+    srv_right.port = GPIO_PORTD;
+    srv_right.pin = GPIO_PIN_2;
+
+    srv_left.id   = 3;
+    srv_left.port = GPIO_PORTD;
+    srv_left.pin = GPIO_PIN_3;
+
+    ioctl(fd_servo, SERVOIOC_SETPINCONFIG, (unsigned long)((uintptr_t)&srv_front));
+    ioctl(fd_servo, SERVOIOC_SETPINCONFIG, (unsigned long)((uintptr_t)&srv_back));
+    ioctl(fd_servo, SERVOIOC_SETPINCONFIG, (unsigned long)((uintptr_t)&srv_right));
+    ioctl(fd_servo, SERVOIOC_SETPINCONFIG, (unsigned long)((uintptr_t)&srv_left));
+
+
+    srv_right.pos = 8;
+    srv_left.pos = 8;
+    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_right));
+    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_left));
+ 
+    while(1)
+    {
+        char data[128];
+        ret = read(fd_range, data, sizeof(data));
+        if(ret > 0)
         {
-            servoSet(servo_front, i);
-            servoSet(servo_back, i);           
-            servoSet(servo_right, i);           
-            servoSet(servo_left, i); 
-            usleep(20000);
-        }
-
-        for(i=160; i>8; i-=2)
-        {
-            servoSet(servo_front, i);
-            servoSet(servo_back, i);           
-            servoSet(servo_right, i);           
-            servoSet(servo_left, i); 
-            usleep(20000);
-        }      
-        
-        
-        // moving wings
-        printf("Flying...\n");  
-        servoSet(servo_front, 8);
-        servoSet(servo_back, 8);
-        servoSet(servo_right, 160);
-        servoSet(servo_left, 160);
-
-        for(rep=0; rep<3; rep++)
-        {
-            for(i=160; i>80; i-=1)
+            unsigned int dist = getRange(0, data);
+            if(dist > 0 && dist < 300)
             {
-                servoSet(servo_right, i);           
-                servoSet(servo_left, i); 
-                usleep(5000);
-            }
-
-            for(i=80; i<160; i+=1)
-            {
-                servoSet(servo_right, i);           
-                servoSet(servo_left, i);                
-                usleep(5000);
+                uint32_t value = (uint32_t) (8.0 + ((180.0 - 8.0) / (300.0 - 5.0)) * (300-dist - 5.0));
+                //printf("dist:%d, value:%d\n", dist, value);
+                srv_front.pos = value;
+                srv_back.pos = value;
+                ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_front));
+                ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_back));     
             }
         }
-        
+        usleep(1000);
+    }
 
-        // walking front
-        printf("Walking forward...\n");  
-        servoSet(servo_back, 140);
-        servoSet(servo_right, 160);
-        servoSet(servo_left, 160);
 
-        for(rep=0; rep<10; rep++)
-        {
-            for(i=80; i>8; i-=2)
-            {
-                servoSet(servo_front, i);
-                usleep(20000);
-            }
-        }
+   /*    
+    srv_front.pos = 8;
+    srv_back.pos = 8;
+    srv_right.pos = 8;
+    srv_left.pos = 8;
+    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_front));
+    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_back));
+    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_right));
+    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_left));
+           
+    // all streching
+    printf("Streching...\n");  
+    for(i=8; i<160; i+=2)       
+    {
+        srv_front.pos = i;
+        srv_back.pos = i;
+        srv_right.pos = i;
+        srv_left.pos = i;
+        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_front));
+        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_back));
+        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_right));
+        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_left)); 
+        usleep(20000);
+    }
 
-        servoSet(servo_front, 8);
-        servoSet(servo_back, 8);           
-        servoSet(servo_right, 8);           
-        servoSet(servo_left, 8);           
-        sleep(1);
-        printf("-- done! --\n"); 
+    for(i=160; i>8; i-=2)
+    {
+        srv_front.pos = i;
+        srv_back.pos = i;
+        srv_right.pos = i;
+        srv_left.pos = i;
+        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_front));
+        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_back));
+        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_right));
+        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_left)); 
+        usleep(20000);
+    }      
 
-    //} // end main loop
+    srv_front.pos = 40;
+    srv_back.pos = 40;
+    srv_right.pos = 40;
+    srv_left.pos = 40;
+    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_front));
+    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_back));
+    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_right));
+    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_left));
 
-  return 0;
+    sleep(2);
+*/
+
+    printf("done!\n");
+    close(fd_servo);
+    close(fd_range);
+
+    return 0;
 }
 

@@ -48,10 +48,15 @@ endif
 endif
 
 # Quadrature encoder upper half
-
 ifeq ($(CONFIG_QENCODER),y)
   CSRCS += qencoder.c
 endif
+
+# SRF04 range finder
+ifeq ($(CONFIG_RANGE),y)
+  CSRCS += range_srf04.c
+endif
+
 
 # Include sensor driver build support
 
