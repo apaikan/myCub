@@ -54,26 +54,95 @@ int myCub_main(int argc, char *argv[])
 {
     printf("-- myCub Demo --\n");  
 
-    myCubInterface mycub;
+    MyCubInterface mycub;
     mycub.init();
 
-
-    for(double i=4.0; i>=0.0; i-= 1.0)
-    {
-        printf("speed: %d\n", (int)i);
-        mycub.gotoPoseSync(FRONT_JOINT, 160, i);
-        mycub.gotoPoseSync(FRONT_JOINT, 8, i);
-        sleep(1);
-    }
-
+    
+   
+    /*
     sleep(1);
-
-    mycub.gotoPoseSync(FRONT_JOINT, 100, 3.0);
+    mycub.gotoPoseSync(FRONT_JOINT, 160, 2.0);
     mycub.gotoPoseSync(BACK_JOINT, 100, 3.0);
     mycub.gotoPoseSync(RIGHT_JOINT, 100, 3.0);
     mycub.gotoPoseSync(LEFT_JOINT, 100, 3.0);
-
+    printf("go pose done\n");
+    
     sleep(1);
+    */
+    /*
+    mycub.setPose(FRONT_JOINT, 8);
+    mycub.setPose(BACK_JOINT, 8);
+    mycub.setPose(RIGHT_JOINT, 8);
+    mycub.setPose(LEFT_JOINT, 8);
+    sleep(3);
+    */
+  
+    JointContext ctx = mycub.getContext();
+    mycub.gotoPose(FRONT_JOINT, 160, 0.5);
+    mycub.gotoPose(BACK_JOINT, 100, 0.5);
+    mycub.gotoPose(LEFT_JOINT, 120, 0.5);
+    mycub.gotoPose(RIGHT_JOINT, 120, 0.5);
+    while(!mycub.checkMotionDone()) sleep(1);
+    
+    for(int i=0; i<10; i++)
+    {
+        mycub.gotoPoseSync(BACK_JOINT, 100, 0.2);
+        mycub.gotoPoseSync(FRONT_JOINT, 8, 1.0);
+        
+        mycub.gotoPose(LEFT_JOINT, 80, 0.2);
+        mycub.gotoPose(RIGHT_JOINT, 80, 0.2);        
+        while(!mycub.checkMotionDone()) sleep(1);
+
+        mycub.gotoPoseSync(FRONT_JOINT, 160, 1.0);
+        
+        mycub.gotoPoseSync(BACK_JOINT, 70, 0.2);      
+        mycub.gotoPose(LEFT_JOINT, 120, 0.2);
+        mycub.gotoPose(RIGHT_JOINT, 120, 0.2);        
+        while(!mycub.checkMotionDone()) sleep(1);
+    }
+
+    /*
+    mycub.gotoPose(FRONT_JOINT, 130, 1.0);
+    while(!mycub.checkMotionDone()) sleep(1);
+
+    mycub.setContext(ctx);
+    mycub.gotoPose(FRONT_JOINT, 130, 0.5);
+    mycub.gotoPose(BACK_JOINT, 130, 0.5);
+    while(!mycub.checkMotionDone()) sleep(1);
+
+    mycub.setContext(ctx);
+    mycub.gotoPose(FRONT_JOINT, 130, 0.3);
+    mycub.gotoPose(BACK_JOINT, 130, 0.3);
+    mycub.gotoPose(RIGHT_JOINT, 130, 0.3);
+    while(!mycub.checkMotionDone()) sleep(1);
+
+    mycub.setContext(ctx);
+    mycub.gotoPose(FRONT_JOINT, 130, 0.0);
+    mycub.gotoPose(BACK_JOINT, 130, 0.0);
+    mycub.gotoPose(RIGHT_JOINT, 130, 0.0);
+    mycub.gotoPose(LEFT_JOINT, 130, 0.0);
+    while(!mycub.checkMotionDone()) sleep(1);
+    */
+
+    /*
+    for(int i=0; i<3; i++)
+    {
+        printf("\n up \n");
+        mycub.gotoPose(FRONT_JOINT, 130, 1.5);
+        mycub.gotoPose(BACK_JOINT, 130, 1.5);
+        mycub.gotoPose(RIGHT_JOINT, 130, 1.5);
+        mycub.gotoPose(LEFT_JOINT, 130, 1.5);
+        while(!mycub.checkMotionDone())
+            sleep(1);
+        printf("\n down \n");
+        mycub.gotoPose(FRONT_JOINT, 8, 1.5);
+        mycub.gotoPose(BACK_JOINT, 8, 1.5);
+        mycub.gotoPose(RIGHT_JOINT, 8, 1.5);
+        mycub.gotoPose(LEFT_JOINT, 8, 1.5);
+        while(!mycub.checkMotionDone())
+            sleep(1);
+    }    
+    */
 
     mycub.fini();
 
