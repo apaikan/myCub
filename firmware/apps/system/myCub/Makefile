@@ -51,16 +51,19 @@ endif
 
 APPNAME		= myCub
 PRIORITY	= SCHED_PRIORITY_DEFAULT
-STACKSIZE	= 640
+STACKSIZE	= 2048
 
 ASRCS		=
-CSRCS		= myCub.c
+CSRCS		= 
+CXXSRCS		= myCub.cpp mycub_interface.cpp
 
 AOBJS		= $(ASRCS:.S=$(OBJEXT))
 COBJS		= $(CSRCS:.c=$(OBJEXT))
+CXXOBJS		= $(CXXSRCS:.cpp=$(OBJEXT))
 
-SRCS		= $(ASRCS) $(CSRCS)
-OBJS		= $(AOBJS) $(COBJS)
+SRCS		= $(ASRCS) $(CSRCS) $(CXXSRCS)
+OBJS		= $(AOBJS) $(COBJS) $(CXXOBJS)
+
 
 ifeq ($(CONFIG_WINDOWS_NATIVE),y)
   BIN		= ..\..\libapps$(LIBEXT)
@@ -78,8 +81,20 @@ ROOTDEPPATH	= --dep-path .
 
 VPATH		= 
 
-all:	.built
-.PHONY: context depend clean distclean
+all: .built
+.PHONY:	clean depend distclean chkcxx
+
+chkcxx:
+ifneq ($(CONFIG_HAVE_CXX),y)
+	@echo ""
+	@echo "In order to use this example, you toolchain must support must"
+	@echo ""
+	@echo "  (1) Explicitly select CONFIG_HAVE_CXX to build in C++ support"
+	@echo "  (2) Define CXX, CXXFLAGS, and COMPILEXX in the Make.defs file"
+	@echo "      of the configuration that you are using."
+	@echo ""
+	@exit 1
+endif
 
 $(AOBJS): %$(OBJEXT): %.S
 	$(call ASSEMBLE, $<, $@)
@@ -87,11 +102,12 @@ $(AOBJS): %$(OBJEXT): %.S
 $(COBJS): %$(OBJEXT): %.c
 	$(call COMPILE, $<, $@)
 
-.built: $(OBJS)
-	$(call ARCHIVE, $(BIN), $(OBJS))
-	$(Q) touch .built
+$(CXXOBJS): %$(OBJEXT): %.cpp
+	$(call COMPILEXX, $<, $@)
 
-# Register application
+.built: chkcxx $(OBJS)
+	$(call ARCHIVE, $(BIN), $(OBJS))
+	@touch .built
 
 ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
 $(BUILTIN_REGISTRY)$(DELIM)$(APPNAME)_main.bdat: $(DEPCONFIG) Makefile
@@ -102,11 +118,9 @@ else
 context:
 endif
 
-# Create dependencies
-
 .depend: Makefile $(SRCS)
-	$(Q) $(MKDEP) $(ROOTDEPPATH) "$(CC)" -- $(CFLAGS) -- $(SRCS) >Make.dep
-	$(Q) touch $@
+	@$(MKDEP) $(ROOTDEPPATH) "$(CC)" -- $(CFLAGS) -- $(SRCS) >Make.dep
+	@touch $@
 
 depend: .depend
 
