@@ -63,7 +63,7 @@
 #include "lm_gpio.h"
 
 
-#define RANGE_MAX_COUNT     6
+#define RANGE_MAX_COUNT     4
 
 
 /****************************************************************************
@@ -271,7 +271,7 @@ static int range_read(FAR struct range_lowerhalf_s *dev,
             SysCtlDelay(SysCtlClockGet() / 5000000 / 3); 
             //usleep(2);
             lm_gpiowrite( GPIO_FUNC_OUTPUT | GPIO_VALUE_ONE | range->trig_port | range->trig_pin, true);
-            SysCtlDelay(SysCtlClockGet() / 100000 / 3); 
+            SysCtlDelay(SysCtlClockGet() / 200000 / 3); 
             //usleep(10);
             lm_gpiowrite( GPIO_FUNC_OUTPUT | GPIO_VALUE_ONE | range->trig_port | range->trig_pin, false);
             unsigned long width = pulse_in(range->echo_port, range->echo_pin); 

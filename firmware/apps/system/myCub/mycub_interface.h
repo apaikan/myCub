@@ -95,10 +95,14 @@
  * Joint index mapping
  */
 
-#define FRONT_JOINT    0
-#define RIGHT_JOINT    1
-#define BACK_JOINT     2
-#define LEFT_JOINT     3
+#define FRONT_JOINT     0
+#define RIGHT_JOINT     1
+#define BACK_JOINT      2
+#define LEFT_JOINT      3
+
+
+#define FRONT_RANGE     0
+#define RIGHT_RANGE     1
 
 
 typedef struct __JointContext {

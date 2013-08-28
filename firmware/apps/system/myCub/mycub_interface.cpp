@@ -544,7 +544,7 @@ int MyCubInterface::getDistance(const int id)
     char data[128];
     int ret = read(fd_range, data, sizeof(data));
     if(ret > 0)   
-       return getRange(0, data);
+       return getRange(id, data);
     
     return -1;
 }

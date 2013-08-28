@@ -28,201 +28,122 @@
  *
  ****************************************************************************/
 
-/* Collects and reports system information.
- *
- * TODO: Gather information also from low-level devices, kernel/sched, clock,
- *   and further reporting as: sysinfo rtc, or sysinfo sched, ... with
- *   sysinfo help to report all of the options.
- */
 
 /****************************************************************************
  * Included Files
  ****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
+
 #include <mycub_interface.h>
 
     
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
+#define USEC_PER_MSEC 1000
+#define MSEC_PER_SEC  1000
+#define USEC_PER_SEC  (USEC_PER_MSEC * MSEC_PER_SEC)
+#define SHORT_DELAY   (USEC_PER_SEC / 3)
+
+
+#define FRONT_ARM   RIGHT_JOINT
+#define BACK_ARM    LEFT_JOINT
+#define RIGHT_ARM   FRONT_JOINT
+#define LEFT_ARM    BACK_JOINT
 
 extern "C"
 {
 
+bool should_stop;
+
+void siguser_action(int signo, siginfo_t *siginfo, void *arg)
+{
+    if(signo == SIGUSR1)
+    {
+        printf("SIGUSR1 received\n");
+        should_stop = true;
+    }
+}
+
+
 int myCub_main(int argc, char *argv[])
 {
+    struct sigaction act;
+    struct sigaction oact;
+    int status;
+
+    memset(&act, 0, sizeof(struct sigaction));
+    act.sa_sigaction = siguser_action;
+    act.sa_flags     = SA_SIGINFO;
+    (void)sigemptyset(&act.sa_mask);
+    status = sigaction(SIGUSR1, &act, &oact);
+    if(status != 0)
+    {
+        fprintf(stderr, "Failed to install SIGUSR1 handler, errno=%d\n", errno);
+        exit(2);
+    }
+
     printf("-- myCub Demo --\n");  
 
     MyCubInterface mycub;
     mycub.init();
 
-    
-   
-    /*
-    sleep(1);
-    mycub.gotoPoseSync(FRONT_JOINT, 160, 2.0);
-    mycub.gotoPoseSync(BACK_JOINT, 100, 3.0);
-    mycub.gotoPoseSync(RIGHT_JOINT, 100, 3.0);
-    mycub.gotoPoseSync(LEFT_JOINT, 100, 3.0);
-    printf("go pose done\n");
-    
-    sleep(1);
-    */
-    /*
-    mycub.setPose(FRONT_JOINT, 8);
-    mycub.setPose(BACK_JOINT, 8);
-    mycub.setPose(RIGHT_JOINT, 8);
-    mycub.setPose(LEFT_JOINT, 8);
-    sleep(3);
-    */
-  
     JointContext ctx = mycub.getContext();
-    mycub.gotoPose(FRONT_JOINT, 160, 0.5);
-    mycub.gotoPose(BACK_JOINT, 100, 0.5);
-    mycub.gotoPose(LEFT_JOINT, 120, 0.5);
-    mycub.gotoPose(RIGHT_JOINT, 120, 0.5);
+    mycub.gotoPose(FRONT_ARM, 160, 0.5);
+    mycub.gotoPose(BACK_ARM, 100, 0.5);
+    mycub.gotoPose(LEFT_ARM, 120, 0.5);
+    mycub.gotoPose(RIGHT_ARM, 120, 0.5);
     while(!mycub.checkMotionDone()) sleep(1);
     
-    for(int i=0; i<10; i++)
+    should_stop = false;
+    while(!should_stop)
     {
-        mycub.gotoPoseSync(BACK_JOINT, 100, 0.2);
-        mycub.gotoPoseSync(FRONT_JOINT, 8, 1.0);
-        
-        mycub.gotoPose(LEFT_JOINT, 80, 0.2);
-        mycub.gotoPose(RIGHT_JOINT, 80, 0.2);        
-        while(!mycub.checkMotionDone()) sleep(1);
+        int dist = mycub.getDistance(RIGHT_RANGE);
+        if(dist == 0)
+            printf("No obstacle in the range\n");
+        else
+            printf("Obstacle at distance %d\n", dist);
 
-        mycub.gotoPoseSync(FRONT_JOINT, 160, 1.0);
+        /*
+        int retry = 0;
+        while(((dist = mycub.getDistance(RIGHT_RANGE)) <= 0) && (retry <10)) {        
+            usleep(500000);
+            retry++;
+        }           
+        if(dist<=0)
+        {
+            printf("Error in reading range finder %d \n", RIGHT_RANGE);
+            //should_stop = true;
+            //break;
+        }
+        */
         
-        mycub.gotoPoseSync(BACK_JOINT, 70, 0.2);      
-        mycub.gotoPose(LEFT_JOINT, 120, 0.2);
-        mycub.gotoPose(RIGHT_JOINT, 120, 0.2);        
-        while(!mycub.checkMotionDone()) sleep(1);
+        if((dist == 0) || (dist > 150))
+        {
+            mycub.gotoPoseSync(BACK_ARM, 100, 0.2);
+            mycub.gotoPoseSync(FRONT_ARM, 8, 1.0);
+            
+            mycub.gotoPose(LEFT_ARM, 80, 0.2);
+            mycub.gotoPose(RIGHT_ARM, 80, 0.2);        
+            while(!mycub.checkMotionDone()) sleep(1);
+
+            mycub.gotoPoseSync(FRONT_ARM, 160, 1.0);
+            
+            mycub.gotoPoseSync(BACK_ARM, 70, 0.2);      
+            mycub.gotoPose(LEFT_ARM, 120, 0.2);
+            mycub.gotoPose(RIGHT_ARM, 120, 0.2);        
+            while(!mycub.checkMotionDone()) sleep(1);
+        }
+        else
+            sleep(1);   //wait a bit
     }
-
-    /*
-    mycub.gotoPose(FRONT_JOINT, 130, 1.0);
-    while(!mycub.checkMotionDone()) sleep(1);
-
-    mycub.setContext(ctx);
-    mycub.gotoPose(FRONT_JOINT, 130, 0.5);
-    mycub.gotoPose(BACK_JOINT, 130, 0.5);
-    while(!mycub.checkMotionDone()) sleep(1);
-
-    mycub.setContext(ctx);
-    mycub.gotoPose(FRONT_JOINT, 130, 0.3);
-    mycub.gotoPose(BACK_JOINT, 130, 0.3);
-    mycub.gotoPose(RIGHT_JOINT, 130, 0.3);
-    while(!mycub.checkMotionDone()) sleep(1);
-
-    mycub.setContext(ctx);
-    mycub.gotoPose(FRONT_JOINT, 130, 0.0);
-    mycub.gotoPose(BACK_JOINT, 130, 0.0);
-    mycub.gotoPose(RIGHT_JOINT, 130, 0.0);
-    mycub.gotoPose(LEFT_JOINT, 130, 0.0);
-    while(!mycub.checkMotionDone()) sleep(1);
-    */
-
-    /*
-    for(int i=0; i<3; i++)
-    {
-        printf("\n up \n");
-        mycub.gotoPose(FRONT_JOINT, 130, 1.5);
-        mycub.gotoPose(BACK_JOINT, 130, 1.5);
-        mycub.gotoPose(RIGHT_JOINT, 130, 1.5);
-        mycub.gotoPose(LEFT_JOINT, 130, 1.5);
-        while(!mycub.checkMotionDone())
-            sleep(1);
-        printf("\n down \n");
-        mycub.gotoPose(FRONT_JOINT, 8, 1.5);
-        mycub.gotoPose(BACK_JOINT, 8, 1.5);
-        mycub.gotoPose(RIGHT_JOINT, 8, 1.5);
-        mycub.gotoPose(LEFT_JOINT, 8, 1.5);
-        while(!mycub.checkMotionDone())
-            sleep(1);
-    }    
-    */
 
     mycub.fini();
-
-    /*
-    srv_right.pos = 8;
-    srv_left.pos = 8;
-    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_right));
-    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_left));
- 
-    while(1)
-    {
-        char data[128];
-        ret = read(fd_range, data, sizeof(data));
-        if(ret > 0)
-        {
-            unsigned int dist = getRange(0, data);
-            if(dist > 0 && dist < 300)
-            {
-                uint32_t value = (uint32_t) (8.0 + ((180.0 - 8.0) / (300.0 - 5.0)) * (300-dist - 5.0));
-                //printf("dist:%d, value:%d\n", dist, value);
-                srv_front.pos = value;
-                srv_back.pos = value;
-                ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_front));
-                ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_back));     
-            }
-        }
-        usleep(1000);
-    }
-    */
-
-   /*    
-    srv_front.pos = 8;
-    srv_back.pos = 8;
-    srv_right.pos = 8;
-    srv_left.pos = 8;
-    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_front));
-    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_back));
-    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_right));
-    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_left));
-           
-    // all streching
-    printf("Streching...\n");  
-    for(i=8; i<160; i+=2)       
-    {
-        srv_front.pos = i;
-        srv_back.pos = i;
-        srv_right.pos = i;
-        srv_left.pos = i;
-        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_front));
-        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_back));
-        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_right));
-        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_left)); 
-        usleep(20000);
-    }
-
-    for(i=160; i>8; i-=2)
-    {
-        srv_front.pos = i;
-        srv_back.pos = i;
-        srv_right.pos = i;
-        srv_left.pos = i;
-        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_front));
-        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_back));
-        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_right));
-        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_left)); 
-        usleep(20000);
-    }      
-
-    srv_front.pos = 40;
-    srv_back.pos = 40;
-    srv_right.pos = 40;
-    srv_left.pos = 40;
-    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_front));
-    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_back));
-    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_right));
-    ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&srv_left));
-
-    sleep(2);
-*/
-
     printf("done!\n");
 
     return 0;

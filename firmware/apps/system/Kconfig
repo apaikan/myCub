@@ -59,4 +59,8 @@ menu "Squirrel interpreter"
 source "$APPSDIR/system/squirrel/Kconfig"
 endmenu
 
+menu "Tiny serial terminal"
+source "$APPSDIR/system/tinyserial/Kconfig"
+endmenu
+
 

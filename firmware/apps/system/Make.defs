@@ -90,3 +90,7 @@ ifeq ($(CONFIG_SYSTEM_SQUIRREL),y)
 CONFIGURED_APPS += system/squirrel
 endif
 
+ifeq ($(CONFIG_SYSTEM_TINYSERIAL),y)
+CONFIGURED_APPS += system/tinyserial
+endif
+

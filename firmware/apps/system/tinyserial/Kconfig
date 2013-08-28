@@ -1,0 +1,14 @@
+#
+# For a description of the syntax of this configuration file,
+# see misc/tools/kconfig-language.txt.
+#
+
+config SYSTEM_TINYSERIAL
+	bool "Tiny serial terminal"
+	default n
+	---help---
+		Build Tiny serial terminal emulator
+
+if SYSTEM_TINYSERIAL
+endif
+
