@@ -86,3 +86,7 @@ ifeq ($(CONFIG_SYSTEM_MYCUB),y)
 CONFIGURED_APPS += system/myCub
 endif
 
+ifeq ($(CONFIG_SYSTEM_SQUIRREL),y)
+CONFIGURED_APPS += system/squirrel
+endif
+

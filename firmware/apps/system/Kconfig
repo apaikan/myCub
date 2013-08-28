@@ -55,4 +55,8 @@ menu "myCub"
 source "$APPSDIR/system/myCub/Kconfig"
 endmenu
 
+menu "Squirrel interpreter"
+source "$APPSDIR/system/squirrel/Kconfig"
+endmenu
+
 
