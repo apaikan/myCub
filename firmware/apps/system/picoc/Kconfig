@@ -1,0 +1,14 @@
+#
+# For a description of the syntax of this configuration file,
+# see misc/tools/kconfig-language.txt.
+#
+
+config SYSTEM_PICOC
+	bool "picoc C interpreter"
+	default n
+	---help---
+		Build picoc C interpreter
+
+if SYSTEM_PICOC
+endif
+

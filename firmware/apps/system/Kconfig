@@ -63,4 +63,9 @@ menu "Tiny serial terminal"
 source "$APPSDIR/system/tinyserial/Kconfig"
 endmenu
 
+menu "picoc C interpreter"
+source "$APPSDIR/system/picoc/Kconfig"
+endmenu
+
+
 

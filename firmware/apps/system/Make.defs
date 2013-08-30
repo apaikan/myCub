@@ -94,3 +94,7 @@ ifeq ($(CONFIG_SYSTEM_TINYSERIAL),y)
 CONFIGURED_APPS += system/tinyserial
 endif
 
+ifeq ($(CONFIG_SYSTEM_PICOC),y)
+CONFIGURED_APPS += system/picoc
+endif
+
