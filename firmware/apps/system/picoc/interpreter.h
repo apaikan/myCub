@@ -454,7 +454,7 @@ void PlatformLibraryInit();
 /* include.c */
 void IncludeInit();
 void IncludeCleanup();
-void IncludeRegister(const char *IncludeName, void (*SetupFunction)(void), struct LibraryFunction *FuncList, const char *SetupCSource);
+void IncludeRegister(const char *IncludeName, void (*SetupFunction)(), struct LibraryFunction *FuncList, const char *SetupCSource);
 void IncludeFile(char *Filename);
 /* the following is defined in picoc.h:
  * void PicocIncludeAllSystemHeaders(); */
@@ -462,38 +462,38 @@ void IncludeFile(char *Filename);
 /* stdio.c */
 extern const char StdioDefs[];
 extern struct LibraryFunction StdioFunctions[];
-void StdioSetupFunc(void);
+void StdioSetupFunc();
 
 /* math.c */
 extern struct LibraryFunction MathFunctions[];
-void MathSetupFunc(void);
+void MathSetupFunc();
 
 /* string.c */
 extern struct LibraryFunction StringFunctions[];
-void StringSetupFunc(void);
+void StringSetupFunc();
 
 /* stdlib.c */
 extern struct LibraryFunction StdlibFunctions[];
-void StdlibSetupFunc(void);
+void StdlibSetupFunc();
 
 /* time.c */
 extern const char StdTimeDefs[];
 extern struct LibraryFunction StdTimeFunctions[];
-void StdTimeSetupFunc(void);
+void StdTimeSetupFunc();
 
 /* errno.c */
-void StdErrnoSetupFunc(void);
+void StdErrnoSetupFunc();
 
 /* ctype.c */
 extern struct LibraryFunction StdCtypeFunctions[];
 
 /* stdbool.c */
 extern const char StdboolDefs[];
-void StdboolSetupFunc(void);
+void StdboolSetupFunc();
 
 /* unistd.c */
 extern const char UnistdDefs[];
 extern struct LibraryFunction UnistdFunctions[];
-void UnistdSetupFunc(void);
+void UnistdSetupFunc();
 
 #endif /* INTERPRETER_H */

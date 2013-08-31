@@ -128,13 +128,13 @@ int myCub_main(int argc, char *argv[])
             mycub.gotoPoseSync(BACK_ARM, 100, 0.2);
             mycub.gotoPoseSync(FRONT_ARM, 8, 1.0);
             
-            mycub.gotoPose(LEFT_ARM, 80, 0.2);
-            mycub.gotoPose(RIGHT_ARM, 80, 0.2);        
+            mycub.gotoPose(LEFT_ARM, 70, 0.2);
+            mycub.gotoPose(RIGHT_ARM, 70, 0.2);        
             while(!mycub.checkMotionDone()) sleep(1);
 
             mycub.gotoPoseSync(FRONT_ARM, 160, 1.0);
             
-            mycub.gotoPoseSync(BACK_ARM, 70, 0.2);      
+            mycub.gotoPoseSync(BACK_ARM, 80, 0.2);
             mycub.gotoPose(LEFT_ARM, 120, 0.2);
             mycub.gotoPose(RIGHT_ARM, 120, 0.2);        
             while(!mycub.checkMotionDone()) sleep(1);

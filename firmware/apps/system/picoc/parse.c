@@ -854,7 +854,7 @@ void PicocParseInteractive()
     
     PlatformPrintf(INTERACTIVE_PROMPT_START);
     LexInitParser(&Parser, NULL, NULL, StrEmpty, TRUE);
-    PicocPlatformSetExitPoint();
+    //PicocPlatformSetExitPoint();
     LexInteractiveClear(&Parser);
 
     do

@@ -44,7 +44,7 @@ STACKSIZE	= 2048
 
 # Hello, World! Example
 
-CFLAGS		+= -pedantic -DUNIX_HOST -DNO_FP
+CFLAGS		+= -pedantic
 
 ASRCS		=
 CSRCS		= picoc.c

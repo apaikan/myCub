@@ -320,6 +320,7 @@ int StdioBasePrintf(struct ParseState *Parser, FILE *Stream, char *StrOut, int S
 }
 
 /* internal do-anything v[s][n]scanf() formatting system with input from strings or FILE * */
+/*
 int StdioBaseScanf(struct ParseState *Parser, FILE *Stream, char *StrIn, char *Format, struct StdVararg *Args)
 {
     struct Value *ThisArg = Args->Param[0];
@@ -348,6 +349,7 @@ int StdioBaseScanf(struct ParseState *Parser, FILE *Stream, char *StrIn, char *F
     else
         return sscanf(StrIn, Format, ScanfArg[0], ScanfArg[1], ScanfArg[2], ScanfArg[3], ScanfArg[4], ScanfArg[5], ScanfArg[6], ScanfArg[7], ScanfArg[8], ScanfArg[9]);
 }
+*/
 
 /* stdio calls */
 void StdioFopen(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs) 
@@ -355,10 +357,12 @@ void StdioFopen(struct ParseState *Parser, struct Value *ReturnValue, struct Val
     ReturnValue->Val->Pointer = fopen(Param[0]->Val->Pointer, Param[1]->Val->Pointer);
 }
 
+/*
 void StdioFreopen(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs) 
 {
     ReturnValue->Val->Pointer = freopen(Param[0]->Val->Pointer, Param[1]->Val->Pointer, Param[2]->Val->Pointer);
 }
+*/
 
 void StdioFclose(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs) 
 {
@@ -385,10 +389,12 @@ void StdioFgets(struct ParseState *Parser, struct Value *ReturnValue, struct Val
     ReturnValue->Val->Pointer = fgets(Param[0]->Val->Pointer, Param[1]->Val->Integer, Param[2]->Val->Pointer);
 }
 
+/*
 void StdioRemove(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs) 
 {
     ReturnValue->Val->Integer = remove(Param[0]->Val->Pointer);
 }
+*/
 
 void StdioRename(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs) 
 {
@@ -400,10 +406,12 @@ void StdioRewind(struct ParseState *Parser, struct Value *ReturnValue, struct Va
     rewind(Param[0]->Val->Pointer);
 }
 
+/*
 void StdioTmpfile(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs) 
 {
     ReturnValue->Val->Pointer = tmpfile();
 }
+*/
 
 void StdioClearerr(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs) 
 {
@@ -475,15 +483,19 @@ void StdioPutchar(struct ParseState *Parser, struct Value *ReturnValue, struct V
     ReturnValue->Val->Integer = putchar(Param[0]->Val->Integer);
 }
 
+/*
 void StdioSetbuf(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs) 
 {
     setbuf(Param[0]->Val->Pointer, Param[1]->Val->Pointer);
 }
+*/
 
+/*
 void StdioSetvbuf(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs) 
 {
     setvbuf(Param[0]->Val->Pointer, Param[1]->Val->Pointer, Param[2]->Val->Integer, Param[3]->Val->Integer);
 }
+*/
 
 void StdioUngetc(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs) 
 {
@@ -557,6 +569,7 @@ void StdioSnprintf(struct ParseState *Parser, struct Value *ReturnValue, struct 
     ReturnValue->Val->Integer = StdioBasePrintf(Parser, NULL, Param[0]->Val->Pointer, Param[1]->Val->Integer, Param[2]->Val->Pointer, &PrintfArgs);
 }
 
+/*
 void StdioScanf(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
 {
     struct StdVararg ScanfArgs;
@@ -565,7 +578,9 @@ void StdioScanf(struct ParseState *Parser, struct Value *ReturnValue, struct Val
     ScanfArgs.NumArgs = NumArgs-1;
     ReturnValue->Val->Integer = StdioBaseScanf(Parser, stdin, NULL, Param[0]->Val->Pointer, &ScanfArgs);
 }
+*/
 
+/*
 void StdioFscanf(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
 {
     struct StdVararg ScanfArgs;
@@ -574,7 +589,8 @@ void StdioFscanf(struct ParseState *Parser, struct Value *ReturnValue, struct Va
     ScanfArgs.NumArgs = NumArgs-2;
     ReturnValue->Val->Integer = StdioBaseScanf(Parser, Param[0]->Val->Pointer, NULL, Param[1]->Val->Pointer, &ScanfArgs);
 }
-
+*/
+/*
 void StdioSscanf(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
 {
     struct StdVararg ScanfArgs;
@@ -583,7 +599,7 @@ void StdioSscanf(struct ParseState *Parser, struct Value *ReturnValue, struct Va
     ScanfArgs.NumArgs = NumArgs-2;
     ReturnValue->Val->Integer = StdioBaseScanf(Parser, NULL, Param[0]->Val->Pointer, Param[1]->Val->Pointer, &ScanfArgs);
 }
-
+*/
 void StdioVsprintf(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
 {
     ReturnValue->Val->Integer = StdioBasePrintf(Parser, NULL, Param[0]->Val->Pointer, -1, Param[1]->Val->Pointer, Param[2]->Val->Pointer);
@@ -594,11 +610,14 @@ void StdioVsnprintf(struct ParseState *Parser, struct Value *ReturnValue, struct
     ReturnValue->Val->Integer = StdioBasePrintf(Parser, NULL, Param[0]->Val->Pointer, Param[1]->Val->Integer, Param[2]->Val->Pointer, Param[3]->Val->Pointer);
 }
 
+/*
 void StdioVscanf(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
 {
     ReturnValue->Val->Integer = StdioBaseScanf(Parser, stdin, NULL, Param[0]->Val->Pointer, Param[1]->Val->Pointer);
 }
+*/
 
+/*
 void StdioVfscanf(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
 {
     ReturnValue->Val->Integer = StdioBaseScanf(Parser, Param[0]->Val->Pointer, NULL, Param[1]->Val->Pointer, Param[2]->Val->Pointer);
@@ -608,6 +627,7 @@ void StdioVsscanf(struct ParseState *Parser, struct Value *ReturnValue, struct V
 {
     ReturnValue->Val->Integer = StdioBaseScanf(Parser, NULL, Param[0]->Val->Pointer, Param[1]->Val->Pointer, Param[2]->Val->Pointer);
 }
+*/
 
 /* handy structure definitions */
 const char StdioDefs[] = "\
@@ -619,7 +639,7 @@ typedef struct __FILEStruct FILE;\
 struct LibraryFunction StdioFunctions[] =
 {
     { StdioFopen,   "FILE *fopen(char *, char *);" },
-    { StdioFreopen, "FILE *freopen(char *, char *, FILE *);" },
+/*    { StdioFreopen, "FILE *freopen(char *, char *, FILE *);" }, */
     { StdioFclose,  "int fclose(FILE *);" },
     { StdioFread,   "int fread(void *, int, int, FILE *);" },
     { StdioFwrite,  "int fwrite(void *, int, int, FILE *);" },
@@ -628,10 +648,10 @@ struct LibraryFunction StdioFunctions[] =
     { StdioFgets,   "char *fgets(char *, int, FILE *);" },
     { StdioFputc,   "int fputc(int, FILE *);" },
     { StdioFputs,   "int fputs(char *, FILE *);" },
-    { StdioRemove,  "int remove(char *);" },
+/*    { StdioRemove,  "int remove(char *);" }, */
     { StdioRename,  "int rename(char *, char *);" },
     { StdioRewind,  "void rewind(FILE *);" },
-    { StdioTmpfile, "FILE *tmpfile();" },
+/*    { StdioTmpfile, "FILE *tmpfile();" }, */
     { StdioClearerr,"void clearerr(FILE *);" },
     { StdioFeof,    "int feof(FILE *);" },
     { StdioFerror,  "int ferror(FILE *);" },
@@ -645,8 +665,8 @@ struct LibraryFunction StdioFunctions[] =
     { StdioPutc,    "int putc(char *, FILE *);" },
     { StdioPutchar, "int putchar(int);" },
     { StdioPutchar, "int fputchar(int);" },
-    { StdioSetbuf,  "void setbuf(FILE *, char *);" },
-    { StdioSetvbuf, "void setvbuf(FILE *, char *, int, int);" },
+/*    { StdioSetbuf,  "void setbuf(FILE *, char *);" }, */
+/*    { StdioSetvbuf, "void setvbuf(FILE *, char *, int, int);" }, */
     { StdioUngetc,  "int ungetc(int, FILE *);" },
     { StdioPuts,    "int puts(char *);" },
     { StdioGets,    "char *gets(char *);" },
@@ -655,16 +675,16 @@ struct LibraryFunction StdioFunctions[] =
     { StdioFprintf, "int fprintf(FILE *, char *, ...);" },
     { StdioSprintf, "int sprintf(char *, char *, ...);" },
     { StdioSnprintf,"int snprintf(char *, int, char *, ...);" },
-    { StdioScanf,   "int scanf(char *, ...);" },
-    { StdioFscanf,  "int fscanf(FILE *, char *, ...);" },
-    { StdioSscanf,  "int sscanf(char *, char *, ...);" },
+/*    { StdioScanf,   "int scanf(char *, ...);" }, */
+/*    { StdioFscanf,  "int fscanf(FILE *, char *, ...);" }, */
+/*    { StdioSscanf,  "int sscanf(char *, char *, ...);" }, */
     { StdioVprintf, "int vprintf(char *, va_list);" },
     { StdioVfprintf,"int vfprintf(FILE *, char *, va_list);" },
     { StdioVsprintf,"int vsprintf(char *, char *, va_list);" },
     { StdioVsnprintf,"int vsnprintf(char *, int, char *, va_list);" },
-    { StdioVscanf,   "int vscanf(char *, va_list);" },
+/*    { StdioVscanf,   "int vscanf(char *, va_list);" },
     { StdioVfscanf,  "int vfscanf(FILE *, char *, va_list);" },
-    { StdioVsscanf,  "int vsscanf(char *, char *, va_list);" },
+    { StdioVsscanf,  "int vsscanf(char *, char *, va_list);" }, */
     { NULL,         NULL }
 };
 

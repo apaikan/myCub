@@ -4,6 +4,7 @@ void UnixSetupFunc()
 {    
 }
 
+
 void Ctest (struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs) 
 {
     printf("test(%d)\n", Param[0]->Val->Integer);
@@ -25,5 +26,7 @@ struct LibraryFunction UnixFunctions[] =
 
 void PlatformLibraryInit()
 {
-    IncludeRegister("picoc_unix.h", &UnixSetupFunc, &UnixFunctions[0], NULL);
+    //IncludeRegister("picoc_nuttx.h", &UnixSetupFunc, &UnixFunctions[0], NULL);
 }
+
+//LibraryAdd(&GlobalTable, "platform library", &PlatformLibrary0

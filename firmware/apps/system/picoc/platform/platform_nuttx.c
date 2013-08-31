@@ -1,14 +1,20 @@
-#include "../picoc.h"
 #include "../interpreter.h"
+#include "../picoc.h"
+
+#include <stdio.h>
+
 
 #ifdef USE_READLINE
-#include <readline/readline.h>
-#include <readline/history.h>
+//#include <readline/readline.h>
+//#include <readline/history.h>
+#include <apps/readline.h>
 #endif
 
-/* mark where to end the program for platforms which require this */
-jmp_buf PicocExitBuf;
 
+/* mark where to end the program for platforms which require this */
+int PicocExitBuf[41];
+
+/* deallocate any storage */
 void PlatformCleanup()
 {
 }
@@ -16,10 +22,17 @@ void PlatformCleanup()
 /* get a line of interactive input */
 char *PlatformGetLine(char *Buf, int MaxLen, const char *Prompt)
 {
+
+
 #ifdef USE_READLINE
     if (Prompt != NULL)
+        printf("%s", Prompt);
+    ssize_t len = readline(Buf, MaxLen, stdin, stdout);
+    Buf[len-1] = '\0';
+    return Buf;
+    /*
+    if (Prompt != NULL)
     {
-        /* use GNU readline to read the line */
         char *InLine = readline(Prompt);
         if (InLine == NULL)
             return NULL;
@@ -34,6 +47,7 @@ char *PlatformGetLine(char *Buf, int MaxLen, const char *Prompt)
         free(InLine);
         return Buf;
     }
+    */
 #endif
 
     if (Prompt != NULL)
@@ -43,22 +57,33 @@ char *PlatformGetLine(char *Buf, int MaxLen, const char *Prompt)
     return fgets(Buf, MaxLen, stdin);
 }
 
-/* get a character of interactive input */
-int PlatformGetCharacter()
-{
-    fflush(stdout);
-    return getchar();
-}
-
 /* write a character to the console */
 void PlatformPutc(unsigned char OutCh, union OutputStreamInfo *Stream)
 {
+    if (OutCh == '\n')
+        putchar('\r');
+        
     putchar(OutCh);
+}
+
+/* read a character */
+int PlatformGetCharacter()
+{
+    return getchar();
+}
+
+/* exit the program */
+void PlatformExit(int RetVal)
+{
+    PicocExitValue = RetVal;
+    PicocExitBuf[40] = 1;
+    //longjmp(PicocExitBuf, 1);
 }
 
 /* read a file into memory */
 char *PlatformReadFile(const char *FileName)
 {
+    /*
     struct stat FileInfo;
     char *ReadText;
     FILE *InFile;
@@ -83,6 +108,8 @@ char *PlatformReadFile(const char *FileName)
     fclose(InFile);
     
     return ReadText;    
+    */
+    return NULL;
 }
 
 /* read and scan a file for definitions */
@@ -93,10 +120,4 @@ void PicocPlatformScanFile(const char *FileName)
     PicocParse(FileName, SourceStr, strlen(SourceStr), TRUE, FALSE, TRUE);
 }
 
-/* exit the program */
-void PlatformExit(int RetVal)
-{
-    PicocExitValue = RetVal;
-    longjmp(PicocExitBuf, 1);
-}
 
