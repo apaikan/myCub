@@ -55,7 +55,7 @@ STACKSIZE	= 2048
 
 ASRCS		=
 CSRCS		= 
-CXXSRCS		= myCub.cpp mycub_interface.cpp
+CXXSRCS		= myCub.cpp mycub_interface.cpp mycub_walk.cpp
 
 AOBJS		= $(ASRCS:.S=$(OBJEXT))
 COBJS		= $(CSRCS:.c=$(OBJEXT))
