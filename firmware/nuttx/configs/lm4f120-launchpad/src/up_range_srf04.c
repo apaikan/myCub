@@ -150,9 +150,9 @@ static int range_setup(FAR struct range_lowerhalf_s *dev)
         range->state = RANGE_STATE_INIT;
     }
 
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER1);
-    TimerConfigure(TIMER1_BASE, TIMER_CFG_PERIODIC_UP);
-    TimerEnable(TIMER1_BASE, TIMER_A);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
+    TimerConfigure(TIMER5_BASE, TIMER_CFG_PERIODIC_UP);
+    TimerEnable(TIMER5_BASE, TIMER_A);
 
     return OK;
 }
@@ -160,7 +160,7 @@ static int range_setup(FAR struct range_lowerhalf_s *dev)
 
 static int range_shutdown(FAR struct range_lowerhalf_s *dev)
 {
-    TimerDisable(TIMER1_BASE, TIMER_A);
+    TimerDisable(TIMER5_BASE, TIMER_A);
     return OK;
 }
 
@@ -221,32 +221,32 @@ static int range_detach(FAR struct range_lowerhalf_s *dev,
 unsigned long pulse_in( unsigned long port, unsigned char pin)
 {
     
-    TimerDisable(TIMER1_BASE, TIMER_A);
-    TimerEnable(TIMER1_BASE, TIMER_A);
+    TimerDisable(TIMER5_BASE, TIMER_A);
+    TimerEnable(TIMER5_BASE, TIMER_A);
 
     // wait for any previous pulse to end   
-    unsigned long t = TimerValueGet(TIMER1_BASE, TIMER_A);
+    unsigned long t = TimerValueGet(TIMER5_BASE, TIMER_A);
     while(lm_gpioread(GPIO_FUNC_INPUT  | GPIO_VALUE_ONE | port | pin, 0) == true)
-        if((TimerValueGet(TIMER1_BASE, TIMER_A) - t) > 50000000)
+        if((TimerValueGet(TIMER5_BASE, TIMER_A) - t) > 50000000)
             return 0;
     
     // wait for the pulse to start
-    t = TimerValueGet(TIMER1_BASE, TIMER_A);
+    t = TimerValueGet(TIMER5_BASE, TIMER_A);
     while(lm_gpioread(GPIO_FUNC_INPUT  | GPIO_VALUE_ONE | port | pin, 0) == false)
-        if((TimerValueGet(TIMER1_BASE, TIMER_A) - t) > 50000000)
+        if((TimerValueGet(TIMER5_BASE, TIMER_A) - t) > 50000000)
             return 0;
    
     // wait for the pulse to stop
-    unsigned long width = TimerValueGet(TIMER1_BASE, TIMER_A);
+    unsigned long width = TimerValueGet(TIMER5_BASE, TIMER_A);
     unsigned long cnt=0;
     while(lm_gpioread(GPIO_FUNC_INPUT  | GPIO_VALUE_ONE | port | pin, 0) == true)
     {
         cnt++;
-        if((TimerValueGet(TIMER1_BASE, TIMER_A) - width) > 50000000)
+        if((TimerValueGet(TIMER5_BASE, TIMER_A) - width) > 50000000)
             return 0;
     }
 
-    width = (TimerValueGet(TIMER1_BASE, TIMER_A) - width);// - (8*cnt);
+    width = (TimerValueGet(TIMER5_BASE, TIMER_A) - width);// - (8*cnt);
     return (width / 85);
 }
 

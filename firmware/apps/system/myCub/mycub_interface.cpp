@@ -43,7 +43,7 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#include<arch/board/board.h>
+#include <arch/board/board.h>
 #include <mycub_interface.h>
 
 extern "C"
@@ -54,6 +54,7 @@ extern "C"
  */
 int servo_devinit(void);
 int range_devinit(void);
+int adclm4f_devinit(void);
 
 /* very lowleve high precision delay loop */
 void sysDelay(unsigned long ulCount) 
@@ -123,7 +124,7 @@ static void * controller(void *pParams)
                 pthread_mutex_unlock(&(params->mutex));
                
                 unsigned long oneMicSec = SYSCLK_FREQUENCY / 1000000 / 3;
-                unsigned long delayStep = oneMicSec * ((t * 1000000 / 3) / (abs(pos - curPos))) / 6;
+                unsigned long delayStep = oneMicSec * ((t * 1000000 / 2) / (abs(pos - curPos)));
                 if(delayStep < 5000)
                     delayStep = 5000;
                 
@@ -186,6 +187,7 @@ MyCubInterface::MyCubInterface(void)
 {
     fd_servo = -1;
     fd_range = -1;
+    fd_adc = -1;
     for(int i=0; i<4; i++)
         joints_pos[i] = 8;
 }
@@ -216,29 +218,33 @@ bool MyCubInterface::init(void)
 
         // Configure servo pins
 
-        // front
+
         servo_drv[0].id   = 0;
+        servo_drv[1].id   = 1;
+        servo_drv[2].id   = 2;
+        servo_drv[3].id   = 3;
+
+        /*
+        // front
         servo_drv[0].port = GPIO_PORTD;
         servo_drv[0].pin = GPIO_PIN_0;
 
         //right
-        servo_drv[1].id   = 1;
         servo_drv[1].port = GPIO_PORTD;
         servo_drv[1].pin = GPIO_PIN_2;
         
         //back
-        servo_drv[2].id   = 2;
         servo_drv[2].port = GPIO_PORTD;
         servo_drv[2].pin = GPIO_PIN_1;
 
         //left        
-        servo_drv[3].id   = 3;
         servo_drv[3].port = GPIO_PORTD;
         servo_drv[3].pin = GPIO_PIN_3;
-
+        
         for(int i=0; i<4; i++)
             ioctl(fd_servo, SERVOIOC_SETPINCONFIG, (unsigned long)((uintptr_t)&servo_drv[i]));
-        
+        */
+
         for(int i=0; i<4; i++)
         {
             servo_drv[i].pos = joints_pos[i];
@@ -278,6 +284,26 @@ bool MyCubInterface::init(void)
         range_drv[1].echo_pin = GPIO_PIN_1; 
         ioctl(fd_range, RANGEIOC_ATTACHE, (unsigned long)((uintptr_t)&range_drv[1]));
     }
+
+    if(fd_adc < 0)
+    {
+        int ret = adclm4f_devinit();
+        if (ret != OK)
+        {
+            printf("MyCubInterface::init(): adclm4f_devinit failed: %d\n", ret);
+            fini();
+            return false;
+        }
+
+        fd_adc = open("/dev/adclm4f0", O_RDONLY);
+        if (fd_adc < 0)
+        {
+            printf("MyCubInterface::init(): adc driver open failed: %d\n", errno);
+            fini();
+            return false;
+        }
+    }
+
 
     // initializing and starting controller threads
     pthread_attr_t attr;
@@ -386,10 +412,13 @@ void MyCubInterface::fini(void)
         close(fd_servo); fd_servo = -1;
     }
 
-    if(fd_range != -1)
-    {
+    if(fd_range != -1) {
         close(fd_range); fd_range = -1;
     }        
+
+    if(fd_adc != -1) {
+        close(fd_adc); fd_adc = -1;
+    } 
 }
 
 bool MyCubInterface::setPose(const unsigned int joint, const int pos)
@@ -567,4 +596,14 @@ int MyCubInterface::getRange(int id, const char* str)
     return atoi(dummy);
 }
 
+int MyCubInterface::getRawAnalogData(const int channel, unsigned long freq,
+                                     uint16_t* data, size_t len)
+{
+    adclm4f_info_s info;
+    info.channel = channel;
+    info.nsamples = len;
+    info.freq = freq;
+    ioctl(fd_adc, ADCIOC_SETCONF, (unsigned long)((uintptr_t)&info));
+    return read(fd_adc, (char*)data, len*sizeof(uint16_t));
+}
 

@@ -66,7 +66,7 @@ pthread_mutex_t params_mutex;
 
 
 /* controller thread */
- void * walker(void *pParams) 
+void * walker(void *pParams) 
 {
     walk_param_t* params = (walk_param_t *) pParams;
 
@@ -88,10 +88,10 @@ pthread_mutex_t params_mutex;
         return NULL;
     }
 
-    params->mycub->gotoPose(front, 160, 0.1);
-    params->mycub->gotoPose(back, 100, 0.1);
-    params->mycub->gotoPose(left, 120, 0.1);
-    params->mycub->gotoPose(right, 120, 0.1);
+    params->mycub->gotoPose(front, 160, 0.5);
+    params->mycub->gotoPose(back, 100, 0.5);
+    params->mycub->gotoPose(left, 120, 0.5);
+    params->mycub->gotoPose(right, 120, 0.5);
     while(!params->mycub->checkMotionDone()) usleep(300000);
 
     while(!should_stop)

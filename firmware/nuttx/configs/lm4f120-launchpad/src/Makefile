@@ -35,7 +35,7 @@
 
 -include $(TOPDIR)/Make.defs
 
-CFLAGS		+= -I$(TOPDIR)/sched -Dgcc
+CFLAGS		+= -I$(TOPDIR)/sched -Dgcc -DPART_LM4F120H5QR
 
 ASRCS		= 
 AOBJS		= $(ASRCS:.S=$(OBJEXT))
@@ -73,7 +73,7 @@ CSRCS       += board_driver/usb.c
 CSRCS       += board_driver/watchdog.c
 
 ## Nuttx relevent board driver ## 
-CSRCS		+= lm4f_boot.c lm4f_ssi.c up_servo.c up_range_srf04.c
+CSRCS		+= lm4f_boot.c lm4f_ssi.c up_servo.c up_range_srf04.c up_adc.c
 
 ifeq ($(CONFIG_ARCH_LEDS),y)
 CSRCS		+= lm4f_autoleds.c

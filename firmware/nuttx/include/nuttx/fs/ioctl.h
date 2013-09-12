@@ -70,7 +70,8 @@
 #define _SLCDIOCBASE    (0x1100) /* Segment LCD ioctl commands */
 #define _WLIOCBASE      (0x1100) /* Wireless modules ioctl commands */
 #define _SERVOIOCBASE   (0x1300) /* SERVO ioctl commands */
-#define _RANGEIOCBASE   (0x1400) /* SERVO ioctl commands */
+#define _RANGEIOCBASE   (0x1400) /* RANGE ioctl commands */
+#define _ADCLM4FIOCBASE (0x1500) /* ADCLM4F ioctl commands */
 
 /* Macros used to manage ioctl commands */
 
@@ -271,6 +272,11 @@
 
 #define _RANGEIOCVALID(c)   (_IOC_TYPE(c)==_RANGEIOCBASE)
 #define _RANGEIOC(nr)       _IOC(_RANGEIOCBASE,nr)
+
+/* NuttX ADCLM4F ioctl definitions (see nuttx/analog/adc_lm4f.h) ***************************/
+
+#define _ADCLM4FIOCVALID(c)   (_IOC_TYPE(c)==_ADCLM4FIOCBASE)
+#define _ADCLM4FIOC(nr)       _IOC(_ADCLM4FIOCBASE,nr)
 
 
 

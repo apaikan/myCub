@@ -235,10 +235,6 @@ int myCub_main(int argc, char *argv[])
     mycub.fini();
     printf("done!\n");
 
-
-    /*
-     */
-        
     return 0;
 }
 

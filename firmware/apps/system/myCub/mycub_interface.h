@@ -56,7 +56,7 @@
 #include <nuttx/arch.h>
 #include <nuttx/servo.h>
 #include <nuttx/sensors/range_srf04.h>
-
+#include <nuttx/analog/adc_lm4f.h>
 
 /* This identifies the GPIO port
  * .... .... .... .... .... .... .PPP P...
@@ -146,9 +146,13 @@ private:
     int fd_range;
     struct range_info_s range_drv[2];
 
+    // adc 
+    int fd_adc;
+
 private:
     int getRange(int id, const char* str);
-
+    int getRawAnalogData(const int channel, unsigned long freq,
+                         uint16_t* data, size_t len);
 };
 
 #endif /* __APPS_MYCUB_INTERFACE_H */

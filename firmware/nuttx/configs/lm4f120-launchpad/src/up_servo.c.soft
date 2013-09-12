@@ -51,23 +51,28 @@
 
 
 #include "chip.h"
-#include <arch/board/inc/hw_ints.h>
+#include "arch/board/inc/hw_ints.h"
 #include <arch/board/inc/hw_types.h>
 #include <arch/board/inc/hw_memmap.h>
-#include <arch/board/inc/hw_timer.h>
-#include <arch/board/driverlib/pin_map.h>
-#include <arch/board/driverlib/gpio.h>
+//#include <arch/board/driverlib/pin_map.h>
+//#include <arch/board/driverlib/gpio.h>
 #include <arch/board/driverlib/sysctl.h>
 #include <arch/board/driverlib/timer.h>
-//#include <arch/board/driverlib/interrupt.h>
+#include <arch/board/driverlib/interrupt.h>
 
-//#include "lm_gpio.h"
+#include "lm_gpio.h"
 
 
 /*
  * TODO: these paramaters should be taken from nuttx/config.h
  */ 
-#define SERVO_MAX_COUNT         4
+#define SERVO_MAX_COUNT         5
+#define SERVO_TIMER             TIMER2_BASE
+#define SERVO_TIMER_TRIGGER     TIMER_TIMA_TIMEOUT
+#define SERVO_TIMER_INTERRUPT   INT_TIMER2A
+#define SERVO_TIMER_A           TIMER_A
+#define SERVO_TIMER_PERIPH      SYSCTL_PERIPH_TIMER2
+#define SERVO_TIMER_RESOLUTION  10                      // Microseconds
 #define SERVO_MIN_PULSE         544
 #define SERVO_MAX_PULSE         2400
 #define SERVO_PERIOD            20000
@@ -102,6 +107,8 @@ static int servo_setpos(FAR struct servo_lowerhalf_s *dev,
 static int servo_ioctl(FAR struct servo_lowerhalf_s *dev,
                        int cmd, unsigned long arg);
 
+int up_timerisr_servo(int irq, uint32_t *regs);
+
 /****************************************************************************
  * Private Data
  ****************************************************************************/
@@ -122,17 +129,21 @@ static struct lm4f_servo_s g_servodev =
   .count      = SERVO_MAX_COUNT,
 };
 
-unsigned long g_servo_timers[SERVO_MAX_COUNT] = {
-                                               TIMER2_BASE, 
-                                               TIMER3_BASE, 
-                                               TIMER1_BASE, 
-                                               TIMER0_BASE };
+typedef enum {
+    SERVO_STATE_INIT = 0,
+    SERVO_STATE_ENABLED = 1
+} SERVO_STATE;
 
-unsigned long g_servo_peripherals[SERVO_MAX_COUNT] = {
-                                               SYSCTL_PERIPH_TIMER2, 
-                                               SYSCTL_PERIPH_TIMER3, 
-                                               SYSCTL_PERIPH_TIMER1, 
-                                               SYSCTL_PERIPH_TIMER0 };
+typedef struct {
+    uint16_t value;
+    unsigned long port;
+    unsigned char pin;
+    uint8_t state;
+} servo_t;
+
+servo_t g_servos[SERVO_MAX_COUNT];      // Servo configurations
+uint16_t g_pulseTime;                   // Keep track of how far the period has gone
+
 
 /****************************************************************************
  * Private Functions
@@ -142,45 +153,39 @@ static int servo_setup(FAR struct servo_lowerhalf_s *dev)
 {
     FAR struct lm4f_servotimer_s *priv = (FAR struct lm4f_servotimer_s *)dev;
     uint8_t i;
-   
-    /* Configuring pwm pinouts */
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
-
-    GPIOPinConfigure(GPIO_PB0_T2CCP0);
-    GPIOPinTypeTimer(GPIO_PORTB_BASE, GPIO_PIN_0);
-    
-    GPIOPinConfigure(GPIO_PB2_T3CCP0);
-    GPIOPinTypeTimer(GPIO_PORTB_BASE, GPIO_PIN_2);
-
-    GPIOPinConfigure(GPIO_PB4_T1CCP0);
-    GPIOPinTypeTimer(GPIO_PORTB_BASE, GPIO_PIN_4);
-    
-    GPIOPinConfigure(GPIO_PB6_T0CCP0);
-    GPIOPinTypeTimer(GPIO_PORTB_BASE, GPIO_PIN_6);
- 
-    //lm_configgpio(GPIO_FUNC_OUTPUT | GPIO_VALUE_ONE | servo->port | servo->pin);
-
     for(i=0; i<SERVO_MAX_COUNT; i++) {
-
-        SysCtlPeripheralEnable(g_servo_peripherals[i]);
-        TimerConfigure(g_servo_timers[i], TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM);
-        HWREG(g_servo_timers[i] + TIMER_O_CTL) |= TIMER_CTL_TAPWML;
-        uint32_t period1 = SysCtlClockGet() / 50; /* 50Hz*/
-        uint8_t extender1 = period1 >> 16;
-        period1 &= 0xFFFF;
-        TimerPrescaleSet(g_servo_timers[i], TIMER_A, extender1);
-        TimerLoadSet(g_servo_timers[i], TIMER_A, period1);     
+        servo_t *servo = &g_servos[i];
+        servo->value = SERVO_MIN_PULSE;
+        servo->port = 0;
+        servo->pin = 0;
+        servo->state = SERVO_STATE_INIT;
     }
+    g_pulseTime = 0;
+
+   (void)irq_attach(LM_IRQ_TIMER2A, (xcpt_t)up_timerisr_servo);
+    SysCtlPeripheralEnable(SERVO_TIMER_PERIPH);
+    IntMasterEnable();
+    TimerConfigure(SERVO_TIMER, TIMER_CFG_PERIODIC);
+    TimerLoadSet(SERVO_TIMER, SERVO_TIMER_A, (SysCtlClockGet() / 1000000) * SERVO_TIMER_RESOLUTION);
+    IntEnable(SERVO_TIMER_INTERRUPT);
+    TimerIntEnable(SERVO_TIMER, SERVO_TIMER_TRIGGER);
+    TimerEnable(SERVO_TIMER, SERVO_TIMER_A);
+    up_enable_irq(LM_IRQ_TIMER2A);
     return OK;
 }
 
 
 static int servo_shutdown(FAR struct servo_lowerhalf_s *dev)
-{    
+{
+    
     FAR struct lm4f_servotimer_s *priv = (FAR struct lm4f_servotimer_s *)dev;
-    uint8_t i;
-    for(i=0; i<SERVO_MAX_COUNT; i++) 
-        TimerDisable(g_servo_timers[i], TIMER_A);
+    up_disable_irq(LM_IRQ_TIMER2A);
+    TimerDisable(SERVO_TIMER, SERVO_TIMER_A);
+    TimerIntDisable(SERVO_TIMER, SERVO_TIMER_TRIGGER);
+    SysCtlPeripheralDisable(SERVO_TIMER_PERIPH);
+    irq_detach(LM_IRQ_TIMER2A);
+    //printf("%s: %d\n", __FILE__, __LINE__);
+
     return OK;
 }
 
@@ -188,7 +193,23 @@ static int servo_attach(FAR struct servo_lowerhalf_s *dev,
                      FAR const struct servo_info_s *info)
 {
     FAR struct lm4f_servotimer_s *priv = (FAR struct lm4f_servotimer_s *)dev;
-    return -ENODEV;
+    //printf("info->port: %x, info->pin: %x, GPIO_POTRD :%x, GPIO_PIN_0): %x \n", 
+    //        info->port, info->pin, GPIO_PORTD,  GPIO_PIN_0);
+    if(info->id >= SERVO_MAX_COUNT)
+    {
+        dbg("servo_attach: servo %d is out of range! (SERVO_MAX_COUNT : %d)\n", 
+            info->id, SERVO_MAX_COUNT);
+        return ERANGE;
+    }
+
+    servo_t *servo = &g_servos[info->id];
+    servo->port = info->port;
+    servo->pin = info->pin;
+
+    /* configure the servo pin */
+    lm_configgpio(GPIO_FUNC_OUTPUT | GPIO_VALUE_ONE | servo->port | servo->pin);
+
+    return OK;
 }
 
 static int servo_setpos(FAR struct servo_lowerhalf_s *dev,
@@ -203,15 +224,12 @@ static int servo_setpos(FAR struct servo_lowerhalf_s *dev,
         return ERANGE;
     }
 
+    servo_t *servo = &g_servos[info->id];
     uint32_t value = SERVO_MIN_PULSE + ((SERVO_MAX_PULSE - SERVO_MIN_PULSE) / 180) * info->pos;
     value = value <= SERVO_MAX_PULSE ? value : SERVO_MAX_PULSE;
     value = value >= SERVO_MIN_PULSE ? value : SERVO_MIN_PULSE;
-    uint32_t period2 = (SysCtlClockGet() / 50) * value / SERVO_PERIOD;
-    uint8_t extender2 = period2 >> 16;
-    period2 &= 0xFFFF;
-    TimerPrescaleMatchSet(g_servo_timers[info->id], TIMER_A, extender2);
-    TimerMatchSet(g_servo_timers[info->id], TIMER_A, period2);
-    TimerEnable(g_servo_timers[info->id], TIMER_A);
+    servo->value = value;
+    servo->state |= SERVO_STATE_ENABLED;
     return OK;
 }
 
@@ -219,7 +237,41 @@ static int servo_setpos(FAR struct servo_lowerhalf_s *dev,
 static int servo_ioctl(FAR struct servo_lowerhalf_s *dev, int cmd, unsigned long arg)
 {
     FAR struct lm4f_servotimer_s *priv = (FAR struct lm4f_servotimer_s *)dev;
-    return -ENODEV;
+    return -ENOTTY;
+}
+
+
+// Triggered every SERVO_TIMER_RESOLUTION microseconds
+int up_timerisr_servo(int irq, uint32_t *regs)
+{
+    // Clear the interrupt
+    TimerIntClear(SERVO_TIMER, SERVO_TIMER_TRIGGER);
+    
+    // SERVO_TIMER_RESOLUTION microseconds have passed, increment each counter by that
+    // to determine how long to set the pin high for
+    g_pulseTime += SERVO_TIMER_RESOLUTION;
+
+    if(g_pulseTime > SERVO_PERIOD) {
+        g_pulseTime = 0;
+    }
+
+    // Loop through al servo configs and see if they need to be set low yet
+    uint8_t i;
+    for(i=0; i<SERVO_MAX_COUNT; i++) {
+        servo_t *servo = &g_servos[i];
+        
+        if(servo->state & SERVO_STATE_ENABLED) {
+            if(g_pulseTime >= servo->value) {
+                // End of pulse, set low
+                lm_gpiowrite( GPIO_FUNC_OUTPUT | GPIO_VALUE_ONE | servo->port | servo->pin, false); 
+            } else  {
+                // Beginning of pulse, set high
+                lm_gpiowrite( GPIO_FUNC_OUTPUT | GPIO_VALUE_ONE | servo->port | servo->pin, true); 
+            }
+        }
+    }
+
+    return 0;
 }
 
 /****************************************************************************
