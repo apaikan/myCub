@@ -158,8 +158,8 @@ static int adclm4f_configure(FAR struct adclm4f_lowerhalf_s *dev,
         return ERANGE;
     }
    
-    printf("adclm4f_configure: channel:%d, freq: %d \n", 
-            info->channel, info->freq);
+    //printf("adclm4f_configure: channel:%d, freq: %d \n", 
+    //        info->channel, info->freq);
    
     g_adclm4info.channel = info->channel;
     g_adclm4info.freq = info->freq;

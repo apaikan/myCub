@@ -226,6 +226,24 @@ int myCub_main(int argc, char *argv[])
                 MyCubWalker::stop();
                 printf("[ok]"); fflush(stdout);
             }
+            else if(strcmp(mycub_cmd[0], "getADC")==0 ) {
+                if(n >= 4)
+                {
+                    int channel = atoi(mycub_cmd[1]);
+                    unsigned long freq = atol(mycub_cmd[2]);
+                    size_t len = atoi(mycub_cmd[3]);
+                    uint16_t* data = (uint16_t*) malloc(len*sizeof(uint16_t));
+                    int ret = mycub.getRawAnalogData(channel, freq, data, len);
+                    for(int i=0; i<ret; i++) {
+                        printf("%d, ", data[i]); fflush(stdout);
+                    }
+                    printf("\n[ok]"); fflush(stdout);
+                    free(data);
+                }
+                else
+                    printf("[error]"); fflush(stdout);
+            }
+
 
         }
         //usleep(100000);

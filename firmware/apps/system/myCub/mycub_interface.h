@@ -136,6 +136,9 @@ public:
     // ultrasonic range finder 
     int getDistance(const int id);
 
+    // adc
+    int getRawAnalogData(const int channel, unsigned long freq,
+                         uint16_t* data, size_t len);
 private:
     // servo controller driver  variables 
     int fd_servo;
@@ -151,8 +154,6 @@ private:
 
 private:
     int getRange(int id, const char* str);
-    int getRawAnalogData(const int channel, unsigned long freq,
-                         uint16_t* data, size_t len);
 };
 
 #endif /* __APPS_MYCUB_INTERFACE_H */
