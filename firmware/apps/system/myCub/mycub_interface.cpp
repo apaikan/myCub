@@ -274,8 +274,13 @@ bool MyCubInterface::init(void)
         // Configure range finder
         
         // front
-        //...
-       
+        range_drv[0].id = 0;
+        range_drv[0].trig_port = GPIO_PORTD;
+        range_drv[0].trig_pin = GPIO_PIN_2; 
+        range_drv[0].echo_port = GPIO_PORTD;
+        range_drv[0].echo_pin = GPIO_PIN_3; 
+        ioctl(fd_range, RANGEIOC_ATTACHE, (unsigned long)((uintptr_t)&range_drv[0]));
+      
         //right
         range_drv[1].id = 1;
         range_drv[1].trig_port = GPIO_PORTE;
@@ -283,6 +288,7 @@ bool MyCubInterface::init(void)
         range_drv[1].echo_port = GPIO_PORTE;
         range_drv[1].echo_pin = GPIO_PIN_1; 
         ioctl(fd_range, RANGEIOC_ATTACHE, (unsigned long)((uintptr_t)&range_drv[1]));
+        getDistance(0); getDistance(1);
     }
 
     if(fd_adc < 0)
@@ -605,5 +611,22 @@ int MyCubInterface::getRawAnalogData(const int channel, unsigned long freq,
     info.freq = freq;
     ioctl(fd_adc, ADCIOC_SETCONF, (unsigned long)((uintptr_t)&info));
     return read(fd_adc, (char*)data, len*sizeof(uint16_t));
+}
+
+
+double MyCubInterface::getBatteryVolt(void)
+{
+    double volt = 0.0;
+    uint16_t value[10];
+    int ret = getRawAnalogData(6, 1000, value, 10);
+    if(ret <= 0)
+        return -1.0; 
+    for(int i=0; i<10; i++)
+       volt += value[i];
+    volt /= 10.0;       
+    // R_gnd = 1K
+    // R_vcc = 10K
+    double vm = volt * (0.000805);
+    return (vm * 11000.0 / 1000.0);
 }
 

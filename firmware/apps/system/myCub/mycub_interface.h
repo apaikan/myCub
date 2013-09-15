@@ -137,6 +137,7 @@ public:
     int getDistance(const int id);
 
     // adc
+    double getBatteryVolt(void);
     int getRawAnalogData(const int channel, unsigned long freq,
                          uint16_t* data, size_t len);
 private:

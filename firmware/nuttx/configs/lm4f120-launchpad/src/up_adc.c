@@ -57,7 +57,6 @@
 #include <arch/board/driverlib/gpio.h>
 #include <arch/board/driverlib/sysctl.h>
 #include <arch/board/driverlib/adc.h>
-#include "lm_gpio.h"
 
 #define CHANNEL_MAX_COUNT           12
 

@@ -70,6 +70,30 @@
 #define MAX_CMD_NUM     16
 #define MAX_CMD_LEN     32
 
+#define BATTERY_CRITICAL_LEVE   7000 // 7.0VV
+
+#define MYCUB_LOGO  "\
+                  ____      _      \n\
+ _ __ ___  _   _ / ___|   _| |__   \n\
+| '_ ` _ \\| | | | |  | | | | '_ \\  \n\
+| | | | | | |_| | |__| |_| | |_) | \n\
+|_| |_| |_|\\__, |\\____\\__,_|_.__/  \n\
+           |___/                   \n"
+
+#define HELP_MESSAGE        "\
+Commands:\n\
+  setPose <joint> <pos> \n\
+  getPose <joint> \n\
+  gotoPose <joint> <pos> [time] \n\
+  gotoPoseSync <joint> <pos> [time] \n\
+  moveFront [time] \n\
+  moveBack [time] \n\
+  moveRight [time] \n\
+  moveLeft [time] \n\
+  getDistance <sonar> \n\
+  getBatteryVolt \n\
+  getADC <channel> <freq> <samples>  \n\
+  help \n"
 
 extern "C"
 {
@@ -116,16 +140,20 @@ int myCub_main(int argc, char *argv[])
         exit(2);
     }
 
-    printf("-- myCub Intreface --\n");  
+    printf("%s\n", MYCUB_LOGO);
 
     MyCubInterface mycub;
     mycub.init();
     MyCubWalker::init();
-
+    
     char buf[256];
     should_stop = false;
     while(!should_stop) 
     {
+        int power = (int) (mycub.getBatteryVolt() * 1000);
+        if( power < BATTERY_CRITICAL_LEVE )
+            printf("[WARNING] Battery volatge is critically low (%d.%d V) \n", 
+                    power/1000, power%1000);
         //ssize_t len = readline_serial(comfd, buf, 256, "[myCub] ");
         printf("[myCub] "); fflush(stdout);
         ssize_t len = readline(buf, 256, stdin, stdout);
@@ -144,10 +172,10 @@ int myCub_main(int argc, char *argv[])
                 if(n >= 3)
                 {
                     mycub.setPose(atoi(mycub_cmd[1]), atoi(mycub_cmd[2]));
-                    printf("[ok]"); fflush(stdout);
+                    printf("[ok]\n"); fflush(stdout);
                 }
                 else
-                    printf("[error]"); fflush(stdout);
+                    printf("[error]\n"); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "getPose")==0 ) {
                 if(n >= 2)
@@ -156,7 +184,7 @@ int myCub_main(int argc, char *argv[])
                     printf("%d\n", pos); fflush(stdout);
                 }
                 else
-                    printf("[error]"); fflush(stdout);
+                    printf("[error]\n"); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "getDistance")==0 ) {
                 if(n >= 2)
@@ -165,7 +193,7 @@ int myCub_main(int argc, char *argv[])
                     printf("%d\n", dist); fflush(stdout);
                 }
                 else
-                    printf("[error]"); fflush(stdout);
+                    printf("[error]\n"); fflush(stdout);
             }
 
 
@@ -176,10 +204,10 @@ int myCub_main(int argc, char *argv[])
                     if(n>=4)
                         t = atoi(mycub_cmd[3]) / 1000.0;
                     mycub.gotoPose(atoi(mycub_cmd[1]), atoi(mycub_cmd[2]), t);
-                    printf("[ok]"); fflush(stdout);
+                    printf("[ok]\n"); fflush(stdout);
                 }
                 else
-                    printf("[error]"); fflush(stdout);
+                    printf("[error]\n"); fflush(stdout);
             }
 
             else if(strcmp(mycub_cmd[0], "gotoPoseSync")==0 ) {
@@ -189,61 +217,69 @@ int myCub_main(int argc, char *argv[])
                     if(n>=4)
                         t = atoi(mycub_cmd[3]) / 1000.0;
                     mycub.gotoPoseSync(atoi(mycub_cmd[1]), atoi(mycub_cmd[2]), t);
-                    printf("[ok]"); fflush(stdout);
+                    printf("[ok]\n"); fflush(stdout);
                 }
                 else
-                    printf("[error]"); fflush(stdout);
+                    printf("[error]\n"); fflush(stdout);
             }            
             else if(strcmp(mycub_cmd[0], "moveFront")==0 ) {
                double t = 0.0;
                 if(n>=2)
                     t = atoi(mycub_cmd[1]) / 1000.0;
                 MyCubWalker::moveFront(mycub, t);
-                printf("[ok]"); fflush(stdout);
+                printf("[ok]\n"); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "moveBack")==0 ) {
                double t = 0.0;
                 if(n>=2)
                     t = atoi(mycub_cmd[1]) / 1000.0;
                 MyCubWalker::moveBack(mycub, t);
-                printf("[ok]"); fflush(stdout);
+                printf("[ok]\n"); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "moveRight")==0 ) {
                double t = 0.0;
                 if(n>=2)
                     t = atoi(mycub_cmd[1]) / 1000.0;
                 MyCubWalker::moveRight(mycub, t);
-                printf("[ok]"); fflush(stdout);
+                printf("[ok]\n"); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "moveLeft")==0 ) {
                double t = 0.0;
                 if(n>=2)
                     t = atoi(mycub_cmd[1]) / 1000.0;
                 MyCubWalker::moveLeft(mycub, t);
-                printf("[ok]"); fflush(stdout);
+                printf("[ok]\n"); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "stop")==0 ) {
                 MyCubWalker::stop();
-                printf("[ok]"); fflush(stdout);
+                printf("[ok]\n"); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "getADC")==0 ) {
                 if(n >= 4)
                 {
                     int channel = atoi(mycub_cmd[1]);
                     unsigned long freq = atol(mycub_cmd[2]);
-                    size_t len = atoi(mycub_cmd[3]);
-                    uint16_t* data = (uint16_t*) malloc(len*sizeof(uint16_t));
-                    int ret = mycub.getRawAnalogData(channel, freq, data, len);
+                    size_t samples = atoi(mycub_cmd[3]);
+                    uint16_t* data = (uint16_t*) malloc(samples*sizeof(uint16_t));
+                    int ret = mycub.getRawAnalogData(channel, freq, data, samples);
                     for(int i=0; i<ret; i++) {
                         printf("%d, ", data[i]); fflush(stdout);
                     }
-                    printf("\n[ok]"); fflush(stdout);
+                    printf("\n[ok]\n"); fflush(stdout);
                     free(data);
                 }
                 else
-                    printf("[error]"); fflush(stdout);
+                    printf("[error]\n"); fflush(stdout);
             }
-
+            else if(strcmp(mycub_cmd[0], "getBatteryVolt")==0 ) {
+                    int volt = (int) (mycub.getBatteryVolt() * 1000);                    
+                    printf("%d.%d\n", volt/1000, volt%1000); fflush(stdout);
+            }
+            else if(strcmp(mycub_cmd[0], "help")==0 ) {
+                    printf("\n%s\n", HELP_MESSAGE); fflush(stdout);
+            }
+            else
+                printf("[error] type 'help' for more commands.\n", HELP_MESSAGE); fflush(stdout);
 
         }
         //usleep(100000);
@@ -251,7 +287,7 @@ int myCub_main(int argc, char *argv[])
 
     MyCubWalker::fini();
     mycub.fini();
-    printf("done!\n");
+    printf("bye!\n");
 
     return 0;
 }
