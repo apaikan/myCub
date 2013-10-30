@@ -44,6 +44,8 @@
 #include <assert.h>
 #include <errno.h>
 #include <debug.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <nuttx/arch.h>
 #include <nuttx/sensors/range_srf04.h>
@@ -153,7 +155,6 @@ static int range_setup(FAR struct range_lowerhalf_s *dev)
     SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
     TimerConfigure(TIMER5_BASE, TIMER_CFG_PERIODIC_UP);
     TimerEnable(TIMER5_BASE, TIMER_A);
-
     return OK;
 }
 
@@ -220,34 +221,43 @@ static int range_detach(FAR struct range_lowerhalf_s *dev,
 
 unsigned long pulse_in( unsigned long port, unsigned char pin)
 {
-    
-    TimerDisable(TIMER5_BASE, TIMER_A);
-    TimerEnable(TIMER5_BASE, TIMER_A);
+    //TimerLoadSet(TIMER5_BASE, TIMER_A, 4294967295L);
+    TimerDisable(TIMER5_BASE, TIMER_A);     
+    TimerEnable(TIMER5_BASE, TIMER_A);  
 
-    // wait for any previous pulse to end   
+    // wait for any previous pulse to end 
     unsigned long t = TimerValueGet(TIMER5_BASE, TIMER_A);
     while(lm_gpioread(GPIO_FUNC_INPUT  | GPIO_VALUE_ONE | port | pin, 0) == true)
-        if((TimerValueGet(TIMER5_BASE, TIMER_A) - t) > 50000000)
+        if((TimerValueGet(TIMER5_BASE, TIMER_A) - t) > 50000000L)
+        {
+            printf("wait for previous pulse ... [timeout]\n");
             return 0;
+        }   
     
     // wait for the pulse to start
     t = TimerValueGet(TIMER5_BASE, TIMER_A);
     while(lm_gpioread(GPIO_FUNC_INPUT  | GPIO_VALUE_ONE | port | pin, 0) == false)
-        if((TimerValueGet(TIMER5_BASE, TIMER_A) - t) > 50000000)
+        if((TimerValueGet(TIMER5_BASE, TIMER_A) - t) > 50000000L)
+        {
+            printf("wait for pulse to start ... [timeout]\n");
             return 0;
-   
-    // wait for the pulse to stop
-    unsigned long width = TimerValueGet(TIMER5_BASE, TIMER_A);
-    unsigned long cnt=0;
+        }
+
+    // wait for the pulse to stop    
+    unsigned long t2;
+    t = TimerValueGet(TIMER5_BASE, TIMER_A);
     while(lm_gpioread(GPIO_FUNC_INPUT  | GPIO_VALUE_ONE | port | pin, 0) == true)
     {
-        cnt++;
-        if((TimerValueGet(TIMER5_BASE, TIMER_A) - width) > 50000000)
+        t2 = TimerValueGet(TIMER5_BASE, TIMER_A);
+        if((t2 - t) > 50000000L)
+        {
+            printf("wait for pulse to stop ... [timeout]\n");
             return 0;
+        }            
     }
 
-    width = (TimerValueGet(TIMER5_BASE, TIMER_A) - width);// - (8*cnt);
-    return (width / 85);
+    //printf("Count: %lu, Pulse start : %lu, Pulse end: %lu, width %lu\n", cnt,  width, width2, width2 - width);
+    return ((t2-t) / 85L);
 }
 
 
@@ -275,8 +285,8 @@ static int range_read(FAR struct range_lowerhalf_s *dev,
             //usleep(10);
             lm_gpiowrite( GPIO_FUNC_OUTPUT | GPIO_VALUE_ONE | range->trig_port | range->trig_pin, false);
             unsigned long width = pulse_in(range->echo_port, range->echo_pin); 
-            unsigned int dist = (int)((float)width / 5.2466);
-            sprintf(dummy, "(%d %d) ", i, (dist<600)? dist : 0);
+            unsigned int dist = (int)(width / 5.2466);
+            sprintf(dummy, "(%d %d) ", i, (dist<4000)? dist : 0);
             strncpy(ptr, dummy, buflen-strlen(buff));
             ptr += strlen(dummy);
         }

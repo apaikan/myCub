@@ -42,6 +42,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <sched.h>
 
 #include <arch/board/board.h>
 #include <mycub_interface.h>
@@ -134,11 +135,12 @@ static void * controller(void *pParams)
                         servo_drv.pos = i;
                         ioctl(fd_servo, SERVOIOC_SETPOS, 
                               (unsigned long)((uintptr_t)&servo_drv));
-                        sysDelay(delayStep);
+                        sysDelay(delayStep);                    
+                        sched_yield();
                         /* exclusive access to parameters */
                         pthread_mutex_lock(&(params->mutex));
                         *(params->curPos) = i;
-                        pthread_mutex_unlock(&(params->mutex));        
+                        pthread_mutex_unlock(&(params->mutex));                         
                     }
                 }    
                 else {
@@ -148,6 +150,7 @@ static void * controller(void *pParams)
                         ioctl(fd_servo, SERVOIOC_SETPOS, 
                               (unsigned long)((uintptr_t)&servo_drv));
                         sysDelay(delayStep);
+                        sched_yield();
                         /* exclusive access to parameters */
                         pthread_mutex_lock(&(params->mutex));
                         *(params->curPos) = i;
@@ -199,6 +202,14 @@ MyCubInterface::~MyCubInterface()
 
 bool MyCubInterface::init(void)
 {
+
+    // setting the MyCubInterface task to highest priority
+    struct sched_param sparam; 
+    sparam.sched_priority = sched_get_priority_max(SCHED_FIFO); 
+    //if(sched_setparam(0, &sparam) != 0 )
+    if(sched_setscheduler(0, SCHED_FIFO, &sparam) != 0)
+        printf("MyCubInterface::init(): sched_setparam failed!\n");
+
     if(fd_servo < 0)
     {
         int ret = servo_devinit();
@@ -313,7 +324,6 @@ bool MyCubInterface::init(void)
 
     // initializing and starting controller threads
     pthread_attr_t attr;
-    struct sched_param sparam; 
     int status = pthread_attr_init(&attr);
     if (status != 0) {
         printf("MyCubInterface::int(): pthread_attr_init failed, status=%d\n", status);

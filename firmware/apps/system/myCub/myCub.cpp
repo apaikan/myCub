@@ -42,6 +42,8 @@
 
 #include <mycub_interface.h>
 #include <mycub_walk.h>
+//#include <mycub_fun.h>
+#include <nuttx_thread.h>
 
 /*
 #include <termios.h>
@@ -122,9 +124,36 @@ void siguser_action(int signo, siginfo_t *siginfo, void *arg)
     }
 }
 
+/* dancer threads */
+void dancer_body(void *pParams) 
+{
+    static unsigned long int cnt = 0;
+    MyCubInterface* mycub = (MyCubInterface*) pParams;
+
+    if(cnt%4)
+    {
+        mycub->gotoPose(FRONT_JOINT, 50, 0.2);
+        mycub->gotoPose(BACK_JOINT, 10, 0.2);
+    }        
+    else
+    {
+        mycub->gotoPose(FRONT_JOINT, 10, 0.2);
+        mycub->gotoPose(BACK_JOINT, 50, 0.2);        
+    }     
+
+    int pos = (int) (((double)rand() / (double)MAX_RAND) * 100.0) + 60;
+    //printf("pos %d\n", pos);
+    mycub->gotoPose(RIGHT_JOINT, pos, 0.1);
+    mycub->gotoPose(LEFT_JOINT, pos, 0.1);
+    cnt++;
+}   
+
 
 int myCub_main(int argc, char *argv[])
 {
+    NxThread dancer1;
+    srand(23);
+
     struct sigaction act;
     struct sigaction oact;
     int status;
@@ -145,7 +174,7 @@ int myCub_main(int argc, char *argv[])
     MyCubInterface mycub;
     mycub.init();
     MyCubWalker::init();
-    
+
     char buf[256];
     should_stop = false;
     while(!should_stop) 
@@ -250,8 +279,22 @@ int myCub_main(int argc, char *argv[])
                 MyCubWalker::moveLeft(mycub, t);
                 printf("[ok]\n"); fflush(stdout);
             }
+            else if(strcmp(mycub_cmd[0], "dance")==0 ) {
+                //MyCubFun::dance(mycub);
+                dancer1.stop();
+                mycub.gotoPose(FRONT_JOINT, 60, 0.5);
+                mycub.gotoPose(BACK_JOINT, 60, 0.5);
+                mycub.gotoPose(RIGHT_JOINT, 150, 0.5);
+                mycub.gotoPose(LEFT_JOINT, 150, 0.5);
+
+                dancer1.setCallback(dancer_body, &mycub);
+                dancer1.setPeriod(500000);
+                dancer1.start();
+                printf("[ok]\n"); fflush(stdout);
+            }
             else if(strcmp(mycub_cmd[0], "stop")==0 ) {
                 MyCubWalker::stop();
+                dancer1.stop();
                 printf("[ok]\n"); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "getADC")==0 ) {
@@ -291,5 +334,4 @@ int myCub_main(int argc, char *argv[])
 
     return 0;
 }
-
 }

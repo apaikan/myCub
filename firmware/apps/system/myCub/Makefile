@@ -53,9 +53,21 @@ APPNAME		= myCub
 PRIORITY	= SCHED_PRIORITY_DEFAULT
 STACKSIZE	= 2048
 
+CXXFLAGS 	+=  -I./lib -I./lib/nxobjects
+CFLAGS 	    +=  -I./lib -I./lib/nxobjects
+
 ASRCS		=
 CSRCS		= 
-CXXSRCS		= myCub.cpp mycub_interface.cpp mycub_walk.cpp
+CXXSRCS		= myCub.cpp
+
+CXXSRCS		+= ./lib/mycub_interface.cpp 
+CXXSRCS		+= ./lib/mycub_walk.cpp
+#CXXSRCS		+= ./lib/mycub_fun.cpp
+
+CXXSRCS		+= ./lib/nxobjects/nuttx_mutex.cpp
+CXXSRCS		+= ./lib/nxobjects/nuttx_event.cpp
+CXXSRCS		+= ./lib/nxobjects/nuttx_thread.cpp
+
 
 AOBJS		= $(ASRCS:.S=$(OBJEXT))
 COBJS		= $(CSRCS:.c=$(OBJEXT))

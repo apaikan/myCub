@@ -71,7 +71,7 @@ void * walker(void *pParams)
     walk_param_t* params = (walk_param_t *) pParams;
 
     pthread_mutex_lock(&(params_mutex));
-    double t = params->t;
+    //double t = params->t;
     int front = params->front;
     int back = params->back;
     int right = params->right;
@@ -97,7 +97,7 @@ void * walker(void *pParams)
     while(!should_stop)
     {
         pthread_mutex_lock(&(params_mutex));
-        t = params->t;
+        //t = params->t;
         front = params->front;
         back = params->back;
         right = params->right;
