@@ -52,6 +52,7 @@
 #include <errno.h>
 #include <debug.h>
 
+#include <pthread.h>
 
 #include <nuttx/arch.h>
 #include <nuttx/servo.h>
@@ -152,6 +153,8 @@ private:
 
     // adc 
     int fd_adc;
+    
+    pthread_attr_t attr;
 
 private:
     int getRange(int id, const char* str);

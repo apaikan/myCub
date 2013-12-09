@@ -231,7 +231,7 @@ int myCub_main(int argc, char *argv[])
                 {
                     double t = 0.0;
                     if(n>=4)
-                        t = atoi(mycub_cmd[3]) / 1000.0;
+                        t = atoi(mycub_cmd[3]);
                     mycub.gotoPose(atoi(mycub_cmd[1]), atoi(mycub_cmd[2]), t);
                     printf("[ok]\n"); fflush(stdout);
                 }
@@ -244,7 +244,7 @@ int myCub_main(int argc, char *argv[])
                 {
                     double t = 0.0;
                     if(n>=4)
-                        t = atoi(mycub_cmd[3]) / 1000.0;
+                        t = atoi(mycub_cmd[3]);
                     mycub.gotoPoseSync(atoi(mycub_cmd[1]), atoi(mycub_cmd[2]), t);
                     printf("[ok]\n"); fflush(stdout);
                 }
@@ -254,28 +254,28 @@ int myCub_main(int argc, char *argv[])
             else if(strcmp(mycub_cmd[0], "moveFront")==0 ) {
                double t = 0.0;
                 if(n>=2)
-                    t = atoi(mycub_cmd[1]) / 1000.0;
+                    t = atoi(mycub_cmd[1]);
                 MyCubWalker::moveFront(mycub, t);
                 printf("[ok]\n"); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "moveBack")==0 ) {
                double t = 0.0;
                 if(n>=2)
-                    t = atoi(mycub_cmd[1]) / 1000.0;
+                    t = atoi(mycub_cmd[1]);
                 MyCubWalker::moveBack(mycub, t);
                 printf("[ok]\n"); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "moveRight")==0 ) {
                double t = 0.0;
                 if(n>=2)
-                    t = atoi(mycub_cmd[1]) / 1000.0;
+                    t = atoi(mycub_cmd[1]);
                 MyCubWalker::moveRight(mycub, t);
                 printf("[ok]\n"); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "moveLeft")==0 ) {
                double t = 0.0;
                 if(n>=2)
-                    t = atoi(mycub_cmd[1]) / 1000.0;
+                    t = atoi(mycub_cmd[1]);
                 MyCubWalker::moveLeft(mycub, t);
                 printf("[ok]\n"); fflush(stdout);
             }

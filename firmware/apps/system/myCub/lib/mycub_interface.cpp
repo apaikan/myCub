@@ -124,19 +124,22 @@ static void * controller(void *pParams)
                 servo_info_s servo_drv = *params->servo_drv;
                 pthread_mutex_unlock(&(params->mutex));
                
-                unsigned long oneMicSec = SYSCLK_FREQUENCY / 1000000 / 3;
-                unsigned long delayStep = oneMicSec * ((t * 1000000 / 2) / (abs(pos - curPos)));
-                if(delayStep < 5000)
-                    delayStep = 5000;
-                
+                //unsigned long oneMicSec = SYSCLK_FREQUENCY / 1000000 / 3;
+                //unsigned long delayStep = oneMicSec * ((t * 1000000 / 2) / (abs(pos - curPos)));
+                //if(delayStep < 5000)
+                //    delayStep = 5000;
+                unsigned long delayStep = (t * 1000000) / (abs(pos - curPos));
                 if(pos > curPos) {
                     for(int i=curPos; i<pos; i++)
                     {       
                         servo_drv.pos = i;
                         ioctl(fd_servo, SERVOIOC_SETPOS, 
                               (unsigned long)((uintptr_t)&servo_drv));
-                        sysDelay(delayStep);                    
-                        sched_yield();
+                        //sysDelay(delayStep);                    
+                        //sched_yield();
+                        int ret;
+                        if((ret = usleep(delayStep)) != 0)
+                            printf("(%d) usleep error : %s\n", joint, strerror(errno));
                         /* exclusive access to parameters */
                         pthread_mutex_lock(&(params->mutex));
                         *(params->curPos) = i;
@@ -149,8 +152,11 @@ static void * controller(void *pParams)
                         servo_drv.pos = i;
                         ioctl(fd_servo, SERVOIOC_SETPOS, 
                               (unsigned long)((uintptr_t)&servo_drv));
-                        sysDelay(delayStep);
-                        sched_yield();
+                        //sysDelay(delayStep);
+                        //sched_yield();
+                        int ret;
+                        if((ret = usleep(delayStep)) != 0)
+                            printf("(%d) usleep error : %s\n", strerror(errno));
                         /* exclusive access to parameters */
                         pthread_mutex_lock(&(params->mutex));
                         *(params->curPos) = i;
@@ -323,18 +329,19 @@ bool MyCubInterface::init(void)
 
 
     // initializing and starting controller threads
-    pthread_attr_t attr;
     int status = pthread_attr_init(&attr);
     if (status != 0) {
         printf("MyCubInterface::int(): pthread_attr_init failed, status=%d\n", status);
         fini();
         return false;
     }
-       
+      
+
+    pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
     //int prio_min = sched_get_priority_min(SCHED_RR);
-    int prio_max = sched_get_priority_max(SCHED_RR);
+    int prio_max = sched_get_priority_max(SCHED_FIFO);
     //int prio_mid = (prio_min + prio_max) / 2;
-    sparam.sched_priority = prio_max;
+    sparam.sched_priority = prio_max - 1;
     status = pthread_attr_setschedparam(&attr, &sparam);
     if (status != OK)
     {       
@@ -342,8 +349,6 @@ bool MyCubInterface::init(void)
         fini();
         return false;
     }
-    pthread_attr_destroy(&attr);
-
     // initialize thread params and start the threads
     for(int i=0; i<4; i++)
     {
@@ -370,7 +375,7 @@ bool MyCubInterface::init(void)
             printf("MyCubInterface::init(): ERROR pthread_condinit failed, status=%d\n", status);
         }
 
-        status = pthread_create(&ctrl_threads[i], NULL, controller, &ctrl_params[i]);
+        status = pthread_create(&ctrl_threads[i], &attr, controller, &ctrl_params[i]);
         if (status != 0)
         {
             printf("MyCubInterface::init(): pthread_create failed, status=%d\n", status);
@@ -378,8 +383,7 @@ bool MyCubInterface::init(void)
             return false;
         }
     }
-
-
+    
     return true;
 }
 
@@ -415,6 +419,8 @@ void MyCubInterface::fini(void)
         pthread_cond_destroy(&(ctrl_params[i].cond));
         pthread_cond_destroy(&(syncpos_cond[i]));
     }   
+
+    pthread_attr_destroy(&attr);
 
     for(int i=0; i<4; i++)
     {
