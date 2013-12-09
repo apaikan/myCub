@@ -98,3 +98,7 @@ ifeq ($(CONFIG_SYSTEM_PICOC),y)
 CONFIGURED_APPS += system/picoc
 endif
 
+ifeq ($(CONFIG_SYSTEM_ELUA),y)
+CONFIGURED_APPS += system/elua
+endif
+

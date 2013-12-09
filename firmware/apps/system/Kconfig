@@ -68,4 +68,9 @@ source "$APPSDIR/system/picoc/Kconfig"
 endmenu
 
 
+menu "eLua interpreter"
+source "$APPSDIR/system/elua/Kconfig"
+endmenu
+
+
 
