@@ -18,12 +18,13 @@
 #include "lualib.h"
 
 
+#include <apps/readline.h>
+
 #define SIGINT  SIGUSR1
 
 static lua_State *globalL = NULL;
 
 static const char *progname = LUA_PROGNAME;
-
 
 
 static void lstop (lua_State *L, lua_Debug *ar) {
@@ -37,6 +38,15 @@ static void laction (int i) {
   //signal(i, SIG_DFL); /* if another SIGINT happens before lstop,
   //                            terminate process (default action) */
   lua_sethook(globalL, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
+}
+
+static void siguser_lua(int signo, siginfo_t *siginfo, void *arg)
+{
+    if(signo == SIGUSR1)
+    {
+        printf("SIGUSR1 received\n");
+        laction(signo);
+    }
 }
 
 
@@ -96,13 +106,22 @@ static int traceback (lua_State *L) {
 
 
 static int docall (lua_State *L, int narg, int clear) {
+  struct sigaction act;
+  struct sigaction oact;
+
   int status;
   int base = lua_gettop(L) - narg;  /* function index */
   lua_pushcfunction(L, traceback);  /* push traceback function */
   lua_insert(L, base);  /* put it under chunk and args */
   //signal(SIGINT, laction);
+  memset(&act, 0, sizeof(struct sigaction));
+  act.sa_sigaction = siguser_lua;
+  act.sa_flags     = SA_SIGINFO;
+  (void)sigemptyset(&act.sa_mask);
+  sigaction(SIGUSR1, &act, &oact);
   status = lua_pcall(L, narg, (clear ? 0 : LUA_MULTRET), base);
   //signal(SIGINT, SIG_DFL);
+  //sigaction(SIGUSR1, &oact, NULL);
   lua_remove(L, base);  /* remove traceback function */
   /* force a complete garbage collection in case of errors */
   if (status != 0) lua_gc(L, LUA_GCCOLLECT, 0);
@@ -181,8 +200,12 @@ static int pushline (lua_State *L, int firstline) {
   char *b = buffer;
   size_t l;
   const char *prmt = get_prompt(L, firstline);
-  if (lua_readline(L, b, prmt) == 0)
-    return 0;  /* no input */
+  //if (lua_readline(L, b, prmt) == 0)
+  //  return 0;  /* no input */
+  fprintf(stdout, "%s", prmt); fflush(stdout);
+  ssize_t len = readline(b, LUA_MAXINPUT, stdin, stdout);
+  if(!len)
+    return 0;
   l = strlen(b);
   if (l > 0 && b[l-1] == '\n')  /* line ends with newline? */
     b[l-1] = '\0';  /* remove it */

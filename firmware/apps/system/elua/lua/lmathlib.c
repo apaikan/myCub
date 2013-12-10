@@ -21,13 +21,9 @@
 #define PI (3.14159265358979323846)
 #define RADIANS_PER_DEGREE (PI/180.0)
 
-
+#ifndef RAND_MAX
 #define RAND_MAX        MAX_RAND
-
-#define INFINITY (1.0/0.0)
-#define NAN (0.0/0.0)
-#define HUGE_VAL INFINITY
-
+#endif 
 
 static int math_abs (lua_State *L) {
 #ifdef LUA_NUMBER_INTEGRAL

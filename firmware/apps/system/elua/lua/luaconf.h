@@ -617,7 +617,7 @@
 @@ The luai_num* macros define the primitive operations over numbers.
 */
 #if defined(LUA_CORE)
-#include <nuttx/math.h>
+#include <math.h>
 #define luai_numadd(a,b)	((a)+(b))
 #define luai_numsub(a,b)	((a)-(b))
 #define luai_nummul(a,b)	((a)*(b))
@@ -733,8 +733,10 @@ union luai_Cast { double l_d; long l_l; };
 
 #else
 /* default handling with long jumps */
-#define LUAI_THROW(L,c)	longjmp((c)->b, 1)
-#define LUAI_TRY(L,c,a)	if (setjmp((c)->b) == 0) { a }
+#define LUAI_THROW(L,c)	{ }
+#define LUAI_TRY(L,c,a)	{ a }
+//#define LUAI_THROW(L,c)	longjmp((c)->b, 1)
+//#define LUAI_TRY(L,c,a)	if (setjmp((c)->b) == 0) { a }
 #define luai_jmpbuf	jmp_buf
 
 #endif
