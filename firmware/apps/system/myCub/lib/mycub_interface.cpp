@@ -593,10 +593,12 @@ void MyCubInterface::setContext(JointContext &ctx)
 int MyCubInterface::getDistance(const int id)
 {
     char data[128];
+    sched_lock();
     int ret = read(fd_range, data, sizeof(data));
+    sched_unlock();
     if(ret > 0)   
        return getRange(id, data);
-    
+
     return -1;
 }
 
