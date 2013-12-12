@@ -140,9 +140,28 @@ void dancer_body(void *pParams)
         mycub->gotoPose(FRONT_JOINT, 10, 0.2);
         mycub->gotoPose(BACK_JOINT, 50, 0.2);        
     }     
+    
+    /*
+    unsigned long freq = 200; 
+    size_t samples = 50;
+    uint16_t* data = (uint16_t*) malloc(samples*sizeof(uint16_t));
+    int ret = mycub->getRawAnalogData(0, freq, data, samples);
+    long avg = 0.0;
+    for(int i=0; i<ret; i++)
+        avg += data[i];
+    avg /= ret;
 
+    uint16_t max = 0;;
+    for(int i=0; (i<ret) ; i++)
+        if((data[i]-avg) > max)
+            max = data[i]-avg;
+    int pos = 50 + ((150 - 50) / (100-10)) * max;
+    printf("max:%d, pos %d\n", max, pos);
+    mycub->setPose(RIGHT_JOINT, pos);
+    mycub->setPose(LEFT_JOINT, pos);
+    free(data);
+    */
     int pos = (int) (((double)rand() / (double)MAX_RAND) * 100.0) + 60;
-    //printf("pos %d\n", pos);
     mycub->gotoPose(RIGHT_JOINT, pos, 0.1);
     mycub->gotoPose(LEFT_JOINT, pos, 0.1);
     cnt++;

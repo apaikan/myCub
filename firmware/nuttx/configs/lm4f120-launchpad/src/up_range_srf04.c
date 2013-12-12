@@ -222,11 +222,12 @@ static int range_detach(FAR struct range_lowerhalf_s *dev,
 unsigned long pulse_in( unsigned long port, unsigned char pin)
 {
     //TimerLoadSet(TIMER5_BASE, TIMER_A, 4294967295L);
-    TimerDisable(TIMER5_BASE, TIMER_A);     
-    TimerEnable(TIMER5_BASE, TIMER_A);  
-
+    //TimerDisable(TIMER5_BASE, TIMER_A);     
+    //TimerEnable(TIMER5_BASE, TIMER_A);  
+    unsigned long t, t2;
+    
     // wait for any previous pulse to end 
-    unsigned long t = TimerValueGet(TIMER5_BASE, TIMER_A);
+    t = TimerValueGet(TIMER5_BASE, TIMER_A);
     while(lm_gpioread(GPIO_FUNC_INPUT  | GPIO_VALUE_ONE | port | pin, 0) == true)
         if((TimerValueGet(TIMER5_BASE, TIMER_A) - t) > 50000000L)
         {
@@ -244,8 +245,7 @@ unsigned long pulse_in( unsigned long port, unsigned char pin)
         }
 
     // wait for the pulse to stop    
-    unsigned long t2;
-    t = TimerValueGet(TIMER5_BASE, TIMER_A);
+    //t = TimerValueGet(TIMER5_BASE, TIMER_A);
     while(lm_gpioread(GPIO_FUNC_INPUT  | GPIO_VALUE_ONE | port | pin, 0) == true)
     {
         t2 = TimerValueGet(TIMER5_BASE, TIMER_A);
@@ -256,7 +256,7 @@ unsigned long pulse_in( unsigned long port, unsigned char pin)
         }            
     }
 
-    //printf("Count: %lu, Pulse start : %lu, Pulse end: %lu, width %lu\n", cnt,  width, width2, width2 - width);
+    //printf("Pulse start : %lu, Pulse end: %lu, width %lu\n", t, t2, t2 - t);
     return ((t2-t) / 85L);
 }
 
@@ -278,11 +278,11 @@ static int range_read(FAR struct range_lowerhalf_s *dev,
         {
             //tring the sensor  
             lm_gpiowrite( GPIO_FUNC_OUTPUT | GPIO_VALUE_ONE | range->trig_port | range->trig_pin, false);           
-            SysCtlDelay(SysCtlClockGet() / 5000000 / 3); 
-            //usleep(2);
+            //SysCtlDelay(SysCtlClockGet() / 5000000 / 3); 
+            usleep(2);
             lm_gpiowrite( GPIO_FUNC_OUTPUT | GPIO_VALUE_ONE | range->trig_port | range->trig_pin, true);
-            SysCtlDelay(SysCtlClockGet() / 200000 / 3); 
-            //usleep(10);
+            //SysCtlDelay(SysCtlClockGet() / 200000 / 3); 
+            usleep(10);
             lm_gpiowrite( GPIO_FUNC_OUTPUT | GPIO_VALUE_ONE | range->trig_port | range->trig_pin, false);
             unsigned long width = pulse_in(range->echo_port, range->echo_pin); 
             unsigned int dist = (int)(width / 5.2466);
