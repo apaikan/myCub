@@ -54,7 +54,7 @@ void uart_init(void) {
     UCSR0B |=  (1 << RXCIE0) | (1 << RXEN0);
     stdout = &uart_output;
     stdin  = &uart_input;
-    sei();  
+    //sei();  
 }
 
 int uart_putchar(char c, FILE *stream) {
@@ -76,20 +76,21 @@ int uart_putchar(char c, FILE *stream) {
 }
 
 
+/*
 int uart_getchar(FILE *stream) {
     int read_pointer = (rx_buffer.start + 1) % UART_RX_BUFFER_SIZE;
     
     rx_buffer.start = read_pointer;
     return rx_buffer.buffer[read_pointer];
 }
+*/
 
 
-/*
 int uart_getchar(FILE *stream) {
     loop_until_bit_is_set(UCSR0A, RXC0);
     return UDR0;
 }
-*/
+
 
 
 ISR(USART_RX_vect) 

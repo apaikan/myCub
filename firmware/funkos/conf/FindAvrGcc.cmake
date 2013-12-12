@@ -65,7 +65,7 @@ function(add_avr_executable EXECUTABLE_NAME)
             ${elf_file}
             PROPERTIES
                 COMPILE_FLAGS "${common_opts}"
-                LINK_FLAGS "${common_opts} -Wl,-Map,${map_file}"
+                LINK_FLAGS "${common_opts} -Wl,-u,vfprintf,-Map,${map_file} -lprintf_min"
         )
 
         add_custom_command(

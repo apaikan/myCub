@@ -39,7 +39,7 @@ include_directories(./kernel
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
-add_avr_executable( hello_world
+add_avr_executable( srf04
                     ./kernel/atmega328p/kernelswi.c
                     ./kernel/atmega328p/kerneltimer.c
                     ./kernel/atmega328p/kernelwdt.c
@@ -59,5 +59,5 @@ add_avr_executable( hello_world
                     ./drivers/ardulite/wiring_pulse.c  
                     ./drivers/ardulite/wiring_shift.c
                     ./drivers/serial/uart_async.c
-                    ./projects/hello_world/hello_world.c )
+                    ./projects/srf04/main.c )
 
