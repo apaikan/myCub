@@ -14,12 +14,13 @@
 #include "task.h"
 #include "taskport.h"
 #include "types.h"
+#include "kerneltimer.h"
 
-#include "wiring.h"
+#include "Arduino.h"
 #include "uart.h"
 
-#define TRIG_PIN            7
-#define ECHO_PIN            8
+#define TRIG_PIN            3
+#define ECHO_PIN            4
 
 //---------------------------------------------------------------------------
 //Define a struct to contain all of the first task's task data in one place
@@ -54,9 +55,9 @@ int main(void)
 
     uart_init();
 
-    printf("\nSRF04 distance reader\n\n");
-	Task_Init();									// Initialize the RTOS
-	
+    Task_Init();									// Initialize the RTOS
+
+
 	// Create the application task
 	Task_CreateTask(&(stMyTask.stTask), 			// Pointer to the task
 					"Hello World!",					// Task name
@@ -84,7 +85,7 @@ int main(void)
 	//--------------------------------------
 	// Scheduler takes over - never returns
 	//--------------------------------------
-	
+
 	return 0;
 }
 //---------------------------------------------------------------------------
@@ -95,16 +96,18 @@ void MyTask(MY_TASK_STRUCT *pstThis_)
 	ULONG iCount = 0;
 	while(1)
 	{
-
-        
+        printf("here\n"); fflush(stdout);
         digitalWrite(TRIG_PIN, LOW);
         _delay_us(2);
         digitalWrite(TRIG_PIN, HIGH);
         _delay_us(10);
         digitalWrite(TRIG_PIN, LOW);
-        //int width = pulseIn(ECHO_PIN, HIGH, 500); 
-        //int sonar = (int) ((float)width / 5.2466);  // mm
-        //printf("distance: %d\n", sonar);
+        int sonar = 0;
+        //KernelTimer_DI();
+        int width = pulseIn(ECHO_PIN, HIGH, 1000000L); 
+        //KernelTimer_EI();
+        sonar = (int) ((float)width / 5.2466);  // mm
+        printf("distance: %d\n", sonar); fflush(stdout);
        
        if(iCount++%2)
             digitalWrite(13, HIGH);

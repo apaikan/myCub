@@ -63,6 +63,7 @@
 
 //#include "lm_gpio.h"
 
+#ifdef CONFIG_SERVO
 
 /*
  * TODO: these paramaters should be taken from nuttx/config.h
@@ -294,3 +295,4 @@ int servo_devinit(void)
   return OK;
 }
 
+#endif //CONFIG_SERVO

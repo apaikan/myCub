@@ -75,6 +75,7 @@ include builtin/Make.defs
 include examples/Make.defs
 include graphics/Make.defs
 include interpreters/Make.defs
+include netutils/Make.defs
 include nshlib/Make.defs
 include system/Make.defs
 

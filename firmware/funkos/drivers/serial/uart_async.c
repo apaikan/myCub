@@ -54,7 +54,7 @@ void uart_init(void) {
     UCSR0B |=  (1 << RXCIE0) | (1 << RXEN0);
     stdout = &uart_output;
     stdin  = &uart_input;
-    //sei();  
+    sei();  
 }
 
 int uart_putchar(char c, FILE *stream) {

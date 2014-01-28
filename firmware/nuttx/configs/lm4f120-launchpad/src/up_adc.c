@@ -58,6 +58,9 @@
 #include <arch/board/driverlib/sysctl.h>
 #include <arch/board/driverlib/adc.h>
 
+
+#ifdef CONFIG_ADCLM4F
+
 #define CHANNEL_MAX_COUNT           12
 
 /****************************************************************************
@@ -311,4 +314,6 @@ int adclm4f_devinit(void)
 
   return OK;
 }
+
+#endif //CONFIG_ADCLM4F
 

@@ -96,7 +96,41 @@
  *
  ****************************************************************************/
 
+#ifdef CONFIG_NET_SLIP
+
+#include <nuttx/net/net.h>
+#include <net/if.h>
+#include <nuttx/net/uip/uip-arp.h>
+#include <apps/netutils/uiplib.h>
+
+#define CONFIG_NET_SLIPTTY  "/dev/ttyS1"
+#define SLIP_DEVNO          0
+#define NET_DEVNAME         "sl0"
+
+#endif
+
+
 int nsh_archinitialize(void)
 {
+
+#ifdef CONFIG_NET_SLIP
+    struct in_addr addr;
+    int ret = slip_initialize(SLIP_DEVNO, CONFIG_NET_SLIPTTY);
+    if(ret < 0)
+        printf("ERROR: SLIP initialization failed: %d\n", ret);
+    
+    /* Set up our host address */
+    addr.s_addr = HTONL(CONFIG_NSH_IPADDR);
+    uip_sethostaddr(NET_DEVNAME, &addr);
+
+    /* Set up the default router address */
+    addr.s_addr = HTONL(CONFIG_NSH_DRIPADDR);
+    uip_setdraddr(NET_DEVNAME, &addr);
+
+    /* Setup the subnet mask */
+    addr.s_addr = HTONL(CONFIG_NSH_NETMASK);
+    uip_setnetmask(NET_DEVNAME, &addr);       
+#endif
+
   return OK;
 }

@@ -29,10 +29,11 @@ set_property(GLOBAL PROPERTY FUNKOS_LIBS)
 ADD_DEFINITIONS( -DF_CPU=${SYS_FREQUENCY} )
 ADD_DEFINITIONS( -DTICK_FREQ=${SYS_TICK} )
 ADD_DEFINITIONS( -DARCH_AVR )
+ADD_DEFINITIONS( -DARDUINO=101 )
 
 include_directories(./kernel 
                     ./kernel/atmega328p
-                    ./drivers/ardulite
+                    ./drivers/arduino
                     ./drivers/serial)
 
 # for cmake bug on '-rdynamic'
@@ -52,12 +53,11 @@ add_avr_executable( srf04
                     ./kernel/task.c
                     ./kernel/timer.c
                     ./kernel/watchdog.c
-                    ./drivers/ardulite/pins_arduino.c  
-                    ./drivers/ardulite/wiring_analog.c  
-                    ./drivers/ardulite/wiring.c  
-                    ./drivers/ardulite/wiring_digital.c  
-                    ./drivers/ardulite/wiring_pulse.c  
-                    ./drivers/ardulite/wiring_shift.c
+                    ./drivers/arduino/wiring_analog.c
+                    ./drivers/arduino/wiring.c
+                    ./drivers/arduino/wiring_digital.c
+                    ./drivers/arduino/wiring_pulse.c
+                    ./drivers/arduino/wiring_shift.c
                     ./drivers/serial/uart_async.c
                     ./projects/srf04/main.c )
 

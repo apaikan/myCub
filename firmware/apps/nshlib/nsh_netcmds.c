@@ -292,8 +292,13 @@ int ifconfig_callback(FAR struct uip_driver_s *dev, void *arg)
                  dev->d_ifname, ret);
     }
 
+#ifdef CONFIG_NET_ETHERNET
   nsh_output(vtbl, "%s\tHWaddr %s at %s\n",
              dev->d_ifname, ether_ntoa(&dev->d_mac), (is_running)?"UP":"DOWN");
+#else
+  nsh_output(vtbl, "%s\tHWaddr %s at (SLIP)\n",
+             dev->d_ifname, (is_running)?"UP":"DOWN");
+#endif 
 
   addr.s_addr = dev->d_ipaddr;
   nsh_output(vtbl, "\tIPaddr:%s ", inet_ntoa(addr));
@@ -678,7 +683,9 @@ int cmd_ifconfig(FAR struct nsh_vtbl_s *vtbl, int argc, char **argv)
   if (hw)
     {
       ndbg("HW MAC: %s\n", hw);
+#if !defined(CONFIG_NET_SLIP)
       uip_setmacaddr(intf, mac);
+#endif      
     }
 
 #if defined(CONFIG_NSH_DHCPC)

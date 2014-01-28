@@ -62,6 +62,8 @@
 #include <arch/board/driverlib/timer.h>
 #include <arch/board/driverlib/interrupt.h>
 
+#ifdef CONFIG_RANGE
+
 #include "lm_gpio.h"
 
 
@@ -356,4 +358,6 @@ int range_devinit(void)
 
   return OK;
 }
+
+#endif //CONFIG_RANGE
 

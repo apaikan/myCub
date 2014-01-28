@@ -54,8 +54,7 @@ function(add_avr_executable EXECUTABLE_NAME)
         set(hex_file ${EXECUTABLE_NAME}-${mcu}.hex)
         set(map_file ${EXECUTABLE_NAME}-${mcu}.map)
         add_executable(${elf_file} EXCLUDE_FROM_ALL ${ARGN})
-        set(common_opts "-mmcu=${mcu} -fshort-enums -fpack-struct")
-
+        set(common_opts "-mmcu=${mcu} -fshort-enums -fpack-struct -ffunction-sections -fdata-sections -MMD")
         #PRINTF_LIB_MIN = -Wl,-u,vfprintf -lprintf_min
         #PRINTF_LIB_FLOAT = -Wl,-u,vfprintf -lprintf_flt
         #SCANF_LIB_MIN = -Wl,-u,vfscanf -lscanf_min
@@ -65,7 +64,7 @@ function(add_avr_executable EXECUTABLE_NAME)
             ${elf_file}
             PROPERTIES
                 COMPILE_FLAGS "${common_opts}"
-                LINK_FLAGS "${common_opts} -Wl,-u,vfprintf,-Map,${map_file} -lprintf_min"
+                LINK_FLAGS "${common_opts} -Wl,-u,vfprintf,-Map,${map_file} -lprintf_min -lm"
         )
 
         add_custom_command(
