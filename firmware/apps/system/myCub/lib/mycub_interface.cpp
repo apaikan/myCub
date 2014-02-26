@@ -138,8 +138,8 @@ static void * controller(void *pParams)
                         //sysDelay(delayStep);                    
                         //sched_yield();
                         int ret;
-                        if((ret = usleep(delayStep)) != 0)
-                            printf("(%d) usleep error : %s\n", joint, strerror(errno));
+                        ret = usleep(delayStep);
+                        //printf("(%d) usleep error : %s\n", joint, strerror(errno));
                         /* exclusive access to parameters */
                         pthread_mutex_lock(&(params->mutex));
                         *(params->curPos) = i;
@@ -155,8 +155,8 @@ static void * controller(void *pParams)
                         //sysDelay(delayStep);
                         //sched_yield();
                         int ret;
-                        if((ret = usleep(delayStep)) != 0)
-                            printf("(%d) usleep error : %s\n", strerror(errno));
+                        ret = usleep(delayStep);
+                        //printf("(%d) usleep error : %s\n", strerror(errno));
                         /* exclusive access to parameters */
                         pthread_mutex_lock(&(params->mutex));
                         *(params->curPos) = i;
@@ -212,9 +212,8 @@ bool MyCubInterface::init(void)
     // setting the MyCubInterface task to highest priority
     struct sched_param sparam; 
     sparam.sched_priority = sched_get_priority_max(SCHED_FIFO); 
-    //if(sched_setparam(0, &sparam) != 0 )
-    if(sched_setscheduler(0, SCHED_FIFO, &sparam) != 0)
-        printf("MyCubInterface::init(): sched_setparam failed!\n");
+    sched_setscheduler(0, SCHED_FIFO, &sparam);
+    //printf("MyCubInterface::init(): sched_setparam failed!\n");
 
     if(fd_servo < 0)
     {
@@ -292,12 +291,13 @@ bool MyCubInterface::init(void)
         
         // front
         range_drv[0].id = 0;
-        range_drv[0].trig_port = GPIO_PORTD;
+        range_drv[0].trig_port = GPIO_PORTA;
         range_drv[0].trig_pin = GPIO_PIN_2; 
-        range_drv[0].echo_port = GPIO_PORTD;
+        range_drv[0].echo_port = GPIO_PORTA;
         range_drv[0].echo_pin = GPIO_PIN_3; 
         ioctl(fd_range, RANGEIOC_ATTACHE, (unsigned long)((uintptr_t)&range_drv[0]));
-      
+        
+        /*
         //right
         range_drv[1].id = 1;
         range_drv[1].trig_port = GPIO_PORTE;
@@ -305,7 +305,8 @@ bool MyCubInterface::init(void)
         range_drv[1].echo_port = GPIO_PORTE;
         range_drv[1].echo_pin = GPIO_PIN_1; 
         ioctl(fd_range, RANGEIOC_ATTACHE, (unsigned long)((uintptr_t)&range_drv[1]));
-        getDistance(0); getDistance(1);
+        */
+        getDistance(0);
     }
 
     if(fd_adc < 0)
@@ -373,6 +374,8 @@ bool MyCubInterface::init(void)
         if(status != 0)
         {
             printf("MyCubInterface::init(): ERROR pthread_condinit failed, status=%d\n", status);
+            fini();
+            return false;
         }
 
         status = pthread_create(&ctrl_threads[i], &attr, controller, &ctrl_params[i]);
@@ -447,7 +450,7 @@ bool MyCubInterface::setPose(const unsigned int joint, const int pos)
 {
     if((pos<8) || (pos>160) || (joint > 3))
     {
-        printf("MyCubInterface::gotoPoseSync(): Invalid joint or position value!\n");
+        //printf("MyCubInterface::gotoPoseSync(): Invalid joint or position value!\n");
         return false;
     }
 
@@ -462,7 +465,7 @@ bool MyCubInterface::gotoPose(const unsigned int joint, const int pos, const dou
 {
     if((pos<8) || (pos>160) || (joint > 3))
     {
-        printf("MyCubInterface::gotoPoseSync(): Invalid joint or position value!\n");
+        //printf("MyCubInterface::gotoPoseSync(): Invalid joint or position value!\n");
         return false;
     }        
 
@@ -481,7 +484,7 @@ bool MyCubInterface::gotoPoseSync(const unsigned int joint, const int pos, const
 {
     if((pos<8) || (pos>160) || (joint > 3))
     {
-        printf("MyCubInterface::gotoPoseSync(): Invalid joint or position value!\n");
+        //printf("MyCubInterface::gotoPoseSync(): Invalid joint or position value!\n");
         return false;
     }        
 
@@ -543,7 +546,7 @@ int MyCubInterface::getPose(const unsigned int joint)
 {
     if(joint > 3)
     {
-        printf("MyCubInterface::getPos(): Invalid joint index!\n");
+        //printf("MyCubInterface::getPos(): Invalid joint index!\n");
         return -1;
     }
 

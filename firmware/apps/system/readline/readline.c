@@ -172,8 +172,12 @@ static inline int readline_rawgetc(int infd)
 #ifdef CONFIG_READLINE_ECHO
 static inline void readline_consoleputc(int ch, int outfd)
 {
+  
   char buffer = ch;
   ssize_t nwritten;
+
+  if(outfd == -1)
+    return; 
 
   /* Loop until we successfully write a character (or until an unexpected
    * error occurs).
@@ -203,7 +207,10 @@ static inline void readline_consoleputc(int ch, int outfd)
 #ifdef CONFIG_READLINE_ECHO
 static inline void readline_consolewrite(int outfd, FAR const char *buffer, size_t buflen)
 {
-  (void)write(outfd, buffer, buflen);
+    if(outfd == -1)
+        return;
+
+    (void)write(outfd, buffer, buflen);
 }
 #endif
 
@@ -249,7 +256,7 @@ ssize_t readline(FAR char *buf, int buflen, FILE *instream, FILE *outstream)
 
   /* Sanity checks */
 
-  if (!instream || !outstream || !buf || buflen < 1)
+  if (!instream || !buf || buflen < 1)
     {
       return -EINVAL;
     }
@@ -265,7 +272,10 @@ ssize_t readline(FAR char *buf, int buflen, FILE *instream, FILE *outstream)
    */
 
   infd   = instream->fs_filedes;
-  outfd  = outstream->fs_filedes;
+  if(outstream != NULL)
+    outfd  = outstream->fs_filedes;
+  else
+    outfd = -1;
 
   /* <esc>[K is the VT100 command that erases to the end of the line. */
 

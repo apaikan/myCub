@@ -188,7 +188,12 @@ int myCub_main(int argc, char *argv[])
         exit(2);
     }
 
-    printf("%s\n", MYCUB_LOGO);
+    bool bInteractive = false;
+    if((argc > 1) && strcmp(argv[1], "--interactive") == 0)
+        bInteractive = true;
+
+    if(bInteractive)
+        printf("%s\n", MYCUB_LOGO);
 
     MyCubInterface mycub;
     mycub.init();
@@ -198,13 +203,21 @@ int myCub_main(int argc, char *argv[])
     should_stop = false;
     while(!should_stop) 
     {
-        int power = (int) (mycub.getBatteryVolt() * 1000);
-        if( power < BATTERY_CRITICAL_LEVE )
-            printf("[WARNING] Battery volatge is critically low (%d.%d V) \n", 
-                    power/1000, power%1000);
-        //ssize_t len = readline_serial(comfd, buf, 256, "[myCub] ");
-        printf("[myCub] "); fflush(stdout);
-        ssize_t len = readline(buf, 256, stdin, stdout);
+        if(bInteractive)
+        {
+            int power = (int) (mycub.getBatteryVolt() * 1000);
+            if( power < BATTERY_CRITICAL_LEVE )
+                printf("[WARNING] Battery volatge is critically low (%d.%d V) \n", 
+                        power/1000, power%1000);
+            //ssize_t len = readline_serial(comfd, buf, 256, "[myCub] ");
+            printf("[myCub] "); fflush(stdout);
+        }    
+
+        ssize_t len;
+        if(bInteractive)
+            len = readline(buf, 256, stdin, stdout);
+        else
+            len = readline(buf, 256, stdin, NULL);
         if(len > 0)
         {
             buf[len-1] = '\0';
@@ -327,7 +340,8 @@ int myCub_main(int argc, char *argv[])
                     for(int i=0; i<ret; i++) {
                         printf("%d, ", data[i]); fflush(stdout);
                     }
-                    printf("\n[ok]\n"); fflush(stdout);
+                    if(bInteractive)
+                        printf("\n[ok]\n"); fflush(stdout);
                     free(data);
                 }
                 else
@@ -338,19 +352,31 @@ int myCub_main(int argc, char *argv[])
                     printf("%d.%d\n", volt/1000, volt%1000); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "help")==0 ) {
-                    printf("\n%s\n", HELP_MESSAGE); fflush(stdout);
+                    if(bInteractive)
+                        printf("\n%s\n", HELP_MESSAGE); fflush(stdout);
             }
             else
-                printf("[error] type 'help' for more commands.\n", HELP_MESSAGE); fflush(stdout);
-
+            {
+                if(bInteractive) {
+                    printf("[error] type 'help' for more commands.\n", HELP_MESSAGE); fflush(stdout);
+                }    
+                else {
+                    printf("[error]\n"); fflush(stdout);
+                }    
+            }
         }
         //usleep(100000);
 	}
 
     MyCubWalker::fini();
     mycub.fini();
-    printf("bye!\n");
+    if(bInteractive)
+        printf("bye!\n");
+    else
+        printf("[ok]\n"); fflush(stdout);
 
     return 0;
 }
-}
+
+} // extern "C"
+

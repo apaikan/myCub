@@ -233,7 +233,7 @@ unsigned long pulse_in( unsigned long port, unsigned char pin)
     while(lm_gpioread(GPIO_FUNC_INPUT  | GPIO_VALUE_ONE | port | pin, 0) == true)
         if((TimerValueGet(TIMER5_BASE, TIMER_A) - t) > 50000000L)
         {
-            printf("wait for previous pulse ... [timeout]\n");
+            //printf("wait for previous pulse ... [timeout]\n");
             return 0;
         }   
     
@@ -242,7 +242,7 @@ unsigned long pulse_in( unsigned long port, unsigned char pin)
     while(lm_gpioread(GPIO_FUNC_INPUT  | GPIO_VALUE_ONE | port | pin, 0) == false)
         if((TimerValueGet(TIMER5_BASE, TIMER_A) - t) > 50000000L)
         {
-            printf("wait for pulse to start ... [timeout]\n");
+            //printf("wait for pulse to start ... [timeout]\n");
             return 0;
         }
 
@@ -253,7 +253,7 @@ unsigned long pulse_in( unsigned long port, unsigned char pin)
         t2 = TimerValueGet(TIMER5_BASE, TIMER_A);
         if((t2 - t) > 50000000L)
         {
-            printf("wait for pulse to stop ... [timeout]\n");
+            //printf("wait for pulse to stop ... [timeout]\n");
             return 0;
         }            
     }
