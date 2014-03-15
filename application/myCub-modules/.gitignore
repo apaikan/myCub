@@ -1,0 +1,7 @@
+
+# latex generated files #
+########################
+
+build
+*.o
+

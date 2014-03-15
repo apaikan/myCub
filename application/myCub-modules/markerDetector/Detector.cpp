@@ -1,0 +1,146 @@
+// -*- mode:C++; tab-width:4; c-basic-offset:4; indent-tabs-mode:nil -*-
+/* 
+ * Copyright (C) 2012 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Author: Ali Paikan
+ * email:  ali.paikan@iit.it
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
+
+#include "Detector.h"
+#include <opencv/cvaux.h>
+#include <opencv/highgui.h>
+#include <opencv/cxcore.h>
+
+using namespace yarp::sig;
+using namespace yarp::os;
+using namespace std;
+using namespace cv;
+
+
+void Detector::loop()
+{    
+    ImageOf<PixelRgb> *image = imagePort.read();  // read an image
+    if (image != NULL) 
+    { 
+        IplImage *cvImage = (IplImage*)image->getIplImage();        
+        ImageOf<PixelRgb> &outImage = outPort.prepare(); //get an output image
+        outImage = *image;
+        display = (IplImage*) outImage.getIplImage();
+        Mat imgMat = display;
+
+        arParamChangeSize(&cameraParam, imgMat.rows, imgMat.cols, &cameraParam);
+
+        ARMarkerInfo* markerInfo = NULL;
+        int markerNum = -1;
+        if (arDetectMarker((ARUint8 *)imgMat.data, 100, &markerInfo, &markerNum) < 0) {
+                printf("Marker detector error\n");
+                return;
+        }
+        
+        // Check which one of the found markers is the one we seek
+        int k = -1;
+        for (int i = 0; i < markerNum; i++) {
+            if (patternID == markerInfo[i].id) {
+                if (k == -1) {
+                    k = i;
+                } else if (markerInfo[k].cf < markerInfo[i].cf) {
+                    k = i;
+                }
+            }
+        }
+
+       
+       if( k != -1)
+       {
+            // mark the marker in the image
+            printf("Marker at (%.2f, %.2f) \n", markerInfo[k].pos[0], markerInfo[k].pos[1]);  
+            //printf("vertex (%.2f, %.2f) (%.2f, %.2f)\n",
+            //        markerInfo[k].vertex[0][0], markerInfo[k].vertex[0][1],
+            //        markerInfo[k].vertex[1][0], markerInfo[k].vertex[1][1]);  
+
+            //line(imgMat, cvPoint(markerInfo[k].vertex[0][0], markerInfo[k].vertex[0][1]), 
+            //             cvPoint(markerInfo[k].vertex[1][0], markerInfo[k].vertex[1][1]), CV_RGB(255,0,0)); 
+
+            Bottle &target=targetPort.prepare();
+            target.clear();
+            target.addDouble(markerInfo[k].pos[0]);
+            target.addDouble(markerInfo[k].pos[1]);
+            target.addInt(markerInfo[k].id);
+            target.addDouble(markerInfo[k].cf);
+            targetPort.write(); 
+       }
+        outPort.write();   
+    }
+}
+
+
+bool Detector::open(yarp::os::ResourceFinder &rf)
+{
+    // Load (default) camera parameters
+    //if (arParamLoad("../../bin/Data/camera_para.dat", 1, &cameraParam) < 0) {
+    //        printf("Camera calibration parameters file load error\n");
+    //        return false;
+    //}
+
+    cameraParam.xsize = 160;
+    cameraParam.ysize = 120;
+
+    cameraParam.mat[0][0] = 601.976;
+    cameraParam.mat[0][1] = 0.0;
+    cameraParam.mat[0][2] = 70.351;
+    cameraParam.mat[0][3] = 0.0;
+    cameraParam.mat[1][0] = 0.0; 
+    cameraParam.mat[1][1] = 613.715;
+    cameraParam.mat[1][2] = 62.765;
+    cameraParam.mat[1][3] = 0.0;
+    cameraParam.mat[2][0] = 0.0;
+    cameraParam.mat[2][1] = 0.0;
+    cameraParam.mat[2][2] = 1.0;
+    cameraParam.mat[2][3] = 0.0;
+  
+    cameraParam.dist_factor[0] = -3.640;
+    cameraParam.dist_factor[1] = 191.709;
+    cameraParam.dist_factor[2] = -138.373;
+    cameraParam.dist_factor[3] = -573.965;
+
+    arInitCparam(&cameraParam);
+    arParamDisp( &cameraParam );
+
+    // Load kanji pattern
+    if ((patternID = arLoadPatt(strPattern.c_str())) < 0) 
+    {
+            printf("Cannot load pattern file %s\n", strPattern.c_str());
+            return false;
+    }
+
+    bool ret = imagePort.open("/markerDetector/image:i");  // give the port a name
+    ret = ret && outPort.open("/markerDetector/image:o");
+    ret = ret && targetPort.open("/markerDetector/target");
+    return ret;
+}
+
+bool Detector::close()
+{
+    imagePort.close();
+    outPort.close();
+    targetPort.close();
+    return true;
+}
+
+bool Detector::interrupt()
+{
+    imagePort.interrupt();
+    return true;
+}
+
+

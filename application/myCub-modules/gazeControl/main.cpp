@@ -19,7 +19,7 @@
 #include <signal.h>
 #include <string.h>
 #include <errno.h>
-
+#include <math.h>
 #include <string>
 
 #include <yarp/os/all.h>
@@ -94,12 +94,28 @@ public:
                 joints_speed = pos->get(2).asDouble();
             else
                 joints_speed = JOINTS_SPEED;
-            setAllJointsPose(pos->get(0).asInt(), pos->get(1).asInt(), joints_speed);
+            setAllJointsPose(pos->get(1).asInt(), pos->get(0).asInt(), joints_speed);
         }
-        else if(mode == "camera")
+        else if(mode == "cam")
         { ; }
-        else if(mode == "cartesian")
-        { ; }
+        else if(mode == "cart")
+        {
+             Bottle* pos = cmd->get(1).asList();
+            if(!pos || (pos->size() < 3))
+                return true;
+            if(pos->size() >= 4)
+                joints_speed = pos->get(3).asDouble();
+            else
+                joints_speed = JOINTS_SPEED;
+            double x =  pos->get(0).asDouble();
+            double y =  pos->get(1).asDouble();
+            double z =  pos->get(2).asDouble();
+            x = (x==0.0) ? 0.01 : x;
+            double j2 = asin(-z/x);
+            j2 = (fabs(j2) == M_PI/2.0) ? j2+0.00001 : j2; 
+            double j1 = asin(y/(x*cos(j2)));
+            setAllJointsPose(j2*180/M_PI+JOINT1_REST, j1*180/M_PI+JOINT2_REST, joints_speed);
+        }
 
         return true; 
     }
@@ -147,7 +163,6 @@ private:
 
         double step_delay = (speed / (double)diff) * 1e6; //us
         step_delay = (step_delay < 5000.0) ? 5000.0 : step_delay;
-        printf("delay %.2f\n", step_delay);
         bool set1 = (pos1 == joints_pos[0]);
         bool set2 = (pos2 == joints_pos[1]);
 
