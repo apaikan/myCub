@@ -68,8 +68,11 @@ void Detector::loop()
             //        markerInfo[k].vertex[0][0], markerInfo[k].vertex[0][1],
             //        markerInfo[k].vertex[1][0], markerInfo[k].vertex[1][1]);  
 
-            //line(imgMat, cvPoint(markerInfo[k].vertex[0][0], markerInfo[k].vertex[0][1]), 
+            //line(display, cvPoint(markerInfo[k].vertex[0][0], markerInfo[k].vertex[0][1]), 
             //             cvPoint(markerInfo[k].vertex[1][0], markerInfo[k].vertex[1][1]), CV_RGB(255,0,0)); 
+            
+            cvCircle(display, cvPoint((int)markerInfo[k].pos[0], (int)markerInfo[k].pos[1]), 
+                     3, CV_RGB(0, 255, 0), 2);
 
             Bottle &target=targetPort.prepare();
             target.clear();
@@ -95,23 +98,23 @@ bool Detector::open(yarp::os::ResourceFinder &rf)
     cameraParam.xsize = 160;
     cameraParam.ysize = 120;
 
-    cameraParam.mat[0][0] = 601.976;
+    cameraParam.mat[0][0] = 234.73;
     cameraParam.mat[0][1] = 0.0;
-    cameraParam.mat[0][2] = 70.351;
+    cameraParam.mat[0][2] = 84.65;
     cameraParam.mat[0][3] = 0.0;
     cameraParam.mat[1][0] = 0.0; 
-    cameraParam.mat[1][1] = 613.715;
-    cameraParam.mat[1][2] = 62.765;
+    cameraParam.mat[1][1] = 234.31;
+    cameraParam.mat[1][2] = 59.08;
     cameraParam.mat[1][3] = 0.0;
     cameraParam.mat[2][0] = 0.0;
     cameraParam.mat[2][1] = 0.0;
     cameraParam.mat[2][2] = 1.0;
     cameraParam.mat[2][3] = 0.0;
   
-    cameraParam.dist_factor[0] = -3.640;
-    cameraParam.dist_factor[1] = 191.709;
-    cameraParam.dist_factor[2] = -138.373;
-    cameraParam.dist_factor[3] = -573.965;
+    cameraParam.dist_factor[0] = -0.279;
+    cameraParam.dist_factor[1] = 3.083;
+    cameraParam.dist_factor[2] = -0.005;
+    cameraParam.dist_factor[3] = 0.012;
 
     arInitCparam(&cameraParam);
     arParamDisp( &cameraParam );

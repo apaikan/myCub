@@ -35,10 +35,17 @@ using namespace std;
 #define JOINT1_MAX              155     // deg
 #define JOINT2_MIN              10      // deg
 #define JOINT2_MAX              180     // deg
-#define JOINT1_REST             105
+#define JOINT1_REST             100
 #define JOINT2_REST             105
 
 #define JOINTS_SPEED            0.200     // sec
+
+/*
+ Camera matrix: 
+   0.00426  -0.00000  -0.36063
+   0.00000   0.00427  -0.25214
+   0.00000   0.00000   1.00000
+*/
 
 class GazeControl: public RFModule {
 public:
