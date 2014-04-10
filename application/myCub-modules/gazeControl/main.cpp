@@ -38,7 +38,14 @@ using namespace std;
 #define JOINT1_REST             100
 #define JOINT2_REST             105
 
-#define JOINTS_SPEED            0.200     // sec
+#define JOINTS_SPEED            0.200    // sec
+
+#define d2                      0.03     // meter
+#define a2                      -0.01
+#define d1                      0.045
+#define X_OFFSET                -0.045   // translating to the center of the robot
+#define Y_OFFSET                0.03     // translating to the center of the robot
+
 
 /*
  Camera matrix: 
@@ -114,14 +121,86 @@ public:
                 joints_speed = pos->get(3).asDouble();
             else
                 joints_speed = JOINTS_SPEED;
-            double x =  pos->get(0).asDouble();
-            double y =  pos->get(1).asDouble();
+
+            double x =  pos->get(0).asDouble() + X_OFFSET;
+            double y =  pos->get(1).asDouble() + Y_OFFSET;
             double z =  pos->get(2).asDouble();
+                   
+            double j1_1 = atan2(y,x) - atan2(d2, sqrt(x*x + y*y - (d2*d2)));
+            double j1_2 = atan2(y,x) - atan2(d2, -sqrt(x*x + y*y - (d2*d2)));
+            double A1 = x*cos(j1_1) + y*sin(j1_1);
+            double A2 = x*cos(j1_2) + y*sin(j1_2);            
+
+            double j2_1 = atan2(z-d1, A1) - atan2(a2, sqrt((z-d1)*(z-d1) + A1*A1 - a2*a2)) + M_PI;
+            double j2_2 = atan2(z-d1, A1) - atan2(a2, -sqrt((z-d1)*(z-d1) + A1*A1 - a2*a2)) + M_PI;
+            double j2_3 = atan2(z-d1, A2) - atan2(a2, sqrt((z-d1)*(z-d1) + A2*A2 - a2*a2)) + M_PI;
+            double j2_4 = atan2(z-d1, A2) - atan2(a2, -sqrt((z-d1)*(z-d1) + A2*A2 - a2*a2)) + M_PI;
+
+            double d3_1 = (d1 - z) * sin(j2_1) - A1*cos(j2_1); 
+            double d3_2 = (d1 - z) * sin(j2_2) - A1*cos(j2_2); 
+            double d3_3 = (d1 - z) * sin(j2_3) - A2*cos(j2_3); 
+            double d3_4 = (d1 - z) * sin(j2_4) - A2*cos(j2_4); 
+            
+            double sol1[2]; 
+            double sol2[2]; 
+
+            if(d3_1 < 0.0) {
+                sol1[0] = fmod(j1_1, 2*M_PI); 
+                sol1[1] = fmod(j1_2, 2*M_PI); 
+            }            
+            else{
+                sol1[0] = fmod(j1_1, 2*M_PI); 
+                sol1[1] = fmod(j2_2, 2*M_PI);
+            }
+
+            if(d3_3 < 0.0) {
+                sol2[0] = fmod(j1_2, 2*M_PI); 
+                sol2[1] = fmod(j2_3, 2*M_PI); 
+            }            
+            else{
+                sol2[0] = fmod(j1_2, 2*M_PI); 
+                sol2[1] = fmod(j2_4, 2*M_PI);
+            }
+             
+            for(int i=0; i<2; i++) {
+                sol1[i] = (sol1[i] > M_PI) ? sol1[i] - 2*M_PI : sol1[i];
+            }
+
+            for(int i=0; i<2; i++) {
+                sol2[i] = (sol2[i] > M_PI) ? sol2[i] - 2*M_PI : sol2[i];
+            }
+
+            //printf("d: %.2f, %.2f, %.2f, %.2f\n", d3_1, d3_2, d3_3, d3_4);
+            printf("sol1: %.2f, %.2f\n", sol1[0], sol1[1]);
+            printf("sol2: %.2f, %.2f\n", sol2[0], sol2[1]);
+           
+            sol1[0] *= 180 / M_PI;
+            sol1[1] *= 180 / M_PI;
+            sol2[0] *= 180 / M_PI;
+            sol2[1] *= 180 / M_PI;
+            
+            printf("sol1: %.2f, %.2f\n", sol1[0], sol1[1]);
+            printf("sol2: %.2f, %.2f\n", sol2[0], sol2[1]);
+
+            double eng1 = abs(sol1[0]) + abs(sol1[1]);
+            double eng2 = abs(sol2[0]) + abs(sol2[1]);
+
+            //if((sol1[0]+JOINT1_REST) > JOINT1_MIN  && (sol1[1]+JOINT2_REST) < JOINT1_MAX )
+            //if((sol2[0]+JOINT1_REST) > JOINT1_MIN  && (sol2[1]+JOINT2_REST) < JOINT1_MAX )
+                           
+            if(eng1 < eng2) 
+                setAllJointsPose(-sol1[1]+JOINT1_REST, sol1[0]+JOINT2_REST, joints_speed);
+            else
+                setAllJointsPose(-sol2[1]+JOINT1_REST, sol2[0]+JOINT2_REST, joints_speed);
+
+            /*
             x = (x==0.0) ? 0.01 : x;
             double j2 = asin(-z/x);
             j2 = (fabs(j2) == M_PI/2.0) ? j2+0.00001 : j2; 
             double j1 = asin(y/(x*cos(j2)));
             setAllJointsPose(j2*180/M_PI+JOINT1_REST, j1*180/M_PI+JOINT2_REST, joints_speed);
+            */
+
         }
 
         return true; 
@@ -156,6 +235,7 @@ public:
 
 private:
     bool setAllJointsPose(int pos1, int pos2, double speed) {
+        printf("joints: %d, %d\n", pos2, pos1);
         // checking joint limits     
         pos1 = (pos1 < JOINT1_MIN) ? JOINT1_MIN : pos1;
         pos1 = (pos1 > JOINT1_MAX) ? JOINT1_MAX : pos1;
