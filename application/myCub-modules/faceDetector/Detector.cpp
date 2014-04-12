@@ -50,9 +50,12 @@ void Detector::loop()
                   
                 Bottle &target=targetPort.prepare();
                 target.clear();
-                target.addInt(face.x);
-                target.addInt(face.y);
-                targetPort.write();                
+                target.addString("cam");
+                Bottle &pos = target.addList();
+                pos.addDouble(face.x);
+                pos.addDouble(face.y);
+                pos.addDouble(1.0);
+                targetPort.write();          
            }
            face = c;
         }

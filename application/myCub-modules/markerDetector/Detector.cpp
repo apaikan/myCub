@@ -74,13 +74,18 @@ void Detector::loop()
             cvCircle(display, cvPoint((int)markerInfo[k].pos[0], (int)markerInfo[k].pos[1]), 
                      3, CV_RGB(0, 255, 0), 2);
 
-            Bottle &target=targetPort.prepare();
+            //Bottle &target=targetPort.prepare();
+            Bottle target;
+            Bottle resp;
             target.clear();
-            target.addDouble(markerInfo[k].pos[0]);
-            target.addDouble(markerInfo[k].pos[1]);
-            target.addInt(markerInfo[k].id);
-            target.addDouble(markerInfo[k].cf);
-            targetPort.write(); 
+            target.addString("cam");
+            Bottle &pos = target.addList();
+            pos.addDouble(markerInfo[k].pos[0]);
+            pos.addDouble(markerInfo[k].pos[1]);
+            pos.addDouble(1.0);
+            //target.addInt(markerInfo[k].id);
+            //target.addDouble(markerInfo[k].cf);
+            targetPort.write(target); 
        }
         outPort.write();   
     }

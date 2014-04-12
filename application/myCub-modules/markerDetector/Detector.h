@@ -33,8 +33,8 @@ class Detector
 {
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb> > imagePort;  // make a port for reading images
     yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelRgb> > outPort;
-    yarp::os::BufferedPort<yarp::os::Bottle> targetPort;
-
+   // yarp::os::BufferedPort<yarp::os::Bottle> targetPort;
+    yarp::os::Port targetPort;
 public:
 
     Detector()

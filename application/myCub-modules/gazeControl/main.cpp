@@ -24,8 +24,13 @@
 
 #include <yarp/os/all.h>
 #include <yarp/os/Log.h>
+#include <yarp/sig/Matrix.h>
+#include <yarp/math/Math.h>
+#include <yarp/os/RpcServer.h>
 
 using namespace yarp::os;
+using namespace yarp::sig;
+using namespace yarp::math;
 using namespace std;
 
 #define SERVO_MIN_PULSE         55      // us
@@ -41,7 +46,7 @@ using namespace std;
 #define JOINTS_SPEED            0.200    // sec
 
 #define d2                      0.03     // meter
-#define a2                      -0.01
+#define a2                      0.01
 #define d1                      0.045
 #define X_OFFSET                -0.045   // translating to the center of the robot
 #define Y_OFFSET                0.03     // translating to the center of the robot
@@ -61,6 +66,18 @@ public:
         bIsRT = false;
         fdServo = NULL;
         joints_speed = JOINTS_SPEED;
+
+        // camera params
+        camParam.resize(3,3);
+        camParam(0,0) = 0.00426;
+        camParam(0,1) = 0.0;
+        camParam(0,2) = -0.36063;
+        camParam(1,0) = 0.0;
+        camParam(1,1) = 0.00427;
+        camParam(1,2) = -0.25214;
+        camParam(2,0) = 0.0;
+        camParam(2,1) = 0.0;
+        camParam(2,2) = 1.0;
     }
 
     bool configure(ResourceFinder &rf) {
@@ -88,119 +105,108 @@ public:
     
     bool updateModule() {
         
-        Bottle* cmd = cmdPort.read();
-        if(!cmd) 
+        Bottle cmd;
+        Bottle rep;
+        if(!cmdPort.read(cmd))
             return true;
 
-        //printf("cmd: %s\n", cmd->toString().c_str());
-        if(cmd->size() < 2)
+        //printf("cmd: %s\n", cmd.toString().c_str());
+        if(cmd.size() < 2)
+        {
+            rep.addString("[nack]");
+            cmdPort.reply(rep);
             return true; 
-
-        string mode = cmd->get(0).asString();
+        }
+        string mode = cmd.get(0).asString();
 
         // Controlling in the joint mode
         if(mode == "joint")
         {
-            Bottle* pos = cmd->get(1).asList();
+            Bottle* pos = cmd.get(1).asList();
             if(!pos || (pos->size() < 2))
-                return true;        
+            {
+                rep.addString("[nack]");
+                cmdPort.reply(rep);
+                return true;       
+            }
+
             if(pos->size() >= 3)
                 joints_speed = pos->get(2).asDouble();
             else
                 joints_speed = JOINTS_SPEED;
             setAllJointsPose(pos->get(1).asInt(), pos->get(0).asInt(), joints_speed);
+            
+            rep.addString("[ack]");
+            cmdPort.reply(rep);
         }
         else if(mode == "cam")
-        { ; }
+        { 
+            Bottle* pos = cmd.get(1).asList();
+            if(!pos || (pos->size() < 3))
+            {
+                rep.addString("[nack]");
+                cmdPort.reply(rep);
+                return true;       
+            }
+
+            if(pos->size() >= 3)
+                joints_speed = pos->get(3).asDouble();
+            else
+                joints_speed = JOINTS_SPEED;
+
+            Matrix uv(3,1);
+            uv(0,0) =  pos->get(0).asDouble();
+            uv(1,0) =  pos->get(1).asDouble();
+            uv(2,0) =  1.0;
+            double d3 = pos->get(2).asDouble(); 
+
+            // maping world to camera frame
+            Matrix cFrame = camParam * uv;
+            //printf("cFrame: %.2f, %.2f, %.2f\n", cFrame(0,0), cFrame(1,0), cFrame(2,0));
+            // transfering to the end effector frame
+            double x3 = -cFrame(1,0);
+            double y3 = -cFrame(0,0);
+            double z3 = 0.0;
+            //double d3 = 0.5;
+            //printf("joints: %d, %d\n", joints_pos[1], joints_pos[0]);
+            double theta1 = (joints_pos[1] - JOINT2_REST) * M_PI/180.0;
+            double theta2 = (joints_pos[0] - JOINT1_REST) * M_PI/180.0;
+            //printf("thetas: %.2f, %.2f\n", theta1, theta2);
+
+            double x = d3*cos(theta1)*cos(theta2) - y3*sin(theta1) - d2*sin(theta1) + a2*cos(theta1)*sin(theta2) + z3*cos(theta1)*cos(theta2) + x3*cos(theta1)*sin(theta2);
+            double y = d2*cos(theta1) + y3*cos(theta1) + d3*cos(theta2)*sin(theta1) + a2*sin(theta1)*sin(theta2) + z3*cos(theta2)*sin(theta1) + x3*sin(theta1)*sin(theta2);
+            double z = d1 + a2*cos(theta2) - d3*sin(theta2) + x3*cos(theta2) - z3*sin(theta2);
+            //printf("xyz: %.5f %.5f %.5f\n", x, y ,z);
+            setCartPose(x, y, z, joints_speed);
+            rep.addString("[ack]");
+            cmdPort.reply(rep);
+        }
         else if(mode == "cart")
         {
-             Bottle* pos = cmd->get(1).asList();
+             Bottle* pos = cmd.get(1).asList();
             if(!pos || (pos->size() < 3))
+            {
+                rep.addString("[nack]");
+                cmdPort.reply(rep);
                 return true;
+            }    
             if(pos->size() >= 4)
                 joints_speed = pos->get(3).asDouble();
             else
                 joints_speed = JOINTS_SPEED;
 
-            double x =  pos->get(0).asDouble() + X_OFFSET;
-            double y =  pos->get(1).asDouble() + Y_OFFSET;
+            double x =  pos->get(0).asDouble();// + X_OFFSET;
+            double y =  pos->get(1).asDouble();// + Y_OFFSET;
             double z =  pos->get(2).asDouble();
-                   
-            double j1_1 = atan2(y,x) - atan2(d2, sqrt(x*x + y*y - (d2*d2)));
-            double j1_2 = atan2(y,x) - atan2(d2, -sqrt(x*x + y*y - (d2*d2)));
-            double A1 = x*cos(j1_1) + y*sin(j1_1);
-            double A2 = x*cos(j1_2) + y*sin(j1_2);            
-
-            double j2_1 = atan2(z-d1, A1) - atan2(a2, sqrt((z-d1)*(z-d1) + A1*A1 - a2*a2)) + M_PI;
-            double j2_2 = atan2(z-d1, A1) - atan2(a2, -sqrt((z-d1)*(z-d1) + A1*A1 - a2*a2)) + M_PI;
-            double j2_3 = atan2(z-d1, A2) - atan2(a2, sqrt((z-d1)*(z-d1) + A2*A2 - a2*a2)) + M_PI;
-            double j2_4 = atan2(z-d1, A2) - atan2(a2, -sqrt((z-d1)*(z-d1) + A2*A2 - a2*a2)) + M_PI;
-
-            double d3_1 = (d1 - z) * sin(j2_1) - A1*cos(j2_1); 
-            double d3_2 = (d1 - z) * sin(j2_2) - A1*cos(j2_2); 
-            double d3_3 = (d1 - z) * sin(j2_3) - A2*cos(j2_3); 
-            double d3_4 = (d1 - z) * sin(j2_4) - A2*cos(j2_4); 
+            setCartPose(x, y, z, joints_speed);            
             
-            double sol1[2]; 
-            double sol2[2]; 
-
-            if(d3_1 < 0.0) {
-                sol1[0] = fmod(j1_1, 2*M_PI); 
-                sol1[1] = fmod(j1_2, 2*M_PI); 
-            }            
-            else{
-                sol1[0] = fmod(j1_1, 2*M_PI); 
-                sol1[1] = fmod(j2_2, 2*M_PI);
-            }
-
-            if(d3_3 < 0.0) {
-                sol2[0] = fmod(j1_2, 2*M_PI); 
-                sol2[1] = fmod(j2_3, 2*M_PI); 
-            }            
-            else{
-                sol2[0] = fmod(j1_2, 2*M_PI); 
-                sol2[1] = fmod(j2_4, 2*M_PI);
-            }
-             
-            for(int i=0; i<2; i++) {
-                sol1[i] = (sol1[i] > M_PI) ? sol1[i] - 2*M_PI : sol1[i];
-            }
-
-            for(int i=0; i<2; i++) {
-                sol2[i] = (sol2[i] > M_PI) ? sol2[i] - 2*M_PI : sol2[i];
-            }
-
-            //printf("d: %.2f, %.2f, %.2f, %.2f\n", d3_1, d3_2, d3_3, d3_4);
-            printf("sol1: %.2f, %.2f\n", sol1[0], sol1[1]);
-            printf("sol2: %.2f, %.2f\n", sol2[0], sol2[1]);
-           
-            sol1[0] *= 180 / M_PI;
-            sol1[1] *= 180 / M_PI;
-            sol2[0] *= 180 / M_PI;
-            sol2[1] *= 180 / M_PI;
-            
-            printf("sol1: %.2f, %.2f\n", sol1[0], sol1[1]);
-            printf("sol2: %.2f, %.2f\n", sol2[0], sol2[1]);
-
-            double eng1 = abs(sol1[0]) + abs(sol1[1]);
-            double eng2 = abs(sol2[0]) + abs(sol2[1]);
-
-            //if((sol1[0]+JOINT1_REST) > JOINT1_MIN  && (sol1[1]+JOINT2_REST) < JOINT1_MAX )
-            //if((sol2[0]+JOINT1_REST) > JOINT1_MIN  && (sol2[1]+JOINT2_REST) < JOINT1_MAX )
-                           
-            if(eng1 < eng2) 
-                setAllJointsPose(-sol1[1]+JOINT1_REST, sol1[0]+JOINT2_REST, joints_speed);
-            else
-                setAllJointsPose(-sol2[1]+JOINT1_REST, sol2[0]+JOINT2_REST, joints_speed);
-
-            /*
-            x = (x==0.0) ? 0.01 : x;
-            double j2 = asin(-z/x);
-            j2 = (fabs(j2) == M_PI/2.0) ? j2+0.00001 : j2; 
-            double j1 = asin(y/(x*cos(j2)));
-            setAllJointsPose(j2*180/M_PI+JOINT1_REST, j1*180/M_PI+JOINT2_REST, joints_speed);
-            */
-
+            rep.addString("[ack]");
+            cmdPort.reply(rep);
+        }
+        else
+        {
+            rep.addString("[nack]");
+            cmdPort.reply(rep);
         }
 
         return true; 
@@ -296,13 +302,86 @@ private:
         return ret;
     }
 
+    void setCartPose(double x, double y, double z, double joints_speed) {
+        double j1_1 = atan2(y,x) - atan2(d2, sqrt(x*x + y*y - (d2*d2)));
+        double j1_2 = atan2(y,x) - atan2(d2, -sqrt(x*x + y*y - (d2*d2)));
+        double A1 = x*cos(j1_1) + y*sin(j1_1);
+        double A2 = x*cos(j1_2) + y*sin(j1_2);            
+
+        double j2_1 = atan2(z-d1, -A1) - atan2(a2, sqrt((z-d1)*(z-d1) + A1*A1 - a2*a2));
+        double j2_2 = atan2(z-d1, -A1) - atan2(a2, -sqrt((z-d1)*(z-d1) + A1*A1 - a2*a2));
+        double j2_3 = atan2(z-d1, -A2) - atan2(a2, sqrt((z-d1)*(z-d1) + A2*A2 - a2*a2));
+        double j2_4 = atan2(z-d1, -A2) - atan2(a2, -sqrt((z-d1)*(z-d1) + A2*A2 - a2*a2));
+        
+        printf("[%.2f, %.2f, %.2f, %.2f]\n", j2_1, j2_2, j2_3, j2_4);
+        double d3_1 = (d1 - z) * sin(j2_1) + A1*cos(j2_1); 
+        double d3_2 = (d1 - z) * sin(j2_2) + A1*cos(j2_2); 
+        double d3_3 = (d1 - z) * sin(j2_3) + A2*cos(j2_3); 
+        double d3_4 = (d1 - z) * sin(j2_4) + A2*cos(j2_4); 
+        
+        double sol1[2]; 
+        double sol2[2]; 
+
+        if(d3_1 > 0.0) {
+            sol1[0] = fmod(j1_1, 2*M_PI); 
+            sol1[1] = fmod(j1_2, 2*M_PI); 
+        }            
+        else{
+            sol1[0] = fmod(j1_1, 2*M_PI); 
+            sol1[1] = fmod(j2_2, 2*M_PI);
+        }
+
+        if(d3_3 > 0.0) {
+            sol2[0] = fmod(j1_2, 2*M_PI); 
+            sol2[1] = fmod(j2_3, 2*M_PI); 
+        }            
+        else{
+            sol2[0] = fmod(j1_2, 2*M_PI); 
+            sol2[1] = fmod(j2_4, 2*M_PI);
+        }
+         
+        for(int i=0; i<2; i++) {
+            sol1[i] = (sol1[i] > M_PI) ? sol1[i] - 2*M_PI : sol1[i];
+            sol1[i] = (sol1[i] < -M_PI) ? sol1[i] + 2*M_PI : sol1[i];
+        }
+
+        for(int i=0; i<2; i++) {
+            sol2[i] = (sol2[i] > M_PI) ? sol2[i] - 2*M_PI : sol2[i];
+            sol2[i] = (sol2[i] < -M_PI) ? sol2[i] + 2*M_PI : sol2[i];
+        }
+
+        //printf("d: %.2f, %.2f, %.2f, %.2f\n", d3_1, d3_2, d3_3, d3_4);
+        printf("sol1: %.2f, %.2f\n", sol1[0], sol1[1]);
+        printf("sol2: %.2f, %.2f\n", sol2[0], sol2[1]);
+       
+        sol1[0] *= 180 / M_PI;
+        sol1[1] *= 180 / M_PI;
+        sol2[0] *= 180 / M_PI;
+        sol2[1] *= 180 / M_PI;
+        
+        printf("sol1: %.2f, %.2f\n", sol1[0], sol1[1]);
+        printf("sol2: %.2f, %.2f\n", sol2[0], sol2[1]);
+
+        double eng1 = abs(sol1[0]) + abs(sol1[1]);
+        double eng2 = abs(sol2[0]) + abs(sol2[1]);
+
+        //if((sol1[0]+JOINT1_REST) > JOINT1_MIN  && (sol1[1]+JOINT2_REST) < JOINT1_MAX )
+        //if((sol2[0]+JOINT1_REST) > JOINT1_MIN  && (sol2[1]+JOINT2_REST) < JOINT1_MAX )
+                       
+        if(eng1 < eng2) 
+            setAllJointsPose(sol1[1]+JOINT1_REST, sol1[0]+JOINT2_REST, joints_speed);
+        else
+            setAllJointsPose(sol2[1]+JOINT1_REST, sol2[0]+JOINT2_REST, joints_speed);
+        }
+
 private:
-    BufferedPort<yarp::os::Bottle> cmdPort;
+    RpcServer cmdPort;
     bool bIsRT;
     FILE* fdServo;
     int joints_pos[2];
     double joints_speed;
     bool shouldStop;
+    Matrix camParam;
 };
 
 
