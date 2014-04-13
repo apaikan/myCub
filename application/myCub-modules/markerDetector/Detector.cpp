@@ -64,12 +64,14 @@ void Detector::loop()
        {
             // mark the marker in the image
             printf("Marker at (%.2f, %.2f) \n", markerInfo[k].pos[0], markerInfo[k].pos[1]);  
-            //printf("vertex (%.2f, %.2f) (%.2f, %.2f)\n",
+            //printf("vertex (%.2f, %.2f) (%.2f, %.2f), (%.2f, %.2f), (%.2f, %.2f)\n",
             //        markerInfo[k].vertex[0][0], markerInfo[k].vertex[0][1],
-            //        markerInfo[k].vertex[1][0], markerInfo[k].vertex[1][1]);  
+            //        markerInfo[k].vertex[1][0], markerInfo[k].vertex[1][1],
+            //        markerInfo[k].vertex[2][0], markerInfo[k].vertex[2][1],
+            //        markerInfo[k].vertex[3][0], markerInfo[k].vertex[3][1]);  
 
-            //line(display, cvPoint(markerInfo[k].vertex[0][0], markerInfo[k].vertex[0][1]), 
-            //             cvPoint(markerInfo[k].vertex[1][0], markerInfo[k].vertex[1][1]), CV_RGB(255,0,0)); 
+            cvLine(display, cvPoint(markerInfo[k].vertex[0][0], markerInfo[k].vertex[0][1]), 
+                            cvPoint(markerInfo[k].vertex[1][0], markerInfo[k].vertex[1][1]), CV_RGB(0,0,255), 2); 
             
             cvCircle(display, cvPoint((int)markerInfo[k].pos[0], (int)markerInfo[k].pos[1]), 
                      3, CV_RGB(0, 255, 0), 2);
@@ -116,10 +118,10 @@ bool Detector::open(yarp::os::ResourceFinder &rf)
     cameraParam.mat[2][2] = 1.0;
     cameraParam.mat[2][3] = 0.0;
   
-    cameraParam.dist_factor[0] = -0.279;
-    cameraParam.dist_factor[1] = 3.083;
-    cameraParam.dist_factor[2] = -0.005;
-    cameraParam.dist_factor[3] = 0.012;
+    cameraParam.dist_factor[0] = 1;//-0.279;
+    cameraParam.dist_factor[1] = 1;//3.083;
+    cameraParam.dist_factor[2] = 1;//-0.005;
+    cameraParam.dist_factor[3] = 1;//0.012;
 
     arInitCparam(&cameraParam);
     arParamDisp( &cameraParam );

@@ -1,0 +1,36 @@
+<application>
+    <name>MarkerDetection</name>
+    <description></description>
+    <version>1.0</version>
+    <authors>
+        <author email="ali.paikan@iit.it">Ali Paikan</author>
+    </authors>
+    <module>
+        <name>yarpview</name>
+        <parameters></parameters>
+        <node>localhost</node>
+        <prefix>/marker</prefix>
+    </module>
+    <module>
+        <name>markerDetector</name>
+        <parameters>--context markerDetector --pattern patt.kanji</parameters>
+        <node>raspberry</node>
+        <workdir>/home/pi/install/myCub/application/myCub-modules/markerDetector/build</workdir>
+    </module>
+
+    <connection>
+        <from>/grabber</from>
+        <to>/markerDetector/image:i</to>
+        <protocol>udp</protocol>
+    </connection>
+    <connection>
+        <from>/markerDetector/image:o</from>
+        <to>/marker/yarpview/img:i</to>
+        <protocol>udp</protocol>
+    </connection>
+    <connection>
+        <from>/markerDetector/target</from>
+        <to>/GazeControl/cmd:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+</application>
