@@ -85,6 +85,7 @@ void Detector::loop()
             pos.addDouble(markerInfo[k].pos[0]);
             pos.addDouble(markerInfo[k].pos[1]);
             pos.addDouble(1.0);
+            pos.addDouble(0.0); // maximum control speed
             //target.addInt(markerInfo[k].id);
             //target.addDouble(markerInfo[k].cf);
             targetPort.write(target); 

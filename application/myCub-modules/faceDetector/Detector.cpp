@@ -38,15 +38,16 @@ void Detector::loop()
         display = (IplImage*) outImage.getIplImage();
         Mat imgMat = display;
         circle_t c;
-        detectAndDraw(imgMat, 1.3, c);
+        detectAndDraw(imgMat, 1.2, c);
 
         // check whether a right size face-bounded circle found
         if(c.r > 0)
         {            
-           if(isIn(c, face))
+           if(!isIn(c, face))
            {
-                cvCircle(display, cvPoint(cvRound(face.x), cvRound(face.y)), 2, CV_RGB(0,255,0), 3, 8, 0 );
-                cvCircle(display, cvPoint(cvRound(face.x), cvRound(face.y)), cvRound(face.r), CV_RGB(0,255,0), 2, 8, 0 );
+                face = c;
+                cvCircle(display, cvPoint(cvRound(face.x), cvRound(face.y)), 2, CV_RGB(0,0,255), 1, 8, 0 );
+                cvCircle(display, cvPoint(cvRound(face.x), cvRound(face.y)), cvRound(face.r), CV_RGB(0,0,255), 1, 8, 0 );
                   
                 Bottle &target=targetPort.prepare();
                 target.clear();
@@ -55,9 +56,14 @@ void Detector::loop()
                 pos.addDouble(face.x);
                 pos.addDouble(face.y);
                 pos.addDouble(1.0);
+                pos.addDouble(0.0); //control speed
                 targetPort.write();          
            }
-           face = c;
+           else
+           {
+                cvCircle(display, cvPoint(cvRound(face.x), cvRound(face.y)), 2, CV_RGB(0,255,0), 1, 8, 0 );
+                cvCircle(display, cvPoint(cvRound(face.x), cvRound(face.y)), cvRound(face.r), CV_RGB(0,255,0), 1, 8, 0 ); 
+           }
         }
         else
             counter = 0;
@@ -68,7 +74,7 @@ void Detector::loop()
 
 bool Detector::isIn(circle_t& c1, circle_t& c2)
 {
-    float margin = c2.r/2.0;
+    float margin = c2.r/3.0;
     if(c1.x < c2.x-margin)
         return false;
     if(c1.x > c2.x+margin)
@@ -171,6 +177,15 @@ bool Detector::close()
 {
     imagePort.close();
     outPort.close();
+    // restore to the default context 
+    targetPort.setStrict();
+    Bottle &target = targetPort.prepare();
+    target.addString("joint");
+    Bottle &pos = target.addList();
+    pos.addDouble(105);
+    pos.addDouble(100);
+    pos.addDouble(2.0); //speed
+    targetPort.write();
     targetPort.close();
     return true;
 }

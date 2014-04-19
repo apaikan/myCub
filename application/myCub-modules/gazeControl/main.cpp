@@ -36,7 +36,7 @@ using namespace std;
 #define SERVO_MIN_PULSE         55      // us
 #define SERVO_MAX_PULSE         240     // us
 
-#define JOINT1_MIN              70      // deg
+#define JOINT1_MIN              10      // deg
 #define JOINT1_MAX              155     // deg
 #define JOINT2_MIN              10      // deg
 #define JOINT2_MAX              180     // deg

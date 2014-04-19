@@ -17,11 +17,15 @@ res=0
 
 case "$1" in
   start)
-	/usr/local/sbin/servod --p1pins="18,22" --idle-timeout=2000 >/dev/null
+	/usr/local/sbin/servod --pcm --p1pins="18,22" --idle-timeout=2000 >/dev/null
+	echo 0=155 > /dev/servoblaster
+	echo 1=160 > /dev/servoblaster
 	;;
   restart|reload|force-reload)
 	killall servod
-	/usr/local/sbin/servod --p1pins="18,22" --idle-timeout=2000 >/dev/null
+	/usr/local/sbin/servod --pcm --p1pins="18,22" --idle-timeout=2000 >/dev/null
+	echo 0=155 > /dev/servoblaster
+	echo 1=160 > /dev/servoblaster
 	;;
   stop)
 	killall servod
