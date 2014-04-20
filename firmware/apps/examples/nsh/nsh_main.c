@@ -100,6 +100,8 @@
  * support ELF or NXFLAT binaries!
  */
 
+extern int myCub_main(int argc, char *argv[]);
+
 #if defined(CONFIG_LIBC_EXECFUNCS) && defined(CONFIG_EXECFUNCS_SYMTAB)
 const struct symtab_s CONFIG_EXECFUNCS_SYMTAB[1];
 #endif
@@ -164,6 +166,10 @@ int nsh_main(int argc, char *argv[])
      exitval = 1;
    }
 #endif
+
+
+  /* Start myCubInterface*/
+  myCub_main(0, NULL);
 
   /* If the serial console front end is selected, then run it on this thread */
 

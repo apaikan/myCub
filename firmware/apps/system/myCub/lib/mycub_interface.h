@@ -139,6 +139,7 @@ public:
 
     // adc
     double getBatteryVolt(void);
+    double getBatteryCurrent(void);
     int getRawAnalogData(const int channel, unsigned long freq,
                          uint16_t* data, size_t len);
 private:

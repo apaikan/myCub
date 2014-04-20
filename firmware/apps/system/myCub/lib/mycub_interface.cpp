@@ -639,6 +639,7 @@ double MyCubInterface::getBatteryVolt(void)
 {
     double volt = 0.0;
     uint16_t value[10];
+    // ADC on PD1
     int ret = getRawAnalogData(6, 1000, value, 10);
     if(ret <= 0)
         return -1.0; 
@@ -649,5 +650,20 @@ double MyCubInterface::getBatteryVolt(void)
     // R_vcc = 10K
     double vm = volt * (0.000805);
     return (vm * 11000.0 / 1000.0);
+}
+
+double MyCubInterface::getBatteryCurrent(void)
+{
+    double volt = 0.0;
+    uint16_t value[10];
+    // ADC on PD2
+    int ret = getRawAnalogData(5, 1000, value, 10);
+    if(ret <= 0)
+        return -1.0; 
+    for(int i=0; i<10; i++)
+       volt += value[i];
+    volt /= 10.0;
+    double vin = volt * (0.000805); 
+    return vin * 0.2/2.2;
 }
 

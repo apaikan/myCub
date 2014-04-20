@@ -92,8 +92,10 @@ Commands:\n\
   moveBack [time] \n\
   moveRight [time] \n\
   moveLeft [time] \n\
+  stop \n\
   getDistance <sonar> \n\
   getBatteryVolt \n\
+  getBatteryCurrent \n\
   getADC <channel> <freq> <samples>  \n\
   help \n"
 
@@ -228,7 +230,10 @@ int myCub_main(int argc, char *argv[])
             if(strcmp(mycub_cmd[0], "exit")==0 )
             {
                 should_stop = true;            
-            }                
+            } 
+            else if(strcmp(mycub_cmd[0], "ping")==0 ){
+                printf("[ok]\n"); fflush(stdout);
+            }
             else if(strcmp(mycub_cmd[0], "setPose")==0 ) {
                 if(n >= 3)
                 {
@@ -264,7 +269,7 @@ int myCub_main(int argc, char *argv[])
                     double t = 0.0;
                     if(n>=4)
                         t = atoi(mycub_cmd[3]);
-                    mycub.gotoPose(atoi(mycub_cmd[1]), atoi(mycub_cmd[2]), t);
+                    mycub.gotoPose(atoi(mycub_cmd[1]), atoi(mycub_cmd[2]), t/1000.0);
                     printf("[ok]\n"); fflush(stdout);
                 }
                 else
@@ -346,6 +351,10 @@ int myCub_main(int argc, char *argv[])
                 }
                 else
                     printf("[error]\n"); fflush(stdout);
+            }
+            else if(strcmp(mycub_cmd[0], "getBatteryCurrent")==0 ) {
+                    int cur = (int) (mycub.getBatteryCurrent() * 1000); 
+                    printf("%d.%d\n", cur/1000, cur%1000); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "getBatteryVolt")==0 ) {
                     int volt = (int) (mycub.getBatteryVolt() * 1000);                    
