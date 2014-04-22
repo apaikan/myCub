@@ -1,0 +1,36 @@
+<application>
+    <name>BallDetection</name>
+    <description></description>
+    <version>1.0</version>
+    <authors>
+        <author email="ali.paikan@iit.it">Ali Paikan</author>
+    </authors>
+    <module>
+        <name>yarpview</name>
+        <parameters></parameters>
+        <node>localhost</node>
+        <prefix>/ball</prefix>
+    </module>
+    <module>
+        <name>ballDetector</name>
+        <parameters></parameters>
+        <node>localhost</node>
+        <workdir>/home/apaikan/Install/myCub/application/myCub-modules/ballDetector/build</workdir>
+    </module>
+
+    <connection>
+        <from>/grabber</from>
+        <to>/ballDetector/image:i</to>
+        <protocol>udp</protocol>
+    </connection>
+    <connection>
+        <from>/ballDetector/image:o</from>
+        <to>/ball/yarpview/img:i</to>
+        <protocol>udp</protocol>
+    </connection>
+    <connection>
+        <from>/ballDetector/target</from>
+        <to>/GazeControl/cmd:i</to>
+        <protocol>tcp</protocol>
+    </connection>
+</application>
