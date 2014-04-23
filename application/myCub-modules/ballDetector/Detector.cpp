@@ -61,7 +61,7 @@ void Detector::loop()
         CvMemStorage* storage = cvCreateMemStorage(0);
         // hough detector works better with some smoothing of the image
         cvDilate(thresholded, thresholded, NULL, 3);
-        cvSmooth( thresholded, thresholded, CV_GAUSSIAN, 13, 13);
+        cvSmooth( thresholded, thresholded, CV_GAUSSIAN, 5, 5);
         CvSeq* circles = cvHoughCircles(thresholded, storage, CV_HOUGH_GRADIENT, 1,
                                         thresholded->height/4, 100, 15, 
                                         thresholded->height/30, thresholded->height/2);
