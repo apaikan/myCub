@@ -1,5 +1,5 @@
 <application>
-    <name>BallDetection</name>
+    <name>BallTracker</name>
     <description></description>
     <version>1.0</version>
     <authors>
@@ -14,8 +14,16 @@
     <module>
         <name>ballDetector</name>
         <parameters></parameters>
-        <node>localhost</node>
-        <workdir>/home/apaikan/Install/myCub/application/myCub-modules/ballDetector/build</workdir>
+        <node>raspberry</node>
+        <workdir>/home/pi/install/myCub/application/myCub-modules/ballDetector/build</workdir>
+    </module>
+
+    <module>
+        <name>lookAround.lua</name>
+        <parameters></parameters>
+        <node>raspberry</node>
+        <workdir>/home/pi/install/myCub/application/myCub-modules/lookAround</workdir>
+        <deployer>lua</deployer>
     </module>
 
     <connection>
@@ -28,9 +36,16 @@
         <to>/ball/yarpview/img:i</to>
         <protocol>udp</protocol>
     </connection>
+
     <connection>
         <from>/ballDetector/target</from>
         <to>/GazeControl/cmd:i</to>
-        <protocol>tcp</protocol>
+        <protocol>tcp+recv.portmonitor+context.ball_tracker+file.pm_ball</protocol>
     </connection>
+    <connection>
+        <from>/lookAround/target</from>
+        <to>/GazeControl/cmd:i</to>
+        <protocol>tcp+recv.portmonitor+context.ball_tracker+file.pm_look</protocol>
+    </connection>
+
 </application>

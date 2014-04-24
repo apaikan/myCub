@@ -1,5 +1,5 @@
 <application>
-    <name>BallTracker</name>
+    <name>FaceDetection</name>
     <description></description>
     <version>1.0</version>
     <authors>
@@ -9,43 +9,44 @@
         <name>yarpview</name>
         <parameters></parameters>
         <node>localhost</node>
-        <prefix>/ball</prefix>
+        <prefix>/marker</prefix>
     </module>
     <module>
-        <name>ballDetector</name>
-        <parameters></parameters>
-        <node>localhost</node>
-        <workdir>/home/apaikan/Install/myCub/application/myCub-modules/ballDetector/build</workdir>
+        <name>faceDetector</name>
+        <parameters>--context faceDetector --cascade haarcascade_frontalface_alt.xml</parameters>
+        <node>raspberry</node>
+        <workdir>/home/pi/install/myCub/application/myCub-modules/faceDetector/build</workdir>
     </module>
 
     <module>
         <name>lookAround.lua</name>
         <parameters></parameters>
-        <node>localhost</node>
-        <workdir>/home/apaikan/Install/myCub/application/myCub-modules/lookAround</workdir>
+        <node>raspberry</node>
+        <workdir>/home/pi/install/myCub/application/myCub-modules/lookAround</workdir>
         <deployer>lua</deployer>
     </module>
 
-    <connection>
-        <from>/grabber</from>
-        <to>/ballDetector/image:i</to>
-        <protocol>udp</protocol>
-    </connection>
-    <connection>
-        <from>/ballDetector/image:o</from>
-        <to>/ball/yarpview/img:i</to>
-        <protocol>udp</protocol>
-    </connection>
 
     <connection>
-        <from>/ballDetector/target</from>
+        <from>/grabber</from>
+        <to>/faceDetector/image:i</to>
+        <protocol>udp</protocol>
+    </connection>
+    <connection>
+        <from>/faceDetector/image:o</from>
+        <to>/marker/yarpview/img:i</to>
+        <protocol>udp</protocol>
+    </connection>
+    <connection>
+        <from>/faceDetector/target</from>
         <to>/GazeControl/cmd:i</to>
-        <protocol>tcp+recv.portmonitor+file.pm_ball</protocol>
+        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_face</protocol>
     </connection>
     <connection>
         <from>/lookAround/target</from>
         <to>/GazeControl/cmd:i</to>
-        <protocol>tcp+recv.portmonitor+file.pm_look</protocol>
+        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_look</protocol>
     </connection>
+
 
 </application>
