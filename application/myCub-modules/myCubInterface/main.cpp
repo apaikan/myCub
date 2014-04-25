@@ -33,6 +33,8 @@ using namespace yarp::os;
 using namespace std;
 
 #define JOINTS_SPEED            0.200     // sec
+#define JOINTS_SCALE            2.2687
+#define JOINTS_MIN              8
 
 class MyCubInterface: public RFModule {
 public:
@@ -157,11 +159,14 @@ public:
             }
             char cmd[64];
             if(command.size() > 4 )
-                sprintf(cmd, "gotoPose %d %d %d\n", command.get(2).asInt(), 
-                        command.get(3).asInt(), command.get(4).asInt());
+                sprintf(cmd, "gotoPose %d %d %d\n", 
+                        command.get(2).asInt(), 
+                        (int)(command.get(3).asInt()*JOINTS_SCALE+JOINTS_MIN), 
+                        command.get(4).asInt());
             else
-                sprintf(cmd, "gotoPose %d %d\n", command.get(2).asInt(), 
-                        command.get(3).asInt());
+                sprintf(cmd, "gotoPose %d %d\n", 
+                       command.get(2).asInt(), 
+                       (int)(command.get(3).asInt()*JOINTS_SCALE+JOINTS_MIN));
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine());
@@ -177,11 +182,14 @@ public:
             }
             char cmd[64];
             if(command.size() > 4 )
-                sprintf(cmd, "gotoPoseSync %d %d %d\n", command.get(2).asInt(), 
-                        command.get(3).asInt(), command.get(4).asInt());
+                sprintf(cmd, "gotoPoseSync %d %d %d\n",
+                        command.get(2).asInt(), 
+                        (int)(command.get(3).asInt()*JOINTS_SCALE+JOINTS_MIN), 
+                        command.get(4).asInt());
             else
-                sprintf(cmd, "gotoPoseSync %d %d\n", command.get(2).asInt(), 
-                        command.get(3).asInt());
+                sprintf(cmd, "gotoPoseSync %d %d\n",
+                        command.get(2).asInt(), 
+                        (int)(command.get(3).asInt()*JOINTS_SCALE+JOINTS_MIN)); 
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine());
