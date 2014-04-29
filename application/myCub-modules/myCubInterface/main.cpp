@@ -111,7 +111,7 @@ public:
         sprintf(cmd, "getBatteryVolt\n");
         pSerial->Write(cmd);
         battery_volt = atof(pSerial->ReadLine());
-        battery_volt = (battery_volt-6.0) / (8.0-6.0) * 100.0;
+        battery_volt = (battery_volt-6.0) / (7.4-6.0) * 100.0;
         bool ret = (fprintf(fdDisplay, "\%bat\%% %d\n",(int)battery_volt) > 0); 
         fflush(fdDisplay);
         battery_volt = 0.0;
@@ -124,7 +124,7 @@ public:
 
     double getPeriod() {
         //makeRealTime();
-        return 5; // run every 5 s 
+        return 5.0; // run every 5 s 
     }
     
     bool updateModule() {
@@ -133,10 +133,10 @@ public:
         sprintf(cmd, "getBatteryVolt\n");
         pSerial->Write(cmd);
         battery_volt += atof(pSerial->ReadLine());
-        if(battery_volt_count >= 12)
+        if(battery_volt_count++ >= 12)
         {
             battery_volt /= battery_volt_count;
-            battery_volt = (battery_volt-6.0) / (8.0-6.0) * 100;
+            battery_volt = (battery_volt-6.0) / (7.4-6.0) * 100;
             bool ret = (fprintf(fdDisplay, "\%bat\%% %d\n",(int)battery_volt) > 0); 
             fflush(fdDisplay);
             battery_volt_count = 0;
