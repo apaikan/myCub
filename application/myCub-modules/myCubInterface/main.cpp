@@ -42,6 +42,8 @@ public:
     MyCubInterface(void) {
         bIsRT = false;
         pSerial = NULL;
+        battery_volt = 0.0;
+        battery_volt_count = 0;
     }
     
     ~MyCubInterface(void) {
@@ -99,7 +101,22 @@ public:
             return false;          
         }
 
-        bool ret = cmdPort.open("/MyCubInterface/cmd:i");
+        fdDisplay = fopen("/dev/display", "w");
+        if(!fdDisplay)
+        {
+            fprintf(stdout, "Cannot open display driver! (dose not exist)\n");            
+            return false;
+        }
+        char cmd[64];
+        sprintf(cmd, "getBatteryVolt\n");
+        pSerial->Write(cmd);
+        battery_volt = atof(pSerial->ReadLine());
+        battery_volt = (battery_volt-6.0) / (8.0-6.0) * 100.0;
+        bool ret = (fprintf(fdDisplay, "\%bat\%% %d\n",(int)battery_volt) > 0); 
+        fflush(fdDisplay);
+        battery_volt = 0.0;
+
+        ret = cmdPort.open("/MyCubInterface/cmd:i");
         if(ret)
             attach(cmdPort);
         return ret;
@@ -107,11 +124,24 @@ public:
 
     double getPeriod() {
         //makeRealTime();
-        return 10; // run every 10 s 
+        return 5; // run every 5 s 
     }
     
     bool updateModule() {
- 
+        // update battery status
+        char cmd[64];
+        sprintf(cmd, "getBatteryVolt\n");
+        pSerial->Write(cmd);
+        battery_volt += atof(pSerial->ReadLine());
+        if(battery_volt_count >= 12)
+        {
+            battery_volt /= battery_volt_count;
+            battery_volt = (battery_volt-6.0) / (8.0-6.0) * 100;
+            bool ret = (fprintf(fdDisplay, "\%bat\%% %d\n",(int)battery_volt) > 0); 
+            fflush(fdDisplay);
+            battery_volt_count = 0;
+            battery_volt = 0.0;
+        }
         return true; 
     }
 
@@ -315,6 +345,7 @@ public:
     bool close() {
         cmdPort.close(); 
         //driver.close();
+        fclose(fdDisplay);
         return true; 
     } 
 
@@ -332,8 +363,11 @@ private:
 	//PolyDriver driver;
     //ISerialDevice *pSerial;
     SerialPort* pSerial; 
+    FILE* fdDisplay;
     RpcServer cmdPort;
     bool bIsRT;
+    double battery_volt;
+    int battery_volt_count;
 };
 
 

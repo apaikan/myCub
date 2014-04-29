@@ -56,7 +56,11 @@ int _bk = 7;
 
 // lcd contrast 
 int contrast = 60;
- 
+
+// battery 
+int battery_level = 0; 
+std::vector<std::string> linebuff;
+
 /*
 static void udelay(int us)
 {
@@ -94,13 +98,31 @@ static void setup_sighandlers(void)
 	}
 }
 
+void update_display()
+{
+    // update display
+    LCDclear();
+    for(int i=0; i<linebuff.size(); i++)                         
+        LCDdrawstring(0, i*8, (char*)linebuff[i].c_str());
+
+     // drawing buttom line    
+     for (int i=0; i<83; i+=2)
+        LCDdrawline(i, 40, i, 40, BLACK);
+     // drawing battery
+     LCDdrawrect(70, 42, 12, 5, BLACK);
+     LCDdrawrect(81, 43, 3, 3, BLACK);
+     // battery charge state     
+     LCDfillrect(70, 43, battery_level/10+1, 4, BLACK); 
+
+}
+
+
 static void go_go_go(void)
 {
 	int fd;
 	struct timeval tv;
 	static char line[128];
 	int nchars = 0;
-    std::vector<std::string> linebuff;
     int ntimes_out = 0;
     int ntimes_reset = 0;
 	if ((fd = open(DEVFILE, O_RDWR|O_NONBLOCK)) == -1)
@@ -145,7 +167,7 @@ static void go_go_go(void)
                 if(strcmp(line,"%clear%") == 0)                
                 {
                     linebuff.clear();
-                    LCDclear();
+                    update_display();
                 }   
                 else if(strcmp(line,"%logo%") == 0)
                 {
@@ -153,25 +175,25 @@ static void go_go_go(void)
                     LCDclear();
                     LCDshowLogo();
                 }
-                //else if((str.size() > 8) && (str.substr(0, 8) == "%bitmap%"))
-                //{
-               // }
+                else if(str.substr(0,5) == "%bat%")
+                {
+                    std::string val = str.substr(6, str.npos);
+                    battery_level = atoi(val.c_str());
+                    update_display();
+                }
                 else
                 {
                     int start = 0;  
                     int size = 14;  
-	                while (start < str.size()) 
+                    while (start < str.size()) 
                     {  
-	                    int end = ((start + size) < str.size()) ? size : str.size() - start;                        
-                        if(linebuff.size()>5)
+                        int end = ((start + size) < str.size()) ? size : str.size() - start;                        
+                        if(linebuff.size()>4)
                             linebuff.erase(linebuff.begin());	                  
                         linebuff.push_back(str.substr(start, end));
-	                    start += size;  
-	                } 
-                    // update display
-                    LCDclear();
-                    for(int i=0; i<linebuff.size(); i++)                         
-                        LCDdrawstring(0, i*8, (char*)linebuff[i].c_str());
+                        start += size;  
+                    } 
+                    update_display();
                 }
                 ntimes_out = 0;
                 digitalWrite(_bk, HIGH);
