@@ -129,6 +129,7 @@ public:
     
     bool updateModule() {
         // update battery status
+        serMutex.lock();
         char cmd[64];
         sprintf(cmd, "getBatteryVolt\n");
         pSerial->Write(cmd);
@@ -142,6 +143,7 @@ public:
             battery_volt_count = 0;
             battery_volt = 0.0;
         }
+        serMutex.unlock();
         return true; 
     }
 
@@ -172,11 +174,13 @@ public:
                 reply.addString("[error]");
                 return true;
             }
+            serMutex.lock();
             char cmd[64];
             sprintf(cmd, "setPose %d %d\n", command.get(2).asInt(), command.get(3).asInt());
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine(1000));
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "goto" && 
@@ -187,6 +191,7 @@ public:
                 reply.addString("[error]");
                 return true;
             }
+            serMutex.lock();
             char cmd[64];
             if(command.size() > 4 )
                 sprintf(cmd, "gotoPose %d %d %d\n", 
@@ -200,6 +205,7 @@ public:
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine(1000));
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "goto" && 
@@ -210,6 +216,7 @@ public:
                 reply.addString("[error]");
                 return true;
             }
+            serMutex.lock();
             char cmd[64];
             if(command.size() > 4 )
                 sprintf(cmd, "gotoPoseSync %d %d %d\n",
@@ -223,11 +230,13 @@ public:
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine(1000));
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "move" && 
             command.get(1).asString() == "front") 
         {
+            serMutex.lock();
             char cmd[64];
             if(command.size() > 2 )
                 sprintf(cmd, "moveFront %d\n", command.get(2).asInt()); 
@@ -236,11 +245,13 @@ public:
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine(1000));
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "move" && 
             command.get(1).asString() == "back") 
         {
+            serMutex.lock();
             char cmd[64];
             if(command.size() > 2 )
                 sprintf(cmd, "moveBack %d\n", command.get(2).asInt()); 
@@ -249,11 +260,13 @@ public:
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine(1000));
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "move" && 
             command.get(1).asString() == "right") 
         {
+            serMutex.lock();
             char cmd[64];
             if(command.size() > 2 )
                 sprintf(cmd, "moveRight %d\n", command.get(2).asInt()); 
@@ -262,11 +275,13 @@ public:
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine(1000));
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "move" && 
             command.get(1).asString() == "left") 
         {
+            serMutex.lock();
             char cmd[64];
             if(command.size() > 2 )
                 sprintf(cmd, "moveLeft %d\n", command.get(2).asInt()); 
@@ -275,16 +290,19 @@ public:
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine(1000));
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "move" && 
             command.get(1).asString() == "stop") 
         {
+            serMutex.lock();
             char cmd[64];
             sprintf(cmd, "stop\n");
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine(1000));
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "get" && 
@@ -295,21 +313,25 @@ public:
                 reply.addString("[error]");
                 return true;
             }
+            serMutex.lock();
             char cmd[64];
             sprintf(cmd, "getDistance %d\n", command.get(2).asInt());
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine(1000));
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "get" && 
             command.get(1).asString() == "battery") 
         {
+            serMutex.lock();
             char cmd[64];
             sprintf(cmd, "getBatteryVolt\n");
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine(1000));
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "get" && 
@@ -320,12 +342,14 @@ public:
                 reply.addString("[error]");
                 return true;
             }
+            serMutex.lock();
             char cmd[64];
             sprintf(cmd, "getADC %d %d %d\n", command.get(2).asInt(), 
                     command.get(3).asInt(), command.get(4).asInt());
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine(1000));
+            serMutex.unlock();
             return true;
         }
         else
@@ -362,6 +386,7 @@ public:
 private:
 	//PolyDriver driver;
     //ISerialDevice *pSerial;
+    yarp::os::Mutex serMutex;
     SerialPort* pSerial; 
     FILE* fdDisplay;
     RpcServer cmdPort;
