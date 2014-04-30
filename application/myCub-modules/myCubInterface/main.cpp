@@ -93,7 +93,7 @@ public:
       
         // ping the board 
         pSerial->Write("ping\n");
-        std::string rep = pSerial->ReadLine();
+        std::string rep = pSerial->ReadLine(1000);
         if(rep != "[ok]" )
         {
             printf("Cannot communicate with myCub control board!\n");
@@ -110,7 +110,7 @@ public:
         char cmd[64];
         sprintf(cmd, "getBatteryVolt\n");
         pSerial->Write(cmd);
-        battery_volt = atof(pSerial->ReadLine());
+        battery_volt = atof(pSerial->ReadLine(1000));
         battery_volt = (battery_volt-6.0) / (7.4-6.0) * 100.0;
         bool ret = (fprintf(fdDisplay, "\%bat\%% %d\n",(int)battery_volt) > 0); 
         fflush(fdDisplay);
@@ -132,7 +132,7 @@ public:
         char cmd[64];
         sprintf(cmd, "getBatteryVolt\n");
         pSerial->Write(cmd);
-        battery_volt += atof(pSerial->ReadLine());
+        battery_volt += atof(pSerial->ReadLine(1000));
         if(battery_volt_count++ >= 12)
         {
             battery_volt /= battery_volt_count;
@@ -176,7 +176,7 @@ public:
             sprintf(cmd, "setPose %d %d\n", command.get(2).asInt(), command.get(3).asInt());
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine());
+            reply.addString(pSerial->ReadLine(1000));
             return true;
         }
         else if(command.get(0).asString() == "goto" && 
@@ -199,7 +199,7 @@ public:
                        (int)(command.get(3).asInt()*JOINTS_SCALE+JOINTS_MIN));
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine());
+            reply.addString(pSerial->ReadLine(1000));
             return true;
         }
         else if(command.get(0).asString() == "goto" && 
@@ -222,7 +222,7 @@ public:
                         (int)(command.get(3).asInt()*JOINTS_SCALE+JOINTS_MIN)); 
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine());
+            reply.addString(pSerial->ReadLine(1000));
             return true;
         }
         else if(command.get(0).asString() == "move" && 
@@ -235,7 +235,7 @@ public:
                 sprintf(cmd, "moveFront\n");
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine());
+            reply.addString(pSerial->ReadLine(1000));
             return true;
         }
         else if(command.get(0).asString() == "move" && 
@@ -248,7 +248,7 @@ public:
                 sprintf(cmd, "moveBack\n");
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine());
+            reply.addString(pSerial->ReadLine(1000));
             return true;
         }
         else if(command.get(0).asString() == "move" && 
@@ -261,7 +261,7 @@ public:
                 sprintf(cmd, "moveRight\n");
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine());
+            reply.addString(pSerial->ReadLine(1000));
             return true;
         }
         else if(command.get(0).asString() == "move" && 
@@ -274,7 +274,7 @@ public:
                 sprintf(cmd, "moveLeft\n");
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine());
+            reply.addString(pSerial->ReadLine(1000));
             return true;
         }
         else if(command.get(0).asString() == "move" && 
@@ -284,7 +284,7 @@ public:
             sprintf(cmd, "stop\n");
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine());
+            reply.addString(pSerial->ReadLine(1000));
             return true;
         }
         else if(command.get(0).asString() == "get" && 
@@ -299,7 +299,7 @@ public:
             sprintf(cmd, "getDistance %d\n", command.get(2).asInt());
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine());
+            reply.addString(pSerial->ReadLine(1000));
             return true;
         }
         else if(command.get(0).asString() == "get" && 
@@ -309,7 +309,7 @@ public:
             sprintf(cmd, "getBatteryVolt\n");
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine());
+            reply.addString(pSerial->ReadLine(1000));
             return true;
         }
         else if(command.get(0).asString() == "get" && 
@@ -325,7 +325,7 @@ public:
                     command.get(3).asInt(), command.get(4).asInt());
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine());
+            reply.addString(pSerial->ReadLine(1000));
             return true;
         }
         else

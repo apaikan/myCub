@@ -168,12 +168,14 @@ static void go_go_go(void)
                 {
                     linebuff.clear();
                     update_display();
+                    digitalWrite(_bk, HIGH);               
                 }   
                 else if(strcmp(line,"%logo%") == 0)
                 {
                     linebuff.clear();
                     LCDclear();
                     LCDshowLogo();
+                    digitalWrite(_bk, HIGH);
                 }
                 else if(str.substr(0,5) == "%bat%")
                 {
@@ -194,9 +196,9 @@ static void go_go_go(void)
                         start += size;  
                     } 
                     update_display();
+                    digitalWrite(_bk, HIGH);
                 }
                 ntimes_out = 0;
-                digitalWrite(_bk, HIGH);
                 LCDdisplay();
                 delay(10);
 			} 
