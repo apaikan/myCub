@@ -15,14 +15,14 @@
         <name>ballDetector</name>
         <parameters></parameters>
         <node>raspberry</node>
-        <workdir>/home/pi/install/myCub/application/myCub-modules/ballDetector/build</workdir>
+        <workdir>/home/pi/install/myCub/main/components/ballDetector/build</workdir>
     </module>
 
     <module>
         <name>lookAround.lua</name>
         <parameters></parameters>
         <node>raspberry</node>
-        <workdir>/home/pi/install/myCub/application/myCub-modules/lookAround</workdir>
+        <workdir>/home/pi/install/myCub/main/components/lookAround</workdir>
         <deployer>lua</deployer>
     </module>
 

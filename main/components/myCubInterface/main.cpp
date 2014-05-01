@@ -133,7 +133,7 @@ public:
         char cmd[64];
         sprintf(cmd, "getBatteryVolt\n");
         pSerial->Write(cmd);
-        battery_volt += atof(pSerial->ReadLine(1000));
+        battery_volt += atof(pSerial->ReadLine(3000));
         if(battery_volt_count++ >= 12)
         {
             battery_volt /= battery_volt_count;
@@ -143,6 +143,7 @@ public:
             battery_volt_count = 0;
             battery_volt = 0.0;
         }
+        yarp::os::Time:delay(10);
         serMutex.unlock();
         return true; 
     }
@@ -318,7 +319,7 @@ public:
             sprintf(cmd, "getDistance %d\n", command.get(2).asInt());
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine(1000));
+            reply.addString(pSerial->ReadLine(5000));
             serMutex.unlock();
             return true;
         }
@@ -330,7 +331,7 @@ public:
             sprintf(cmd, "getBatteryVolt\n");
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine(1000));
+            reply.addString(pSerial->ReadLine(3000));
             serMutex.unlock();
             return true;
         }
@@ -348,7 +349,7 @@ public:
                     command.get(3).asInt(), command.get(4).asInt());
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine(1000));
+            reply.addString(pSerial->ReadLine());
             serMutex.unlock();
             return true;
         }

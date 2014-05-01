@@ -15,14 +15,14 @@
         <name>faceDetector</name>
         <parameters>--context faceDetector --cascade haarcascade_frontalface_alt.xml</parameters>
         <node>raspberry</node>
-        <workdir>/home/pi/install/myCub/application/myCub-modules/faceDetector/build</workdir>
+        <workdir>/home/pi/install/myCub/main/components/faceDetector/build</workdir>
     </module>
 
     <module>
         <name>lookAround.lua</name>
         <parameters></parameters>
         <node>raspberry</node>
-        <workdir>/home/pi/install/myCub/application/myCub-modules/lookAround</workdir>
+        <workdir>/home/pi/install/myCub/components/main/lookAround</workdir>
         <deployer>lua</deployer>
     </module>
 

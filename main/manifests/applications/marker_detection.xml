@@ -15,7 +15,7 @@
         <name>markerDetector</name>
         <parameters>--context markerDetector --pattern patt.kanji</parameters>
         <node>raspberry</node>
-        <workdir>/home/pi/install/myCub/application/myCub-modules/markerDetector/build</workdir>
+        <workdir>/home/pi/install/myCub/main/components/markerDetector/build</workdir>
     </module>
 
     <connection>
