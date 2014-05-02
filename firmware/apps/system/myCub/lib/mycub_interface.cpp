@@ -648,8 +648,8 @@ double MyCubInterface::getBatteryVolt(void)
     volt /= 10.0;       
     // R_gnd = 1K
     // R_vcc = 10K
-    double vm = volt * (0.00080586) + 0.05;
-    return (vm * 11000.0 / 1000.0);
+    double vm = volt * (0.00080586);
+    return (vm * 11.0);
 }
 
 double MyCubInterface::getBatteryCurrent(void)
@@ -664,6 +664,6 @@ double MyCubInterface::getBatteryCurrent(void)
        volt += value[i];
     volt /= 10.0;
     double vin = volt * (0.00080586); 
-    return vin * 0.2/2.2;
+    return (vin - 2.34) * 10.0;
 }
 
