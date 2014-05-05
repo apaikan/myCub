@@ -22,7 +22,7 @@
         <name>lookAround.lua</name>
         <parameters></parameters>
         <node>raspberry</node>
-        <workdir>/home/pi/install/myCub/components/main/lookAround</workdir>
+        <workdir>/home/pi/install/myCub/main/components/lookAround</workdir>
         <deployer>lua</deployer>
     </module>
 

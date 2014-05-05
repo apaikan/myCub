@@ -44,6 +44,7 @@ public:
         pSerial = NULL;
         battery_volt = 0.0;
         battery_volt_count = 0;
+        battery_plugged = false;
     }
     
     ~MyCubInterface(void) {
@@ -93,7 +94,7 @@ public:
       
         // ping the board 
         pSerial->Write("ping\n");
-        std::string rep = pSerial->ReadLine(1000);
+        std::string rep = pSerial->ReadLine(5000);
         if(rep != "[ok]" )
         {
             printf("Cannot communicate with myCub control board!\n");
@@ -110,11 +111,12 @@ public:
         char cmd[64];
         sprintf(cmd, "getBatteryVolt\n");
         pSerial->Write(cmd);
-        battery_volt = atof(pSerial->ReadLine(1000));
+        battery_volt = atof(pSerial->ReadLine(5000));
         battery_volt = (battery_volt-6.0) / (7.4-6.0) * 100.0;
         bool ret = (fprintf(fdDisplay, "\%bat\%% %d\n",(int)battery_volt) > 0); 
         fflush(fdDisplay);
         battery_volt = 0.0;
+        serBusy = false;
 
         ret = cmdPort.open("/MyCubInterface/cmd:i");
         if(ret)
@@ -128,23 +130,41 @@ public:
     }
     
     bool updateModule() {
-        // update battery status
-        serMutex.lock();
+        serMutex.wait();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;
         char cmd[64];
+        bool ret;
+
+        //update battery plug state 
+        sprintf(cmd, "getBatteryCurrent\n");
+        pSerial->Write(cmd);
+        string str = pSerial->ReadLine(5000);
+        if((atof(str.c_str()) >= 0.0) != battery_plugged )
+        {
+            battery_plugged = (atof(str.c_str()) > 0.0);
+            ret = (fprintf(fdDisplay, "\%%plug\%% %d\n", (battery_plugged==true)?1:0) > 0); 
+            fflush(fdDisplay);
+        }    
+        Time::delay(0.05);
+
+        // update battery voltage status
         sprintf(cmd, "getBatteryVolt\n");
         pSerial->Write(cmd);
-        battery_volt += atof(pSerial->ReadLine(3000));
+        str = pSerial->ReadLine(5000);
+        //printf("updateModule(): battery : %s\n", str.c_str());
+        battery_volt += atof(str.c_str());
         if(battery_volt_count++ >= 12)
         {
             battery_volt /= battery_volt_count;
             battery_volt = (battery_volt-6.0) / (7.4-6.0) * 100;
-            bool ret = (fprintf(fdDisplay, "\%bat\%% %d\n",(int)battery_volt) > 0); 
+            bool ret = (fprintf(fdDisplay, "\%%bat\%% %d\n",(int)battery_volt) > 0); 
             fflush(fdDisplay);
             battery_volt_count = 0;
             battery_volt = 0.0;
         }
-        yarp::os::Time:delay(10);
-        serMutex.unlock();
+        serBusy = false;
+        serMutex.post();
         return true; 
     }
 
@@ -162,6 +182,7 @@ public:
   getADC <channel> <freq> <samples>  
 */
     bool respond(const Bottle &command, Bottle &reply) {
+        reply.clear();        
         if (command.size() < 2 ){
             reply.addString("[error]");
             return true;
@@ -175,13 +196,16 @@ public:
                 reply.addString("[error]");
                 return true;
             }
-            serMutex.lock();
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
             char cmd[64];
             sprintf(cmd, "setPose %d %d\n", command.get(2).asInt(), command.get(3).asInt());
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine(1000));
-            serMutex.unlock();
+            reply.addString(pSerial->ReadLine(5000));
+            serBusy = false;
+            serMutex.post();
             return true;
         }
         else if(command.get(0).asString() == "goto" && 
@@ -192,7 +216,9 @@ public:
                 reply.addString("[error]");
                 return true;
             }
-            serMutex.lock();
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
             char cmd[64];
             if(command.size() > 4 )
                 sprintf(cmd, "gotoPose %d %d %d\n", 
@@ -205,8 +231,9 @@ public:
                        (int)(command.get(3).asInt()*JOINTS_SCALE+JOINTS_MIN));
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine(1000));
-            serMutex.unlock();
+            reply.addString(pSerial->ReadLine(5000));
+            serBusy = false;
+            serMutex.post();
             return true;
         }
         else if(command.get(0).asString() == "goto" && 
@@ -217,7 +244,9 @@ public:
                 reply.addString("[error]");
                 return true;
             }
-            serMutex.lock();
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
             char cmd[64];
             if(command.size() > 4 )
                 sprintf(cmd, "gotoPoseSync %d %d %d\n",
@@ -230,14 +259,17 @@ public:
                         (int)(command.get(3).asInt()*JOINTS_SCALE+JOINTS_MIN)); 
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine(1000));
-            serMutex.unlock();
+            reply.addString(pSerial->ReadLine(5000));
+            serBusy = false;
+            serMutex.post();
             return true;
         }
         else if(command.get(0).asString() == "move" && 
             command.get(1).asString() == "front") 
         {
-            serMutex.lock();
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
             char cmd[64];
             if(command.size() > 2 )
                 sprintf(cmd, "moveFront %d\n", command.get(2).asInt()); 
@@ -245,14 +277,17 @@ public:
                 sprintf(cmd, "moveFront\n");
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine(1000));
-            serMutex.unlock();
+            reply.addString(pSerial->ReadLine(5000));
+            serBusy = false;
+            serMutex.post();
             return true;
         }
         else if(command.get(0).asString() == "move" && 
             command.get(1).asString() == "back") 
         {
-            serMutex.lock();
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
             char cmd[64];
             if(command.size() > 2 )
                 sprintf(cmd, "moveBack %d\n", command.get(2).asInt()); 
@@ -260,14 +295,17 @@ public:
                 sprintf(cmd, "moveBack\n");
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine(1000));
-            serMutex.unlock();
+            reply.addString(pSerial->ReadLine(5000));
+            serBusy = false;
+            serMutex.post();
             return true;
         }
         else if(command.get(0).asString() == "move" && 
             command.get(1).asString() == "right") 
         {
-            serMutex.lock();
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
             char cmd[64];
             if(command.size() > 2 )
                 sprintf(cmd, "moveRight %d\n", command.get(2).asInt()); 
@@ -275,14 +313,17 @@ public:
                 sprintf(cmd, "moveRight\n");
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine(1000));
-            serMutex.unlock();
+            reply.addString(pSerial->ReadLine(5000));
+            serBusy = false;
+            serMutex.post();
             return true;
         }
         else if(command.get(0).asString() == "move" && 
             command.get(1).asString() == "left") 
         {
-            serMutex.lock();
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
             char cmd[64];
             if(command.size() > 2 )
                 sprintf(cmd, "moveLeft %d\n", command.get(2).asInt()); 
@@ -290,20 +331,24 @@ public:
                 sprintf(cmd, "moveLeft\n");
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine(1000));
-            serMutex.unlock();
+            reply.addString(pSerial->ReadLine(5000));
+            serBusy = false;
+            serMutex.post();
             return true;
         }
         else if(command.get(0).asString() == "move" && 
             command.get(1).asString() == "stop") 
         {
-            serMutex.lock();
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
             char cmd[64];
             sprintf(cmd, "stop\n");
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine(1000));
-            serMutex.unlock();
+            reply.addString(pSerial->ReadLine(5000));
+            serBusy = false;
+            serMutex.post();
             return true;
         }
         else if(command.get(0).asString() == "get" && 
@@ -314,25 +359,42 @@ public:
                 reply.addString("[error]");
                 return true;
             }
-            serMutex.lock();
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
             char cmd[64];
             sprintf(cmd, "getDistance %d\n", command.get(2).asInt());
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine(5000));
-            serMutex.unlock();
+            serBusy = false;
+            serMutex.post();
             return true;
         }
         else if(command.get(0).asString() == "get" && 
             command.get(1).asString() == "battery") 
         {
-            serMutex.lock();
+            if(command.size() < 3 || 
+              (command.get(2).asString() != "volt" &&
+               command.get(2).asString() != "amp")) {
+                reply.clear();
+                reply.addString("[error]");
+                return true;
+            }
+            
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
             char cmd[64];
-            sprintf(cmd, "getBatteryVolt\n");
+            if(command.get(2).asString() == "volt")
+                sprintf(cmd, "getBatteryVolt\n");
+            else
+                sprintf(cmd, "getBatteryCurrent\n");
             pSerial->Write(cmd);
             reply.clear();
-            reply.addString(pSerial->ReadLine(3000));
-            serMutex.unlock();
+            reply.addString(pSerial->ReadLine(5000));
+            serBusy = false;
+            serMutex.post();
             return true;
         }
         else if(command.get(0).asString() == "get" && 
@@ -343,14 +405,17 @@ public:
                 reply.addString("[error]");
                 return true;
             }
-            serMutex.lock();
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
             char cmd[64];
             sprintf(cmd, "getADC %d %d %d\n", command.get(2).asInt(), 
                     command.get(3).asInt(), command.get(4).asInt());
             pSerial->Write(cmd);
             reply.clear();
             reply.addString(pSerial->ReadLine());
-            serMutex.unlock();
+            serBusy = false;
+            serMutex.post();
             return true;
         }
         else
@@ -387,13 +452,15 @@ public:
 private:
 	//PolyDriver driver;
     //ISerialDevice *pSerial;
-    yarp::os::Mutex serMutex;
+    yarp::os::Semaphore serMutex;
+    bool serBusy; 
     SerialPort* pSerial; 
     FILE* fdDisplay;
     RpcServer cmdPort;
     bool bIsRT;
     double battery_volt;
     int battery_volt_count;
+    bool battery_plugged;
 };
 
 

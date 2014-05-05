@@ -58,7 +58,8 @@ int _bk = 7;
 int contrast = 60;
 
 // battery 
-int battery_level = 0; 
+int battery_level = 0;
+bool battery_plugged = false;
 std::vector<std::string> linebuff;
 
 /*
@@ -108,12 +109,24 @@ void update_display()
      // drawing buttom line    
      for (int i=0; i<83; i+=2)
         LCDdrawline(i, 40, i, 40, BLACK);
+
      // drawing battery
      LCDdrawrect(70, 42, 12, 5, BLACK);
      LCDdrawrect(81, 43, 3, 3, BLACK);
-     // battery charge state     
+     // battery charge state    
+     battery_level = (battery_level>100) ? 100 : battery_level;
      LCDfillrect(70, 43, battery_level/10+1, 4, BLACK); 
 
+    // battery plugged state 
+    if(battery_plugged)
+    {
+        LCDdrawline(66, 43, 68, 43, BLACK);
+        LCDdrawline(66, 45, 68, 45, BLACK);
+        LCDfillrect(63, 42, 3, 5, BLACK);
+        LCDfillrect(61, 43, 2, 3, BLACK);
+        LCDdrawline(58, 44, 61, 44, BLACK);
+        LCDdrawline(56, 45, 58, 45, BLACK);
+    }
 }
 
 
@@ -135,28 +148,28 @@ static void go_go_go(void)
 
 		FD_ZERO(&ifds);
 		FD_SET(fd, &ifds);
-        tv.tv_sec = 1;
+        tv.tv_sec = 3;
         tv.tv_usec = 0;
 		if ((n = select(fd+1, &ifds, NULL, NULL, &tv)) != 1)
         {
-            // turn off backlight after 5 sec
-            if(++ntimes_out > 5)
+            // turn off backlight after 6 sec
+            if(++ntimes_out > 2)
             {
                 digitalWrite(_bk, LOW);
                 delay(10);
             }
-            if(++ntimes_reset > 60)
+            if(++ntimes_reset > 20) // 60 sec
             {
                 ntimes_reset = 0;
                 LCDInit(_sclk, _din, _dc, _cs, _rst, contrast);
-                //for(int i=0; i<linebuff.size(); i++)                         
-                //    LCDdrawstring(0, i*8, (char*)linebuff[i].c_str());
                 LCDdisplay();
                 delay(10);
             }
+            //printf("%s : %d\n", __FILE__, __LINE__);
 			continue;
         }   
 		while (read(fd, line+nchars, 1) == 1) {
+            //printf("%s : %d\n", __FILE__, __LINE__);
 			if (line[nchars] == '\n') 
             {
 				line[nchars] = '\0';
@@ -183,6 +196,13 @@ static void go_go_go(void)
                     battery_level = atoi(val.c_str());
                     update_display();
                 }
+                else if(str.substr(0,6) == "%plug%")
+                {
+                    std::string val = str.substr(7, str.npos);
+                    battery_plugged = (atoi(val.c_str()) != 0);
+                    update_display();
+                }
+
                 else
                 {
                     int start = 0;  
@@ -197,8 +217,14 @@ static void go_go_go(void)
                     } 
                     update_display();
                     digitalWrite(_bk, HIGH);
+                    ntimes_out = 0;
                 }
-                ntimes_out = 0;
+                // turn off backlight after 5 sec
+                if(++ntimes_out > 5)
+                {
+                    digitalWrite(_bk, LOW);
+                    delay(10);
+                }
                 LCDdisplay();
                 delay(10);
 			} 
@@ -237,8 +263,8 @@ int main(int argc, char **argv)
 	if (chmod(DEVFILE, 0666) < 0)
 		fatal("didpd: Failed to set permissions on %s: %m\n", DEVFILE);
 
-	if (daemon(0,1) < 0)
-		fatal("dispd: Failed to daemonize process: %m\n");
+	//if (daemon(0,1) < 0)
+	//	fatal("dispd: Failed to daemonize process: %m\n");
 
     LCDInit(_sclk, _din, _dc, _cs, _rst, contrast);
     LCDclear();
