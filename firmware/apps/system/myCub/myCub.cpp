@@ -354,11 +354,11 @@ int myCub_main(int argc, char *argv[])
             }
             else if(strcmp(mycub_cmd[0], "getBatteryCurrent")==0 ) {
                     int cur = (int) (mycub.getBatteryCurrent() * 1000); 
-                    printf("%d.%d\n", cur/1000, cur%1000); fflush(stdout);
+                    printf("%d.%d\n", cur/1000, abs(cur%1000)); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "getBatteryVolt")==0 ) {
                     int volt = (int) (mycub.getBatteryVolt() * 1000);                    
-                    printf("%d.%d\n", volt/1000, volt%1000); fflush(stdout);
+                    printf("%d.%d\n", volt/1000, abs(volt%1000)); fflush(stdout);
             }
             else if(strcmp(mycub_cmd[0], "help")==0 ) {
                     if(bInteractive)
