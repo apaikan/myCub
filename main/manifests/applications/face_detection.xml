@@ -47,6 +47,10 @@
         <to>/GazeControl/cmd:i</to>
         <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_look</protocol>
     </connection>
-
+    <connection>
+        <from>/faceDetector/target</from>
+        <to>/gSpeak</to>
+        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_speak</protocol>
+    </connection>
 
 </application>
