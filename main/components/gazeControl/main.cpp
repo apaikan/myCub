@@ -107,8 +107,8 @@ public:
     }
 
     double getPeriod() {
-        //makeRealTime();
-        return 0.001; // run every 1ms 
+        makeRealTime();
+        return 0.01; // run every 10ms 
     }
     
     bool updateModule() {
@@ -247,7 +247,7 @@ public:
     void makeRealTime() {
 	    if(!bIsRT) {
 	        struct sched_param thread_param;
-    	    thread_param.sched_priority = 99;
+    	    thread_param.sched_priority = 90;
    	        pthread_setschedparam(pthread_self(), SCHED_FIFO, &thread_param);
             bIsRT = true;
 	    }
@@ -410,7 +410,14 @@ int main(int argc, char* argv[])
     ResourceFinder rf;
     rf.configure(argc, argv);
     
-    //mlockall(MCL_CURRENT | MCL_FUTURE);
+    mlockall(MCL_CURRENT | MCL_FUTURE);
+	struct sched_param sch_param;
+	sch_param.__sched_priority = 90;
+	if( sched_setscheduler(0, SCHED_FIFO, &sch_param) != 0 )
+	{
+		printf("sched_setscheduler failed.\n");
+		return -1;
+	}
 
     GazeControl module;
     if(!module.configure(rf)) {

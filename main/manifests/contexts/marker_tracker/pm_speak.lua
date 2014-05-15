@@ -16,7 +16,6 @@ PortMonitor.create = function()
     PortMonitor.setConstraint("true")
     print('in pm_speak.lua')
     prev_spk = 0
-    greetings = {"Hello", "Hi there", "Hey you", "TIME", "How are you?", "How are you doing?", "How is going?"}
     return true
 end
 
@@ -29,18 +28,9 @@ PortMonitor.accept = function(thing)
 end
 
 PortMonitor.update = function(thing)
-
     bt = thing:asBottle()
     bt:clear()
-    msg = greetings[math.random(1,#greetings)]
-    if msg == "TIME" then
-        h = os.date("%H") -- hour
-        if tonumber(h) < 12 then msg = "Good morning"
-        elseif h < 18 then msg = "Good afternoon" 
-        else msg = "Good evening"
-        end
-    end
-    bt:addString(msg)
+    bt:addString("Here is my marker!")
     --th = yarp.Things()
     --msg = yarp.Bottle()
     --msg:addString("Hello!")

@@ -47,8 +47,8 @@ public:
 
     bool configure(ResourceFinder &rf) {
 
-        string lm = rf.check("lm", Value("speech.lm")).asString();
-        string dict = rf.check("dic", Value("speech.dic")).asString();
+        string lm =  rf.findFile(rf.check("lm", Value("speech.lm")).asString());
+        string dict =  rf.findFile(rf.check("dic", Value("speech.dic")).asString());
         string adcdev = rf.check("adcdev", Value("")).asString();
         int samprate = rf.check("samprate", Value(16000)).asInt();
         string str_samprate = rf.check("samprate", Value("16000")).asString();

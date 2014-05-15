@@ -125,7 +125,7 @@ public:
     }
 
     double getPeriod() {
-        //makeRealTime();
+        makeRealTime();
         return 5.0; // run every 5 s 
     }
     
@@ -442,7 +442,7 @@ public:
     void makeRealTime() {
 	    if(!bIsRT) {
 	        struct sched_param thread_param;
-    	    thread_param.sched_priority = 99;
+    	    thread_param.sched_priority = 81;
    	        pthread_setschedparam(pthread_self(), SCHED_FIFO, &thread_param);
             bIsRT = true;
 	    }
@@ -471,7 +471,15 @@ int main(int argc, char* argv[])
     ResourceFinder rf;
     rf.configure(argc, argv);
     
-    //mlockall(MCL_CURRENT | MCL_FUTURE);
+    mlockall(MCL_CURRENT | MCL_FUTURE);
+	struct sched_param sch_param;
+	sch_param.__sched_priority = 80;
+	if( sched_setscheduler(0, SCHED_FIFO, &sch_param) != 0 )
+	{
+		printf("sched_setscheduler failed.\n");
+		return -1;
+	}
+
 
     MyCubInterface module;
     if(!module.configure(rf)) {

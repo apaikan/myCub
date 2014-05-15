@@ -50,7 +50,7 @@ public:
             fprintf(stderr, "Could not find the pattern file. \n");
             return false;
         }
-        detector->strPattern = rf.getContextPath() + "/" + rf.find("pattern").asString();
+        detector->strPattern = rf.findFile(rf.find("pattern").asString());
         printf("pattern: %s\n", detector->strPattern.c_str());
        
         if(rf.check("period"))

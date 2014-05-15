@@ -87,8 +87,8 @@ os.execute("mkdir -p " .. cache_folder)
 
 while true do
     bt = msg_port:read()
-    if bt ~= nil then 
-        msg = bt:toString()
+    if bt ~= nil and bt:size() > 0 then 
+        msg = bt:get(0):asString()
         msg:match "^%s*(.-)%s*$"    -- triming
         print("Received:", msg) 
 

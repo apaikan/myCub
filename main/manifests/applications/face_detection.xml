@@ -13,7 +13,7 @@
     </module>
     <module>
         <name>faceDetector</name>
-        <parameters>--context faceDetector --cascade haarcascade_frontalface_alt.xml</parameters>
+        <parameters>--context face_tracker --cascade haarcascade_frontalface_alt.xml</parameters>
         <node>raspberry</node>
         <workdir>/home/pi/install/myCub/main/components/faceDetector/build</workdir>
     </module>

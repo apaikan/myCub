@@ -50,7 +50,7 @@ public:
             fprintf(stderr, "Could not find the cascade file. \n");
             return false;
         }
-        detector->strCascade = rf.getContextPath() + "/" + rf.find("cascade").asString();
+        detector->strCascade = rf.findFile(rf.find("cascade").asString());
         printf("cascade: %s\n", detector->strCascade.c_str());
         //detector->strNestedCascade= rf.find("nested-cascade").asString();
        

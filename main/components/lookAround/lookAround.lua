@@ -22,9 +22,9 @@ sender:open("/lookAround/target")
 -- connect sender to receiver
 --yarp.NetworkBase_connect(sender:getName(), "/myCubInterface/cmd:i")
 
-search_range   = {xmin=10, xmax=150, ymin=50, ymax=130}
+search_range   = {xmin=50, xmax=150, ymin=50, ymax=130}
 search_delay   = {min=3, max=5}
-search_speed   = {min=1, max=2} 
+search_speed   = {min=3, max=3} 
 
 while true do
     -- write to the sender port
