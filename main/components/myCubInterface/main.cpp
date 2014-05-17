@@ -188,7 +188,20 @@ public:
             return true;
         }
 
-        if(command.get(0).asString() == "set" && 
+        if(command.get(0).asString() == "ping" && 
+            command.get(1).asString() == "board") 
+        {
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
+            pSerial->Write("ping\n");
+            reply.clear();
+            reply.addString(pSerial->ReadLine(5000));
+            serBusy = false;
+            serMutex.post();
+            return true;
+        }
+        else if(command.get(0).asString() == "set" && 
             command.get(1).asString() == "pos") 
         {
             if(command.size() < 4) {
@@ -459,6 +472,19 @@ public:
             char cmd[64];
             sprintf(cmd, "getDistance %d\n", command.get(2).asInt());
             pSerial->Write(cmd);
+            reply.clear();
+            reply.addString(pSerial->ReadLine(5000));
+            serBusy = false;
+            serMutex.post();
+            return true;
+        }
+        else if(command.get(0).asString() == "get" && 
+            command.get(1).asString() == "meminfo") 
+        {
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
+            pSerial->Write("getMemoryInfo\n");
             reply.clear();
             reply.addString(pSerial->ReadLine(5000));
             serBusy = false;
