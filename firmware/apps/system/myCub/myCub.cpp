@@ -44,6 +44,7 @@
 #include <mycub_walk.h>
 //#include <mycub_fun.h>
 #include <nuttx_thread.h>
+#include <nuttx/progmem.h>
 
 /*
 #include <termios.h>
@@ -96,6 +97,7 @@ Commands:\n\
   getDistance <sonar> \n\
   getBatteryVolt \n\
   getBatteryCurrent \n\
+  getMemoryInfo \n\
   getADC <channel> <freq> <samples>  \n\
   help \n"
 
@@ -126,6 +128,51 @@ void siguser_action(int signo, siginfo_t *siginfo, void *arg)
     }
 }
 
+static void free_getprogmeminfo(struct mallinfo * mem)
+{
+  uint16_t page = 0, stpage = 0xFFFF;
+  uint16_t pagesize = 0;
+  int status;
+
+  mem->arena    = 0;
+  mem->fordblks = 0;
+  mem->uordblks = 0;
+  mem->mxordblk = 0;
+
+  for (status=0, page=0; status >= 0; page++)
+    {
+      status = up_progmem_ispageerased(page);
+      pagesize = up_progmem_pagesize(page);
+
+      mem->arena += pagesize;
+
+      /* Is this beginning of new free space section */
+
+      if (status == 0)
+        {
+          if (stpage == 0xFFFF) stpage = page;
+          mem->fordblks += pagesize;
+        }
+      else if (status != 0)
+        {
+          mem->uordblks += pagesize;
+
+          if (stpage != 0xFFFF && up_progmem_isuniform())
+            {
+              stpage = page - stpage;
+              if (stpage > mem->mxordblk)
+                {
+                  mem->mxordblk = stpage;
+                }
+              stpage = 0xFFFF;
+            }
+        }
+    }
+
+  mem->mxordblk *= pagesize;
+}
+
+
 /* dancer threads */
 void dancer_body(void *pParams) 
 {
@@ -143,26 +190,6 @@ void dancer_body(void *pParams)
         mycub->gotoPose(BACK_JOINT, 50, 0.2);        
     }     
     
-    /*
-    unsigned long freq = 200; 
-    size_t samples = 50;
-    uint16_t* data = (uint16_t*) malloc(samples*sizeof(uint16_t));
-    int ret = mycub->getRawAnalogData(0, freq, data, samples);
-    long avg = 0.0;
-    for(int i=0; i<ret; i++)
-        avg += data[i];
-    avg /= ret;
-
-    uint16_t max = 0;;
-    for(int i=0; (i<ret) ; i++)
-        if((data[i]-avg) > max)
-            max = data[i]-avg;
-    int pos = 50 + ((150 - 50) / (100-10)) * max;
-    printf("max:%d, pos %d\n", max, pos);
-    mycub->setPose(RIGHT_JOINT, pos);
-    mycub->setPose(LEFT_JOINT, pos);
-    free(data);
-    */
     int pos = (int) (((double)rand() / (double)MAX_RAND) * 100.0) + 60;
     mycub->gotoPose(RIGHT_JOINT, pos, 0.1);
     mycub->gotoPose(LEFT_JOINT, pos, 0.1);
@@ -178,6 +205,9 @@ int myCub_main(int argc, char *argv[])
     struct sigaction act;
     struct sigaction oact;
     int status;
+    
+    struct mallinfo data;
+    //struct mallinfo prog;
 
     memset(&act, 0, sizeof(struct sigaction));
     act.sa_sigaction = siguser_action;
@@ -234,6 +264,23 @@ int myCub_main(int argc, char *argv[])
             else if(strcmp(mycub_cmd[0], "ping")==0 ){
                 printf("[ok]\n"); fflush(stdout);
             }
+            else if(strcmp(mycub_cmd[0], "getMemoryInfo")==0 ){
+                    #ifdef CONFIG_CAN_PASS_STRUCTS
+                        data = mallinfo();
+                    #else
+                        (void)mallinfo(&data);
+                    #endif
+                    printf("total: %d, used: %d, free: %d, largest: %d\n",
+                         data.arena, data.uordblks, data.fordblks, data.mxordblk);
+                    fflush(stdout);
+            }
+            /*
+            else if(strcmp(mycub_cmd[0], "getMemoryProg")==0 ){
+                    free_getprogmeminfo(&prog);
+                    printf("total: %11d, used: %11d, free: %11d, largest: %11d\n",
+                         prog.arena, prog.uordblks, prog.fordblks, prog.mxordblk);
+                    fflush(stdout);
+            } */
             else if(strcmp(mycub_cmd[0], "setPose")==0 ) {
                 if(n >= 3)
                 {

@@ -227,7 +227,7 @@ unsigned long pulse_in( unsigned long port, unsigned char pin)
     //TimerDisable(TIMER5_BASE, TIMER_A);     
     //TimerEnable(TIMER5_BASE, TIMER_A);  
     unsigned long t, t2;
-    
+  
     // wait for any previous pulse to end 
     t = TimerValueGet(TIMER5_BASE, TIMER_A);
     while(lm_gpioread(GPIO_FUNC_INPUT  | GPIO_VALUE_ONE | port | pin, 0) == true)
@@ -269,10 +269,12 @@ static int range_read(FAR struct range_lowerhalf_s *dev,
     // Loop through al range configs and see if they need to be set low yet
     uint8_t i;
     size_t len = 0;
-    buff[0] = NULL;
+    buff[0] = 0;
     FAR char* ptr = buff;
     char dummy[64];
+    irqstate_t   flags;
 
+    sched_lock();
     for(i=0; i<RANGE_MAX_COUNT; i++) 
     {
         range_t *range = &g_ranges[i];       
@@ -286,14 +288,18 @@ static int range_read(FAR struct range_lowerhalf_s *dev,
             //SysCtlDelay(SysCtlClockGet() / 200000 / 3); 
             usleep(10);
             lm_gpiowrite( GPIO_FUNC_OUTPUT | GPIO_VALUE_ONE | range->trig_port | range->trig_pin, false);
+
+            flags = irqsave();
             unsigned long width = pulse_in(range->echo_port, range->echo_pin); 
+            irqrestore(flags);
+
             unsigned int dist = (int)(width / 5.2466);
             sprintf(dummy, "(%d %d) ", i, (dist<4000)? dist : 0);
             strncpy(ptr, dummy, buflen-strlen(buff));
             ptr += strlen(dummy);
         }
     }   
-
+    sched_unlock();
     return (ptr == buff) ? 0 : strlen(buff)+1;
 }
 

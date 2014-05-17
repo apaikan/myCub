@@ -195,8 +195,11 @@ static int servo_attach(FAR struct servo_lowerhalf_s *dev,
 static int servo_setpos(FAR struct servo_lowerhalf_s *dev,
                         FAR const struct servo_info_s *info)
 {
+    irqstate_t flags;
     FAR struct lm4f_servotimer_s *priv = (FAR struct lm4f_servotimer_s *)dev;
 
+    flags = irqsave();
+    sched_lock();
     if(info->id >= SERVO_MAX_COUNT)
     {
         dbg("servo_attach: servo %d is out of range! (SERVO_MAX_COUNT : %d)\n", 
@@ -213,6 +216,8 @@ static int servo_setpos(FAR struct servo_lowerhalf_s *dev,
     TimerPrescaleMatchSet(g_servo_timers[info->id], TIMER_A, extender2);
     TimerMatchSet(g_servo_timers[info->id], TIMER_A, period2);
     TimerEnable(g_servo_timers[info->id], TIMER_A);
+    irqrestore(flags);
+    sched_unlock();
     return OK;
 }
 

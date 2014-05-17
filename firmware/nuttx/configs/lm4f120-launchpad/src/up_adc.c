@@ -235,10 +235,13 @@ static int adclm4f_read(FAR struct adclm4f_lowerhalf_s *dev,
                       FAR char* buff, size_t buflen)
 {
     // Loop through al adclm4f configs and see if they need to be set low yet
+    irqstate_t   flags;
     int i;
     unsigned long ulADC0_Value[1];
     FAR uint16_t *ptr = (uint16_t*) buff; 
     unsigned long delay = SysCtlClockGet() / g_adclm4info.freq / 3;
+    sched_lock();
+    flags = irqsave();
     for(i=0; (i<g_adclm4info.nsamples) && (i*sizeof(uint16_t) < buflen); i++)
     {
         ADCProcessorTrigger(ADC0_BASE, 3);
@@ -250,6 +253,8 @@ static int adclm4f_read(FAR struct adclm4f_lowerhalf_s *dev,
         ptr++;
         SysCtlDelay(delay);
     }
+    irqrestore(flags);
+    sched_unlock();
     return i;
 }
 
