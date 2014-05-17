@@ -16,31 +16,36 @@ yarp.Network()
 -- t = yarp.Time_now()
 
 -- create and open sender/receiver ports
-sender = yarp.Port()
-sender:open("/lookAround/target")
+sender = yarp.RpcClient()
+sender:open("...")
 
 -- connect sender to receiver
---yarp.NetworkBase_connect(sender:getName(), "/myCubInterface/cmd:i")
+ret = yarp.NetworkBase_connect(sender:getName(), "/MyCubInterface/cmd:i")
+if ret == false then
+    print("Cannot connect to /myCubInterface/cmd:i")
+    return
+end
 
-search_range   = {xmin=50, xmax=150, ymin=50, ymax=130}
-search_delay   = {min=6, max=10}
-search_speed   = {min=3, max=3} 
+t_start = yarp.Time_now()
 
 while true do
     -- write to the sender port
     local cmd = yarp.Bottle()
+    local rep = yarp.Bottle()
     cmd:clear()
-    cmd:addString("joint")
-    pos = cmd:addList()
-    pos:addDouble(math.random(search_range.xmin*10, search_range.xmax*10)/10)
-    pos:addDouble(math.random(search_range.ymin*10, search_range.ymax*10)/10)
-    pos:addDouble(math.random(search_speed.min, search_speed.max))
-    sender:write(cmd)
-    yarp.Time_delay(math.random(search_delay.min, search_delay.max))
+    cmd:addString("get")
+    cmd:addString("dist")
+    cmd:addString("0")
+    sender:write(cmd, rep)
+    print("Reply:", rep:toString())
+    --yarp.Time_delay(0.5)
+    if (yarp.Time_now() - t_start > 600) or rep:toString() == "" then
+        break
+    end
 end
 
 -- disconnect sender from receiver
---yarp.NetworkBase_disconnect(sender:getName(), "/myCubInterface/cmd:i")
+yarp.NetworkBase_disconnect(sender:getName(), "/MyCubInterface/cmd:i")
 
 -- close the ports
 sender:close()

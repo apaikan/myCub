@@ -237,7 +237,7 @@ public:
             return true;
         }
         else if(command.get(0).asString() == "goto" && 
-            command.get(1).asString() == "poss") 
+            command.get(1).asString() == "syncpos") 
         {
             if(command.size() < 4) {
                 reply.clear();
@@ -264,6 +264,100 @@ public:
             serMutex.post();
             return true;
         }
+        else if(command.get(0).asString() == "set" && 
+            command.get(1).asString() == "posall") 
+        {
+            Bottle* poses = NULL;
+
+            if((command.size() < 3) || 
+               !command.get(2).asList() || 
+               (command.get(2).asList()->size() != 4) ) {
+                reply.clear();
+                reply.addString("[error]");
+                return true;
+            }
+            
+            poses = command.get(2).asList(); 
+
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
+            
+            string rep;
+            for(int i=0; i<4; i++)
+            {
+                char cmd[64];
+                sprintf(cmd, "setPose %d %d\n", 
+                       i, 
+                       (int)(poses->get(i).asInt()*JOINTS_SCALE+JOINTS_MIN));
+                pSerial->Write(cmd);
+                rep = pSerial->ReadLine(5000);
+            }
+            reply.clear();
+            reply.addString(rep);
+
+            serBusy = false;
+            serMutex.post();
+
+            return true;
+        }
+
+
+        else if(command.get(0).asString() == "goto" && 
+            command.get(1).asString() == "posall") 
+        {
+            Bottle* poses = NULL;
+            Bottle* speeds = NULL;
+
+            if((command.size() < 3) || 
+               !command.get(2).asList() || 
+               (command.get(2).asList()->size() != 4) ) {
+                reply.clear();
+                reply.addString("[error]");
+                return true;
+            }
+
+            if((command.size() > 3) && 
+               (!command.get(3).asList() || (command.get(3).asList()->size() != 4)) )
+            {
+                reply.clear();
+                reply.addString("[error]");
+                return true;
+            }
+             
+            poses = command.get(2).asList(); 
+            if(command.size() > 3 )
+                speeds = command.get(3).asList(); 
+
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
+            
+            string rep;
+            for(int i=0; i<4; i++)
+            {
+                char cmd[64];
+                if(speeds != NULL)
+                    sprintf(cmd, "gotoPose %d %d %d\n", 
+                            i,
+                            (int)(poses->get(i).asInt()*JOINTS_SCALE+JOINTS_MIN), 
+                            speeds->get(i).asInt());
+                else
+                    sprintf(cmd, "gotoPose %d %d\n", 
+                           i, 
+                           (int)(poses->get(i).asInt()*JOINTS_SCALE+JOINTS_MIN));
+                pSerial->Write(cmd);
+                rep = pSerial->ReadLine(5000);
+            }
+            reply.clear();
+            reply.addString(rep);
+
+            serBusy = false;
+            serMutex.post();
+
+            return true;
+        }
+
         else if(command.get(0).asString() == "move" && 
             command.get(1).asString() == "front") 
         {

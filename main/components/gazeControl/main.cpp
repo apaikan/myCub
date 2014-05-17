@@ -102,6 +102,8 @@ public:
         joints_pos[0] = JOINT1_REST;
         joints_pos[1] = JOINT2_REST;
         bool ret = cmdPort.open("/GazeControl/cmd:i");
+        if(ret)
+            attach(cmdPort);
         shouldStop = !ret;
         return ret;
     }
@@ -110,23 +112,33 @@ public:
         makeRealTime();
         return 0.01; // run every 10ms 
     }
-    
+
+    bool respond(const Bottle &cmd, Bottle &rep) {
+        rep.clear(); 
+        if(cmd.size() < 2){
+            rep.addString("[nack]");
+            return true; 
+        }        
+        setCommand(cmd);
+        getReply(rep);
+        return true;
+    }
+
+
     bool updateModule() {
-        
         Bottle cmd;
         Bottle rep;
-        if(!cmdPort.read(cmd))
-            return true;
 
-        //printf("cmd: %s\n", cmd.toString().c_str());
-        if(cmd.size() < 2)
+        getCommand(cmd);
+
+        // command exit
+        if(cmd.get(0).asString() == "cmd_exit")
         {
-            rep.addString("[nack]");
-            cmdPort.reply(rep);
-            return true; 
+            setReply(rep);
+            return false;
         }
-        string mode = cmd.get(0).asString();
 
+        string mode = cmd.get(0).asString();
         // Controlling in the joint mode
         if(mode == "joint")
         {
@@ -134,20 +146,18 @@ public:
             if(!pos || (pos->size() < 2))
             {
                 rep.addString("[nack]");
-                cmdPort.reply(rep);
+                setReply(rep);
                 return true;       
             }
+
+            rep.addString("[ack]");
+            setReply(rep);
 
             if(pos->size() >= 3)
                 joints_speed = pos->get(2).asDouble();
             else
                 joints_speed = JOINTS_SPEED;
             bool ret = setAllJointsPose(pos->get(1).asInt(), pos->get(0).asInt(), joints_speed);
-            if(ret)
-                rep.addString("[ack]");
-            else
-                rep.addString("[nack]");
-            cmdPort.reply(rep);
         }
         else if(mode == "cam")
         { 
@@ -155,9 +165,12 @@ public:
             if(!pos || (pos->size() < 3))
             {
                 rep.addString("[nack]");
-                cmdPort.reply(rep);
+                setReply(rep);
                 return true;       
             }
+
+            rep.addString("[ack]");
+            setReply(rep);
 
             if(pos->size() >= 3)
                 joints_speed = pos->get(3).asDouble();
@@ -188,11 +201,6 @@ public:
             double z = d1 + a2*cos(theta2) - d3*sin(theta2) + x3*cos(theta2) - z3*sin(theta2);
             //printf("xyz: %.5f %.5f %.5f\n", x, y ,z);
             bool ret = setCartPose(x, y, z, joints_speed);
-            if(ret)
-                rep.addString("[ack]");
-            else
-                rep.addString("[nack]");
-            cmdPort.reply(rep);
         }
         else if(mode == "cart")
         {
@@ -200,9 +208,13 @@ public:
             if(!pos || (pos->size() < 3))
             {
                 rep.addString("[nack]");
-                cmdPort.reply(rep);
+                setReply(rep);
                 return true;
             }    
+
+            rep.addString("[ack]");
+            setReply(rep);
+
             if(pos->size() >= 4)
                 joints_speed = pos->get(3).asDouble();
             else
@@ -212,24 +224,22 @@ public:
             double y =  pos->get(1).asDouble();// + Y_OFFSET;
             double z =  pos->get(2).asDouble();
             bool ret = setCartPose(x, y, z, joints_speed);            
-            if(ret)
-                rep.addString("[ack]");
-            else
-                rep.addString("[nack]");
-            cmdPort.reply(rep);
         }
         else
         {
             rep.addString("[nack]");
-            cmdPort.reply(rep);
-        }
-
+            setReply(rep);
+        }           
         return true; 
     }
 
     bool interruptModule() { 
         cmdPort.interrupt();             // interupt the blocking read 
         shouldStop = true;
+        // send exit command to the thread
+        Bottle cmd;
+        cmd.addString("cmd_exit");
+        setCommand(cmd);            
         return true; 
     }
 
@@ -255,6 +265,39 @@ public:
 
 
 private:
+    void setCommand(const Bottle &cmd) {    
+        cmdSemaphore.wait();
+        shouldStop = true;
+        command = cmd;    
+        rpyEvent.reset();
+        cmdEvent.signal();
+        cmdSemaphore.post();
+    }
+
+    void getCommand(Bottle &cmd) {
+        cmdEvent.wait();
+        cmdSemaphore.wait();
+        shouldStop = false;
+        cmd = command;
+        cmdSemaphore.post();
+    }
+
+    void setReply(const Bottle &rpy) {
+        rpySemaphore.wait();
+        reply = rpy;
+        cmdEvent.reset();
+        rpyEvent.signal();
+        rpySemaphore.post();
+    }
+
+    void getReply(Bottle &rpy) {
+        rpyEvent.wait();
+        rpySemaphore.wait();
+        rpy = reply;
+        rpySemaphore.post();
+    }
+
+
     bool setAllJointsPose(int pos1, int pos2, double speed) {
         printf("joints: %d, %d\n", pos2, pos1);
         // checking joint limits     
@@ -393,6 +436,13 @@ private:
 
 private:
     RpcServer cmdPort;
+    Bottle command;
+    Bottle reply;
+    Event cmdEvent;
+    Event rpyEvent;
+    Semaphore cmdSemaphore;
+    Semaphore rpySemaphore;
+        
     bool bIsRT;
     FILE* fdServo;
 
@@ -400,6 +450,7 @@ private:
     double joints_speed;
     bool shouldStop;
     Matrix camParam;
+    
 };
 
 

@@ -26,12 +26,19 @@
         <deployer>lua</deployer>
     </module>
 
+    <module>
+        <name>speechRecognizer</name>
+        <parameters>--context speech_recognizer --adcdev plughw:1,0 --lm 4040.lm --dic 4040.dic</parameters>
+        <node>raspberry</node>
+        <workdir>/home/pi/install/myCub/main/components/speechRecognizer/build</workdir>
+    </module>
 
     <connection>
         <from>/grabber</from>
         <to>/faceDetector/image:i</to>
         <protocol>udp</protocol>
     </connection>
+
     <connection>
         <from>/faceDetector/image:o</from>
         <to>/marker/yarpview/img:i</to>
@@ -40,17 +47,34 @@
     <connection>
         <from>/faceDetector/target</from>
         <to>/GazeControl/cmd:i</to>
-        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_face</protocol>
+        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_face_gaze</protocol>
     </connection>
-    <connection>
-        <from>/lookAround/target</from>
-        <to>/GazeControl/cmd:i</to>
-        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_look</protocol>
+     <connection>
+        <from>/faceDetector/target</from>
+        <to>/gSpeak</to>
+        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_face_speak</protocol>
     </connection>
     <connection>
         <from>/faceDetector/target</from>
-        <to>/gSpeak</to>
-        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_speak</protocol>
+        <to>/MyCubInterface/cmd:i</to>
+        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_face_arms</protocol>
+    </connection>
+  
+    <connection>
+        <from>/lookAround/target</from>
+        <to>/GazeControl/cmd:i</to>
+        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_look_gaze</protocol>
+    </connection>
+    <connection>
+        <from>/lookAround/target</from>
+        <to>/MyCubInterface/cmd:i</to>
+        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_look_arms</protocol>
+    </connection>
+
+    <connection>
+        <from>/SpeechRecognizer/words:o</from>
+        <to>/GazeControl/cmd:i</to>
+        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_voice_gaze</protocol>
     </connection>
 
 </application>
