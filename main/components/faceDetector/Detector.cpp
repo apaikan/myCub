@@ -178,6 +178,7 @@ bool Detector::close()
     imagePort.close();
     outPort.close();
     // restore to the default context 
+    /*
     targetPort.setStrict();
     Bottle &target = targetPort.prepare();
     target.addString("joint");
@@ -186,6 +187,7 @@ bool Detector::close()
     pos.addDouble(100);
     pos.addDouble(2.0); //speed
     targetPort.write();
+    */
     targetPort.close();
     return true;
 }

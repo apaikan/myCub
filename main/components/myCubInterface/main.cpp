@@ -115,6 +115,31 @@ public:
         battery_volt = (battery_volt-6.0) / (7.4-6.0) * 100.0;
         bool ret = (fprintf(fdDisplay, "\%bat\%% %d\n",(int)battery_volt) > 0); 
         fflush(fdDisplay);
+
+        // start the controller
+        printf("Staring motors controller...\n");
+        pSerial->Write("startControl\n");
+        rep = pSerial->ReadLine(10000);
+        if(rep != "[ok]" )
+        {
+            printf("Cannot start the motors controller!\n");
+            pSerial->Close();
+            return false;
+        }
+        sleep(1);
+        printf("Setting the joints to the default positions...\n");
+        // set the joints to the default positions
+        for(int i=0; i<4; i++)
+        {
+            char cmd[64];
+            sprintf(cmd, "gotoPose %d %d %d\n", 
+                    i, (int)JOINTS_MIN+2, 3000);
+            pSerial->Write(cmd);
+            rep = pSerial->ReadLine(10000);
+            printf("Joint %d ... %s\n", i, rep.c_str());
+            Time::delay(0.2);
+        }
+
         battery_volt = 0.0;
         serBusy = false;
 
@@ -163,6 +188,7 @@ public:
             battery_volt_count = 0;
             battery_volt = 0.0;
         }
+
         serBusy = false;
         serMutex.post();
         return true; 
@@ -556,6 +582,9 @@ public:
         cmdPort.close(); 
         //driver.close();
         fclose(fdDisplay);
+        printf("Stopping motors controller...\n");
+        pSerial->Write("stopControl\n");
+        std::string rep = pSerial->ReadLine(5000);
         return true; 
     } 
 
