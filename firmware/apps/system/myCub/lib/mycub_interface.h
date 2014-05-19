@@ -96,11 +96,10 @@
  * Joint index mapping
  */
 
-#define FRONT_JOINT     0
-#define RIGHT_JOINT     1
-#define BACK_JOINT      2
-#define LEFT_JOINT      3
-
+#define LEFT_JOINT      0
+#define FRONT_JOINT     1
+#define RIGHT_JOINT     2
+#define BACK_JOINT      3
 
 #define FRONT_RANGE     0
 #define RIGHT_RANGE     1
@@ -124,7 +123,9 @@ public:
     bool init(void);
     void fini(void);
 
-    // joint position and speed controller 
+    // joint position and speed controller
+    bool startController(void);
+    void stopController(void);
     bool setPose(const unsigned int joint, const int pos);
     bool gotoPose(const unsigned int joint, const int pos, const double t=0.0);
     bool gotoPoseSync(const unsigned int joint, const int pos, const double t=0.0);

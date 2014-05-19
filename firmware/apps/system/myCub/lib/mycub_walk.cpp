@@ -89,7 +89,7 @@ void * walker(void *pParams)
     }
 
     params->mycub->gotoPose(front, 160, 0.5);
-    params->mycub->gotoPose(back, 100, 0.5);
+    params->mycub->gotoPose(back, 120, 0.5);
     params->mycub->gotoPose(left, 120, 0.5);
     params->mycub->gotoPose(right, 120, 0.5);
     while(!params->mycub->checkMotionDone()) usleep(300000);
@@ -106,21 +106,21 @@ void * walker(void *pParams)
         should_stop = params->should_stop;
         pthread_mutex_unlock(&(params_mutex));
 
-        params->mycub->gotoPoseSync(back, 100, 0.1);
-        if(should_stop) break;
+        //params->mycub->gotoPoseSync(back, 160, 0.1);
+        //if(should_stop) break;
         params->mycub->gotoPoseSync(front, 8, 0.5);        
         if(should_stop) break;
 
-        params->mycub->gotoPose(left, 70, 0.1);
-        params->mycub->gotoPose(right, 70, 0.1);        
+        params->mycub->gotoPose(left, 40, 0.1);
+        params->mycub->gotoPose(right, 40, 0.1);        
         while(!params->mycub->checkMotionDone()) usleep(100000);
         if(should_stop) break;
-
+        usleep(1000000);
         params->mycub->gotoPoseSync(front, 160, 0.5);
         if(should_stop) break;
 
-        params->mycub->gotoPoseSync(back, 80, 0.1);
-        if(should_stop) break;
+        //params->mycub->gotoPoseSync(back, 40, 0.1);
+        //if(should_stop) break;
         params->mycub->gotoPose(left, 120, 0.1);
         params->mycub->gotoPose(right, 120, 0.1);        
         while(!params->mycub->checkMotionDone()) usleep(100000);

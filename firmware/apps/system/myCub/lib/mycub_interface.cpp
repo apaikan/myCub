@@ -137,8 +137,7 @@ static void * controller(void *pParams)
                               (unsigned long)((uintptr_t)&servo_drv));
                         //sysDelay(delayStep);                    
                         //sched_yield();
-                        int ret;
-                        ret = usleep(delayStep);
+                        usleep(delayStep);
                         //printf("(%d) usleep error : %s\n", joint, strerror(errno));
                         /* exclusive access to parameters */
                         pthread_mutex_lock(&(params->mutex));
@@ -154,8 +153,7 @@ static void * controller(void *pParams)
                               (unsigned long)((uintptr_t)&servo_drv));
                         //sysDelay(delayStep);
                         //sched_yield();
-                        int ret;
-                        ret = usleep(delayStep);
+                        usleep(delayStep);
                         //printf("(%d) usleep error : %s\n", strerror(errno));
                         /* exclusive access to parameters */
                         pthread_mutex_lock(&(params->mutex));
@@ -208,67 +206,6 @@ MyCubInterface::~MyCubInterface()
 
 bool MyCubInterface::init(void)
 {
-
-    // setting the MyCubInterface task to highest priority
-    struct sched_param sparam; 
-    sparam.sched_priority = sched_get_priority_max(SCHED_FIFO); 
-    sched_setscheduler(0, SCHED_FIFO, &sparam);
-    //printf("MyCubInterface::init(): sched_setparam failed!\n");
-
-    if(fd_servo < 0)
-    {
-        int ret = servo_devinit();
-        if (ret != OK)
-        {
-            printf("MyCubInterface::init(): servo_devinit failed: %d\n", ret);
-            return false;
-        }
-
-        fd_servo = open("/dev/servo0", O_RDONLY);
-        if (fd_servo < 0)
-        {
-            printf("MyCubInterface::init(): servo driver open failed: %d\n", errno);
-            fini();
-            return false;
-        }
-
-        // Configure servo pins
-
-
-        servo_drv[0].id   = 0;
-        servo_drv[1].id   = 1;
-        servo_drv[2].id   = 2;
-        servo_drv[3].id   = 3;
-
-        /*
-        // front
-        servo_drv[0].port = GPIO_PORTD;
-        servo_drv[0].pin = GPIO_PIN_0;
-
-        //right
-        servo_drv[1].port = GPIO_PORTD;
-        servo_drv[1].pin = GPIO_PIN_2;
-        
-        //back
-        servo_drv[2].port = GPIO_PORTD;
-        servo_drv[2].pin = GPIO_PIN_1;
-
-        //left        
-        servo_drv[3].port = GPIO_PORTD;
-        servo_drv[3].pin = GPIO_PIN_3;
-        
-        for(int i=0; i<4; i++)
-            ioctl(fd_servo, SERVOIOC_SETPINCONFIG, (unsigned long)((uintptr_t)&servo_drv[i]));
-        */
-
-        for(int i=0; i<4; i++)
-        {
-            servo_drv[i].pos = joints_pos[i];
-            ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&servo_drv[i]));
-        }            
-        usleep(500000);
-    }
-
     if(fd_range < 0 )
     {
         int ret = range_devinit();
@@ -327,7 +264,54 @@ bool MyCubInterface::init(void)
             return false;
         }
     }
+   
+    return true;
+}
 
+void MyCubInterface::fini(void)
+{
+    stopController();
+
+    if(fd_range != -1) {
+        close(fd_range); fd_range = -1;
+    }        
+
+    if(fd_adc != -1) {
+        close(fd_adc); fd_adc = -1;
+    } 
+}
+
+bool MyCubInterface::startController(void)
+{
+    // setting the MyCubInterface task to highest priority
+    struct sched_param sparam; 
+    sparam.sched_priority = sched_get_priority_max(SCHED_FIFO); 
+    sched_setscheduler(0, SCHED_FIFO, &sparam);
+    //printf("MyCubInterface::init(): sched_setparam failed!\n");
+
+    if(fd_servo >=0 )
+        return true;
+
+    int ret = servo_devinit();
+    if (ret != OK)
+    {
+        printf("MyCubInterface::init(): servo_devinit failed: %d\n", ret);
+        return false;
+    }
+
+    fd_servo = open("/dev/servo0", O_RDONLY);
+    if (fd_servo < 0)
+    {
+        printf("MyCubInterface::init(): servo driver open failed: %d\n", errno);
+        fini();
+        return false;
+    }
+
+    // Configure servo pins
+    servo_drv[0].id   = 0;
+    servo_drv[1].id   = 1;
+    servo_drv[2].id   = 2;
+    servo_drv[3].id   = 3;
 
     // initializing and starting controller threads
     int status = pthread_attr_init(&attr);
@@ -337,7 +321,6 @@ bool MyCubInterface::init(void)
         return false;
     }
       
-
     pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
     //int prio_min = sched_get_priority_min(SCHED_RR);
     int prio_max = sched_get_priority_max(SCHED_FIFO);
@@ -346,10 +329,11 @@ bool MyCubInterface::init(void)
     status = pthread_attr_setschedparam(&attr, &sparam);
     if (status != OK)
     {       
-        printf("MyCubInterface::init(): pthread_attr_setschedparam failed, status=%d\n", status);
+        printf("MyCubInterface::startController(): pthread_attr_setschedparam failed, status=%d\n", status);
         fini();
         return false;
     }
+
     // initialize thread params and start the threads
     for(int i=0; i<4; i++)
     {
@@ -364,7 +348,7 @@ bool MyCubInterface::init(void)
         status = pthread_mutex_init(&(ctrl_params[i].mutex), NULL);
         status |= pthread_mutex_init(&(syncpos_mutex[i]), NULL);
         if(status != 0) {
-          printf("MyCubInterface::init(): ERROR pthread_mutex_init failed, status=%d\n", status);
+          printf("MyCubInterface::startController(): ERROR pthread_mutex_init failed, status=%d\n", status);
           fini();
           return false;
         }
@@ -373,7 +357,7 @@ bool MyCubInterface::init(void)
         status |= pthread_cond_init(&(syncpos_cond[i]), NULL);
         if(status != 0)
         {
-            printf("MyCubInterface::init(): ERROR pthread_condinit failed, status=%d\n", status);
+            printf("MyCubInterface::startController(): ERROR pthread_condinit failed, status=%d\n", status);
             fini();
             return false;
         }
@@ -381,16 +365,23 @@ bool MyCubInterface::init(void)
         status = pthread_create(&ctrl_threads[i], &attr, controller, &ctrl_params[i]);
         if (status != 0)
         {
-            printf("MyCubInterface::init(): pthread_create failed, status=%d\n", status);
+            printf("MyCubInterface::stopController(): pthread_create failed, status=%d\n", status);
             fini();
             return false;
         }
-    }
-    
+    } 
+
+    sleep(1);
+
+    // Put the joints in the default position
+    /*
+    for(int i=0; i<4; i++)
+         gotoPoseSync(i, joints_pos[i], 1.0);
+    */
     return true;
 }
 
-void MyCubInterface::fini(void)
+void MyCubInterface::stopController(void)
 {
     for(int i=0; i<4; i++)
     {
@@ -424,30 +415,16 @@ void MyCubInterface::fini(void)
     }   
 
     pthread_attr_destroy(&attr);
-
-    for(int i=0; i<4; i++)
-    {
-        servo_drv[i].pos = 8;
-        ioctl(fd_servo, SERVOIOC_SETPOS, (unsigned long)((uintptr_t)&servo_drv[i]));
-    }
-    
-    sleep(2);
-
+    sleep(1);
     if(fd_servo != -1) {
         close(fd_servo); fd_servo = -1;
     }
-
-    if(fd_range != -1) {
-        close(fd_range); fd_range = -1;
-    }        
-
-    if(fd_adc != -1) {
-        close(fd_adc); fd_adc = -1;
-    } 
 }
 
 bool MyCubInterface::setPose(const unsigned int joint, const int pos)
 {
+    if (fd_servo < 0) return false;
+
     if((pos<8) || (pos>160) || (joint > 3))
     {
         //printf("MyCubInterface::gotoPoseSync(): Invalid joint or position value!\n");
@@ -463,6 +440,8 @@ bool MyCubInterface::setPose(const unsigned int joint, const int pos)
 // joint position and speed controller 
 bool MyCubInterface::gotoPose(const unsigned int joint, const int pos, const double t)
 {
+    if (fd_servo < 0) return false;
+
     if((pos<8) || (pos>160) || (joint > 3))
     {
         //printf("MyCubInterface::gotoPoseSync(): Invalid joint or position value!\n");
@@ -482,6 +461,7 @@ bool MyCubInterface::gotoPose(const unsigned int joint, const int pos, const dou
 
 bool MyCubInterface::gotoPoseSync(const unsigned int joint, const int pos, const double t)
 {
+    if (fd_servo < 0) return false;
     if((pos<8) || (pos>160) || (joint > 3))
     {
         //printf("MyCubInterface::gotoPoseSync(): Invalid joint or position value!\n");
@@ -647,7 +627,7 @@ double MyCubInterface::getBatteryVolt(void)
     // R_gnd = 1K
     // R_vcc = 10K
     double vm = volt * (0.00080586);
-    return (vm * 11.0);
+    return (vm * 11.0) - 0.31;
 }
 
 double MyCubInterface::getBatteryCurrent(void)

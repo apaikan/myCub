@@ -85,6 +85,8 @@
 
 #define HELP_MESSAGE        "\
 Commands:\n\
+  startControl \n\
+  stopControl \n\
   setPose <joint> <pos> \n\
   getPose <joint> \n\
   gotoPose <joint> <pos> [time] \n\
@@ -281,6 +283,18 @@ int myCub_main(int argc, char *argv[])
                          prog.arena, prog.uordblks, prog.fordblks, prog.mxordblk);
                     fflush(stdout);
             } */
+            else if(strcmp(mycub_cmd[0], "startControl")==0 ){
+                if(mycub.startController())                    
+                    printf("[ok]\n"); 
+                else    
+                    printf("[error]\n"); 
+                fflush(stdout);
+            }
+            else if(strcmp(mycub_cmd[0], "stopControl")==0 ){
+                mycub.stopController();
+                printf("[ok]\n"); fflush(stdout);
+            }
+
             else if(strcmp(mycub_cmd[0], "setPose")==0 ) {
                 if(n >= 3)
                 {
