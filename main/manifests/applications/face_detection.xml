@@ -76,5 +76,10 @@
         <to>/GazeControl/cmd:i</to>
         <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_voice_gaze</protocol>
     </connection>
+    <connection>
+        <from>/SpeechRecognizer/words:o</from>
+        <to>/gSpeak</to>
+        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_voice_speak</protocol>
+    </connection>
 
 </application>
