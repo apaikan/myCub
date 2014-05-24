@@ -505,6 +505,20 @@ public:
             return true;
         }
         else if(command.get(0).asString() == "get" && 
+            command.get(1).asString() == "head") 
+        {
+            serMutex.wait();
+            while(serBusy) Time::delay(0.1);
+            serBusy = true;
+            pSerial->Write("getHeading\n");
+            reply.clear();
+            reply.addString(pSerial->ReadLine(5000));
+            serBusy = false;
+            serMutex.post();
+            return true;
+        }
+
+        else if(command.get(0).asString() == "get" && 
             command.get(1).asString() == "meminfo") 
         {
             serMutex.wait();

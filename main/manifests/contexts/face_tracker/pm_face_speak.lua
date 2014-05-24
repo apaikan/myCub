@@ -21,10 +21,10 @@ PortMonitor.create = function()
 end
 
 PortMonitor.accept = function(thing)    
+    PortMonitor.setEvent('e_face_detected', 5.0)
     if (yarp.Time_now() - prev_spk) < 10.0 then
         return false
     end
-    PortMonitor.setEvent('e_face_detected', 5.0)
     prev_spk = yarp.Time_now() 
     return true
 end
