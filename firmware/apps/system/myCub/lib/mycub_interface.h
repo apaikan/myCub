@@ -59,6 +59,8 @@
 #include <nuttx/sensors/range_srf04.h>
 #include <nuttx/analog/adc_lm4f.h>
 
+#include "mycub_compass.h"
+
 /* This identifies the GPIO port
  * .... .... .... .... .... .... .PPP P...
  */
@@ -96,14 +98,15 @@
  * Joint index mapping
  */
 
-#define LEFT_JOINT      0
-#define FRONT_JOINT     1
-#define RIGHT_JOINT     2
-#define BACK_JOINT      3
+#define LEFT_JOINT          0
+#define FRONT_JOINT         1
+#define RIGHT_JOINT         2
+#define BACK_JOINT          3
 
-#define FRONT_RANGE     0
-#define RIGHT_RANGE     1
+#define FRONT_RANGE         0
+#define RIGHT_RANGE         1
 
+#define COMPASS_I2C_PORT    1
 
 typedef struct __JointContext {
     int joint_0;
@@ -143,6 +146,9 @@ public:
     double getBatteryCurrent(void);
     int getRawAnalogData(const int channel, unsigned long freq,
                          uint16_t* data, size_t len);
+    // compass
+    float getHeading(void);
+
 private:
     // servo controller driver  variables 
     int fd_servo;
@@ -155,7 +161,10 @@ private:
 
     // adc 
     int fd_adc;
-    
+
+    // compass
+    MyCubCompass compass;
+
     pthread_attr_t attr;
 
 private:

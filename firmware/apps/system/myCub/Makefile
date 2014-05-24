@@ -62,6 +62,7 @@ CXXSRCS		= myCub.cpp
 
 CXXSRCS		+= ./lib/mycub_interface.cpp 
 CXXSRCS		+= ./lib/mycub_walk.cpp
+CXXSRCS		+= ./lib/mycub_compass.cpp
 #CXXSRCS		+= ./lib/mycub_fun.cpp
 
 CXXSRCS		+= ./lib/nxobjects/nuttx_mutex.cpp

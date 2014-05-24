@@ -34,14 +34,13 @@ while true do
     local rep = yarp.Bottle()
     cmd:clear()
     cmd:addString("get")
-    cmd:addString("dist")
-    cmd:addString("0")
+    cmd:addString("head")
     sender:write(cmd, rep)
     print("Reply:", rep:toString())
+    yarp.Time_delay(0.2)
     if (yarp.Time_now() - t_start > 600) or rep:toString() == "" then
         break
     end
-    yarp.Time_delay(0.5)
 end
 
 -- disconnect sender from receiver

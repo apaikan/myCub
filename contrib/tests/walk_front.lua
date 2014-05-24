@@ -26,23 +26,45 @@ if ret == false then
     return
 end
 
-t_start = yarp.Time_now()
+speed = 1000
+--[[
+steps = {
+        "0 30 0 0",
+        "30 30 30 0",
+        "30 0 30 0",
+        "0 0 0 0",
+        }
+]]--
+
+steps = {
+        "0 30 0 0",
+        "30 30 30 0",
+        "30 0 30 0",
+        "0 0 0 0",
+        }
+
+
+cmd = yarp.Bottle()
+rep = yarp.Bottle()
 
 while true do
-    -- write to the sender port
-    local cmd = yarp.Bottle()
-    local rep = yarp.Bottle()
-    cmd:clear()
-    cmd:addString("get")
-    cmd:addString("dist")
-    cmd:addString("0")
-    sender:write(cmd, rep)
-    print("Reply:", rep:toString())
-    if (yarp.Time_now() - t_start > 600) or rep:toString() == "" then
-        break
-    end
-    yarp.Time_delay(0.5)
+    for i=1,#steps do
+        cmd:clear()
+        rep:clear()
+        cmd:addString("goto")
+        cmd:addString("posall")
+        pos = cmd:addList()
+        pos:clear()
+        pos:fromString(steps[i])
+        spd = cmd:addList()
+        spd:clear()
+        for s=1,4 do spd:addInt(speed) end 
+        sender:write(cmd, rep)
+        print(i, cmd:toString(), rep:toString())
+        yarp.Time_delay(2*speed/1000)
+    end    
 end
+
 
 -- disconnect sender from receiver
 yarp.NetworkBase_disconnect(sender:getName(), "/MyCubInterface/cmd:i")

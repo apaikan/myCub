@@ -117,6 +117,22 @@ config SSI1_DISABLE
 	bool "Disable SSI1"
 	default y
 
+config LMM4F_I2C0
+    bool "Enable I2C0"
+    default n
+
+config LMM4F_I2C1
+    bool "Enable I2C1"
+    default n
+
+config LMM4F_I2C2
+    bool "Enable I2C2"
+    default n
+
+config LMM4F_I2C3
+    bool "Enable I2C3"
+    default n
+
 config LM_ETHERNET
 	bool "Stellaris Ethernet"
 	default n

@@ -263,8 +263,16 @@ bool MyCubInterface::init(void)
             fini();
             return false;
         }
+
     }
    
+    if(!compass.init(COMPASS_I2C_PORT))
+    {
+        printf("MyCubInterface::init(): compass driver open failed.\n");
+        fini();
+        return false;
+    }
+
     return true;
 }
 
@@ -627,7 +635,7 @@ double MyCubInterface::getBatteryVolt(void)
     // R_gnd = 1K
     // R_vcc = 10K
     double vm = volt * (0.00080586);
-    return (vm * 11.0) - 0.31;
+    return (vm * 11.0);
 }
 
 double MyCubInterface::getBatteryCurrent(void)
@@ -642,6 +650,11 @@ double MyCubInterface::getBatteryCurrent(void)
        volt += value[i];
     volt /= 10.0;
     double vin = volt * (0.00080586); 
-    return (vin - 2.34) * 10.0;
+    return (vin - 2.5) * 10.0;
+}
+
+float MyCubInterface::getHeading(void) 
+{
+    return compass.getHeading();
 }
 

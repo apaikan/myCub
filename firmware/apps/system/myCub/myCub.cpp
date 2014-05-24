@@ -55,7 +55,7 @@
 */
 
 #include <apps/readline.h>
-  
+
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
@@ -73,7 +73,7 @@
 #define MAX_CMD_NUM     16
 #define MAX_CMD_LEN     32
 
-#define BATTERY_CRITICAL_LEVE   7000 // 7.0VV
+#define BATTERY_CRITICAL_LEVE   6.2 // 6.2VV
 
 #define MYCUB_LOGO  "\
                   ____      _      \n\
@@ -97,10 +97,12 @@ Commands:\n\
   moveLeft [time] \n\
   stop \n\
   getDistance <sonar> \n\
+  getHeading \n\
   getBatteryVolt \n\
   getBatteryCurrent \n\
   getMemoryInfo \n\
   getADC <channel> <freq> <samples>  \n\
+  interactive <0|1> \n\
   help \n"
 
 extern "C"
@@ -266,6 +268,16 @@ int myCub_main(int argc, char *argv[])
             else if(strcmp(mycub_cmd[0], "ping")==0 ){
                 printf("[ok]\n"); fflush(stdout);
             }
+            else if(strcmp(mycub_cmd[0], "interactive")==0 ){
+                if(n<2) {
+                    printf("[error]\n"); fflush(stdout);
+                }    
+                else
+                {
+                    bInteractive = (atoi(mycub_cmd[1]) == 1);
+                    printf("[ok]\n"); fflush(stdout);
+                }                    
+            }
             else if(strcmp(mycub_cmd[0], "getMemoryInfo")==0 ){
                     #ifdef CONFIG_CAN_PASS_STRUCTS
                         data = mallinfo();
@@ -322,8 +334,10 @@ int myCub_main(int argc, char *argv[])
                 else
                     printf("[error]\n"); fflush(stdout);
             }
-
-
+            else if(strcmp(mycub_cmd[0], "getHeading")==0 ) {
+                int head = (int) mycub.getHeading();
+                printf("%d\n", head); fflush(stdout);
+            }
             else if(strcmp(mycub_cmd[0], "gotoPose")==0 ) {
                 if(n >= 3)
                 {
@@ -401,14 +415,14 @@ int myCub_main(int argc, char *argv[])
                     int channel = atoi(mycub_cmd[1]);
                     unsigned long freq = atol(mycub_cmd[2]);
                     size_t samples = atoi(mycub_cmd[3]);
-                    uint16_t* data = (uint16_t*) malloc(samples*sizeof(uint16_t));
-                    int ret = mycub.getRawAnalogData(channel, freq, data, samples);
+                    uint16_t* buff = (uint16_t*) malloc(samples*sizeof(uint16_t));
+                    int ret = mycub.getRawAnalogData(channel, freq, buff, samples);
                     for(int i=0; i<ret; i++) {
-                        printf("%d, ", data[i]); fflush(stdout);
+                        printf("%d, ", buff[i]); fflush(stdout);
                     }
                     if(bInteractive)
                         printf("\n[ok]\n"); fflush(stdout);
-                    free(data);
+                    free(buff);
                 }
                 else
                     printf("[error]\n"); fflush(stdout);

@@ -73,7 +73,7 @@ CSRCS       += board_driver/usb.c
 CSRCS       += board_driver/watchdog.c
 
 ## Nuttx relevent board driver ## 
-CSRCS		+= lm4f_boot.c lm4f_ssi.c up_servo.c up_range_srf04.c up_adc.c
+CSRCS		+= lm4f_boot.c lm4f_ssi.c up_servo.c up_range_srf04.c up_adc.c up_i2c.c
 
 ifeq ($(CONFIG_ARCH_LEDS),y)
 CSRCS		+= lm4f_autoleds.c
