@@ -2,9 +2,9 @@
 
 # change the following as you want
 YARP_CMD="yarp"
-GRAPH_GEN="dot"
-GRAPH_FORMAT="pdf"
-FILENAME="output"
+GRAPH_GEN="dot"     # dot, neato, twopi, circo, ...   
+GRAPH_FORMAT="pdf"  # pdf, eps, svg, jpg, png, ... 
+FILENAME="output"   
 #----------------------------------
 
 
