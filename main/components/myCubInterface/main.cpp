@@ -97,24 +97,26 @@ public:
         std::string rep = pSerial->ReadLine(5000);
         if(rep != "[ok]" )
         {
-            printf("Cannot communicate with myCub control board!\n");
+            printf("Cannot communicate with myCub control board! (got '%s')\n", rep.c_str());
             pSerial->Close();
-            return false;          
+            return false;
         }
 
         fdDisplay = fopen("/dev/display", "w");
         if(!fdDisplay)
         {
             fprintf(stdout, "Cannot open display driver! (dose not exist)\n");            
-            return false;
+            //return false;
         }
         char cmd[64];
         sprintf(cmd, "getBatteryVolt\n");
         pSerial->Write(cmd);
         battery_volt = atof(pSerial->ReadLine(5000));
         battery_volt = (battery_volt-6.0) / (7.4-6.0) * 100.0;
-        bool ret = (fprintf(fdDisplay, "\%bat\%% %d\n",(int)battery_volt) > 0); 
-        fflush(fdDisplay);
+        if(fdDisplay) {
+            fprintf(fdDisplay, "\%bat\%% %d\n",(int)battery_volt); 
+            fflush(fdDisplay);
+        }
 
         // start the controller
         printf("Staring motors controller...\n");
@@ -143,7 +145,7 @@ public:
         battery_volt = 0.0;
         serBusy = false;
 
-        ret = cmdPort.open("/MyCubInterface/cmd:i");
+        bool ret = cmdPort.open("/MyCubInterface/cmd:i");
         if(ret)
             attach(cmdPort);
         return ret;
@@ -168,8 +170,10 @@ public:
         if((atof(str.c_str()) >= 0.0) != battery_plugged )
         {
             battery_plugged = (atof(str.c_str()) > 0.0);
-            ret = (fprintf(fdDisplay, "\%%plug\%% %d\n", (battery_plugged==true)?1:0) > 0); 
-            fflush(fdDisplay);
+            if(fdDisplay) {            
+                ret = (fprintf(fdDisplay, "\%%plug\%% %d\n", (battery_plugged==true)?1:0) > 0); 
+                fflush(fdDisplay);
+            }     
         }    
         Time::delay(0.05);
 
@@ -183,8 +187,10 @@ public:
         {
             battery_volt /= battery_volt_count;
             battery_volt = (battery_volt-6.0) / (7.4-6.0) * 100;
-            bool ret = (fprintf(fdDisplay, "\%%bat\%% %d\n",(int)battery_volt) > 0); 
-            fflush(fdDisplay);
+            if(fdDisplay) {
+                bool ret = (fprintf(fdDisplay, "\%%bat\%% %d\n",(int)battery_volt) > 0); 
+                fflush(fdDisplay);
+            }    
             battery_volt_count = 0;
             battery_volt = 0.0;
         }
@@ -595,7 +601,8 @@ public:
     bool close() {
         cmdPort.close(); 
         //driver.close();
-        fclose(fdDisplay);
+        if(fdDisplay)
+            fclose(fdDisplay);
         printf("Stopping motors controller...\n");
         pSerial->Write("stopControl\n");
         std::string rep = pSerial->ReadLine(5000);

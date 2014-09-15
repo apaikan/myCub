@@ -115,6 +115,7 @@ void update_display()
      LCDdrawrect(81, 43, 3, 3, BLACK);
      // battery charge state    
      battery_level = (battery_level>100) ? 100 : battery_level;
+     battery_level = (battery_level<0) ? 0 : battery_level;
      LCDfillrect(70, 43, battery_level/10+1, 4, BLACK); 
 
     // battery plugged state 
