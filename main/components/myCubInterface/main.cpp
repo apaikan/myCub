@@ -111,7 +111,7 @@ public:
         char cmd[64];
         sprintf(cmd, "getBatteryVolt\n");
         pSerial->Write(cmd);
-        battery_volt = atof(pSerial->ReadLine(5000));
+        battery_volt = (float)(atoi(pSerial->ReadLine(5000))/1000.0);
         battery_volt = (battery_volt-6.0) / (7.4-6.0) * 100.0;
         if(fdDisplay) {
             fprintf(fdDisplay, "\%bat\%% %d\n",(int)battery_volt); 
@@ -182,7 +182,7 @@ public:
         pSerial->Write(cmd);
         str = pSerial->ReadLine(5000);
         //printf("updateModule(): battery : %s\n", str.c_str());
-        battery_volt += atof(str.c_str());
+        battery_volt += (float)(atoi(str.c_str())/1000.0);
         if(battery_volt_count++ >= 12)
         {
             battery_volt /= battery_volt_count;

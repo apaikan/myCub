@@ -41,7 +41,7 @@ while true do
     if (yarp.Time_now() - t_start > 600) or rep:toString() == "" then
         break
     end
-    yarp.Time_delay(0.5)
+    yarp.Time_delay(0.02)
 end
 
 -- disconnect sender from receiver
