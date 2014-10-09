@@ -6,10 +6,18 @@
 # Replace "yarpy" with whatever your executable should be called.
 
 cmake_minimum_required(VERSION 2.6)
+set(PROJECTNAME myCubInterface)
+project(${PROJECTNAME})
 
 
 # Find YARP.  Point the YARP_DIR environment variable at your build.
 find_package(YARP REQUIRED)
+list(APPEND CMAKE_MODULE_PATH ${YARP_MODULE_PATH})
+include(YarpIDL)
+
+#compile definition file to generate source code into the desired directory
+set(IDL_GENERATED_CODE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/generated")
+yarp_idl_to_dir(${PROJECTNAME}.thrift ${IDL_GENERATED_CODE_DIR})
 
 
 file(GLOB folder_source *.cpp ./libserial/*.cpp)
@@ -17,12 +25,16 @@ file(GLOB_RECURSE folder_header *.h ./libserial/*.h)
 source_group("Source Files" FILES ${folder_source})
 source_group("Header Files" FILES ${folder_header})
 
+list(APPEND folder_source ${IDL_GENERATED_CODE_DIR}/src/${PROJECTNAME}_IDL.cpp)
+list(APPEND folder_header ${IDL_GENERATED_CODE_DIR}/include/${PROJECTNAME}_IDL.h)
 
-include_directories(${YARP_INCLUDE_DIRS} ./libserial)
+include_directories(${YARP_INCLUDE_DIRS} 
+                    ${IDL_GENERATED_CODE_DIR}/include
+                    ./libserial)
 
 
 # Set up our main executable.
-add_executable(myCubInterface ${folder_source} ${folder_header} )
-target_link_libraries(myCubInterface ${YARP_LIBRARIES})
+add_executable(${PROJECTNAME} ${folder_source} ${folder_header} )
+target_link_libraries(${PROJECTNAME} ${YARP_LIBRARIES})
 
 

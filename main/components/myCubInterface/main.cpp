@@ -28,6 +28,8 @@
 #include <yarp/dev/SerialInterfaces.h>
 //#include <yarp/dev/PolyDriver.h>
 
+#include <myCubInterface_IDL.h>
+
 using namespace yarp::os;
 //using namespace yarp::dev;
 using namespace std;
@@ -36,7 +38,8 @@ using namespace std;
 #define JOINTS_SCALE            2.2687
 #define JOINTS_MIN              8
 
-class MyCubInterface: public RFModule {
+class MyCubInterface: public RFModule, public myCubInterface_IDL 
+{
 public:
 
     MyCubInterface(void) {
@@ -151,6 +154,10 @@ public:
         return ret;
     }
 
+    bool attach(yarp::os::RpcServer& source) {
+        return this->yarp().attachAsServer(source);
+    }
+
     double getPeriod() {
         makeRealTime();
         return 5.0; // run every 5 s 
@@ -200,19 +207,225 @@ public:
         return true; 
     }
 
-/*
- setPose <joint> <pos> 
-  getPose <joint> 
-  gotoPose <joint> <pos> [time] 
-  gotoPoseSync <joint> <pos> [time] 
-  moveFront [time] 
-  moveBack [time] 
-  moveRight [time] 
-  moveLeft [time] 
-  getDistance <sonar> 
-  getBatteryVolt 
-  getADC <channel> <freq> <samples>  
-*/
+    /**
+     * ping the control board
+     * @return true/false on success/failure
+     */
+    virtual bool ping() {
+        serMutex.wait();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;        
+        pSerial->Write("ping\n");
+        bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
+        serBusy = false;
+        serMutex.post();
+        return ret;
+    }
+
+    /**
+     * Set joint pos
+     * @joint joint id (0..3)
+     * @pos   joint pos (0..90)
+     * @return true/false on success/failure
+     */
+    virtual bool setPose(const int32_t joint, const int32_t pos) {
+        serMutex.wait();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;
+        char cmd[64];
+        sprintf(cmd, "setPose %d %d\n", joint, (int)(pos*JOINTS_SCALE+JOINTS_MIN));
+        pSerial->Write(cmd);
+        bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
+        serBusy = false;
+        serMutex.post();
+        return ret;
+    }
+
+    /**
+    * get joint pos
+    * @joint joint id (0..3)
+    * @return joint pos
+    */
+    virtual int32_t getPose(const int32_t joint) {
+        serMutex.wait();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;
+        char cmd[64];
+        sprintf(cmd, "getPose %d\n", joint);
+        pSerial->Write(cmd);
+        int32_t pos = atoi(pSerial->ReadLine(5000));
+        serBusy = false;
+        serMutex.post();
+        return (int)((pos-JOINTS_MIN+1)/JOINTS_SCALE);
+    }
+
+    /**
+     * get all joint poses
+     * @return joint poses
+     */
+    virtual std::vector<int32_t>  getPoseAll() {
+        std::vector<int32_t> poses; 
+        for(int i=0; i<4; i++)
+            poses.push_back(getPose(i));
+        return poses;
+    }
+
+    /**
+     * Move a joint to position with time duration
+     * @joint joint id (0..3)
+     * @pos   joint pos (0..90)
+     * @t     time duration in ms
+     * @return true/false on success/failure
+     */
+    virtual bool gotoPose(const int32_t joint, 
+                            const int32_t pos, const int32_t t = 100) {
+        serMutex.wait();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;
+        char cmd[64];
+        sprintf(cmd, "gotoPose %d %d %d\n", 
+                joint, (int)(pos*JOINTS_SCALE+JOINTS_MIN), t);
+        pSerial->Write(cmd);
+        bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
+        serBusy = false;
+        serMutex.post();
+        return ret;
+    }
+
+    /**
+     * Move a joint to position with time duration
+     * and wait until it reaches the desired position
+     * @joint joint id (0..3)
+     * @pos   joint pos (0..90)
+     * @t     time duration in ms
+     * @return true/false on success/failure
+     */
+    virtual bool gotoPoseSync(const int32_t joint, 
+                                const int32_t pos, const int32_t t = 100) {
+        gotoPose(joint, pos, t);
+    }
+
+    /**
+     * Set all joint pos
+     * @poses a vector of joint poses (must have 4 elements)
+     * @return true/false on success/failure
+     */
+    virtual bool setPoseAll(const std::vector<int32_t> & poses) {
+        if(poses.size() < 4)
+            return false;
+
+        serMutex.wait();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;
+        
+        bool ret = true;
+        for(int i=0; i<poses.size(); i++)
+        {
+            char cmd[64];
+            sprintf(cmd, "setPose %d %d\n", 
+                   i, 
+                   (int)(poses[i]*JOINTS_SCALE+JOINTS_MIN));
+            pSerial->Write(cmd);
+            ret &= (string(pSerial->ReadLine(5000)) == "[ok]");
+        }
+        serBusy = false;
+        serMutex.post();
+        return ret;
+    }
+
+    /**
+     * move all joint pos with desired duration
+     * @poses a vector of joint poses (must have 4 elements)
+     * @times a vector of time duration (must have 4 elements)
+     * @return true/false on success/failure
+     */
+      virtual bool gotoPoseAll(const std::vector<int32_t> & poses, 
+                               const std::vector<int32_t> & times){
+        if((poses.size() < 4) || (times.size() != poses.size()))
+            return false;
+
+        serMutex.wait();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;
+        
+        bool ret = true;
+        for(int i=0; i<poses.size(); i++)
+        {
+            char cmd[64];
+            sprintf(cmd, "gotoPose %d %d %d\n", 
+                   i, (int)(poses[i]*JOINTS_SCALE+JOINTS_MIN), times[i]);
+            pSerial->Write(cmd);
+            ret &= (string(pSerial->ReadLine(5000)) == "[ok]");
+        }
+        serBusy = false;
+        serMutex.post();
+        return ret;
+      }
+
+    /**
+     * get range-finder value
+     * @id the sensor id started from 0
+     * @return true/false on success/failure
+     */
+    virtual int32_t getDistance(const int32_t id){
+        serMutex.wait();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;
+        char cmd[64];
+        sprintf(cmd, "getDistance %d\n", id);
+        pSerial->Write(cmd);
+        int32_t dist = atoi(pSerial->ReadLine(5000));
+        serBusy = false;
+        serMutex.post();
+        return dist;
+    }
+
+    /**
+     * get digital compass value
+     * @return true/false on success/failure
+     */
+    virtual int32_t getHeading(){
+        serMutex.wait();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;
+        pSerial->Write("getHeading\n");
+        int32_t head = atoi(pSerial->ReadLine(5000));
+        serBusy = false;
+        serMutex.post();
+        return head;
+    }
+
+    /**
+     * get battery voltage status
+     * @return true/false on success/failure
+     */
+    virtual int32_t getBatteryVolt(){
+        serMutex.wait();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;
+        pSerial->Write("getBatteryVolt\n");
+        int32_t volt = atoi(pSerial->ReadLine(5000));
+        serBusy = false;
+        serMutex.post();
+        return volt;
+    }
+
+    /**
+     * get battery current status
+     * @return true/false on success/failure
+     */
+      virtual int32_t getBatteryCurrent() { 
+        serMutex.wait();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;
+        pSerial->Write("getBatteryCurrent\n");
+        int32_t amp = atoi(pSerial->ReadLine(5000));
+        serBusy = false;
+        serMutex.post();
+        return amp;
+      }
+
+    /*
     bool respond(const Bottle &command, Bottle &reply) {
         reply.clear();        
         if (command.size() < 2 ){
@@ -402,94 +615,6 @@ public:
 
             return true;
         }
-
-        else if(command.get(0).asString() == "move" && 
-            command.get(1).asString() == "front") 
-        {
-            serMutex.wait();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            char cmd[64];
-            if(command.size() > 2 )
-                sprintf(cmd, "moveFront %d\n", command.get(2).asInt()); 
-            else
-                sprintf(cmd, "moveFront\n");
-            pSerial->Write(cmd);
-            reply.clear();
-            reply.addString(pSerial->ReadLine(5000));
-            serBusy = false;
-            serMutex.post();
-            return true;
-        }
-        else if(command.get(0).asString() == "move" && 
-            command.get(1).asString() == "back") 
-        {
-            serMutex.wait();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            char cmd[64];
-            if(command.size() > 2 )
-                sprintf(cmd, "moveBack %d\n", command.get(2).asInt()); 
-            else
-                sprintf(cmd, "moveBack\n");
-            pSerial->Write(cmd);
-            reply.clear();
-            reply.addString(pSerial->ReadLine(5000));
-            serBusy = false;
-            serMutex.post();
-            return true;
-        }
-        else if(command.get(0).asString() == "move" && 
-            command.get(1).asString() == "right") 
-        {
-            serMutex.wait();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            char cmd[64];
-            if(command.size() > 2 )
-                sprintf(cmd, "moveRight %d\n", command.get(2).asInt()); 
-            else
-                sprintf(cmd, "moveRight\n");
-            pSerial->Write(cmd);
-            reply.clear();
-            reply.addString(pSerial->ReadLine(5000));
-            serBusy = false;
-            serMutex.post();
-            return true;
-        }
-        else if(command.get(0).asString() == "move" && 
-            command.get(1).asString() == "left") 
-        {
-            serMutex.wait();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            char cmd[64];
-            if(command.size() > 2 )
-                sprintf(cmd, "moveLeft %d\n", command.get(2).asInt()); 
-            else
-                sprintf(cmd, "moveLeft\n");
-            pSerial->Write(cmd);
-            reply.clear();
-            reply.addString(pSerial->ReadLine(5000));
-            serBusy = false;
-            serMutex.post();
-            return true;
-        }
-        else if(command.get(0).asString() == "move" && 
-            command.get(1).asString() == "stop") 
-        {
-            serMutex.wait();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            char cmd[64];
-            sprintf(cmd, "stop\n");
-            pSerial->Write(cmd);
-            reply.clear();
-            reply.addString(pSerial->ReadLine(5000));
-            serBusy = false;
-            serMutex.post();
-            return true;
-        }
         else if(command.get(0).asString() == "get" && 
             command.get(1).asString() == "dist") 
         {
@@ -592,6 +717,7 @@ public:
 
         return true;
     }
+    */
 
     bool interruptModule() { 
         cmdPort.interrupt();             // interupt the blocking read 
