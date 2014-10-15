@@ -54,7 +54,14 @@ public:
         if(pSerial)
             delete pSerial;
     }
+    
+    inline bool checkJointLimits(int32_t pos) {
+        return (((int)(pos*JOINTS_SCALE+JOINTS_MIN) <= 180) && ((int)(pos*JOINTS_SCALE+JOINTS_MIN) >= 0));
+    }
 
+    inline bool checkJointIDs(int32_t id) {
+        return ((id <= 3) && (id >= 0));
+    }
 
     bool configure(ResourceFinder &rf) {
 
@@ -229,6 +236,7 @@ public:
      * @return true/false on success/failure
      */
     virtual bool setPose(const int32_t joint, const int32_t pos) {
+        if(!checkJointIDs(joint) || !checkJointLimits(pos)) return false;
         serMutex.wait();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
@@ -247,6 +255,7 @@ public:
     * @return joint pos
     */
     virtual int32_t getPose(const int32_t joint) {
+       if(!checkJointIDs(joint)) return -1;
         serMutex.wait();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
@@ -279,6 +288,8 @@ public:
      */
     virtual bool gotoPose(const int32_t joint, 
                             const int32_t pos, const int32_t t = 100) {
+        if(!checkJointIDs(joint) || !checkJointLimits(pos)) return false;
+
         serMutex.wait();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
@@ -321,12 +332,16 @@ public:
         bool ret = true;
         for(int i=0; i<poses.size(); i++)
         {
-            char cmd[64];
-            sprintf(cmd, "setPose %d %d\n", 
-                   i, 
-                   (int)(poses[i]*JOINTS_SCALE+JOINTS_MIN));
-            pSerial->Write(cmd);
-            ret &= (string(pSerial->ReadLine(5000)) == "[ok]");
+            if(checkJointLimits(poses[i])) {
+                char cmd[64];
+                sprintf(cmd, "setPose %d %d\n", 
+                       i, 
+                       (int)(poses[i]*JOINTS_SCALE+JOINTS_MIN));
+                pSerial->Write(cmd);
+                ret &= (string(pSerial->ReadLine(5000)) == "[ok]");
+            } 
+            else 
+                ret = false;
         }
         serBusy = false;
         serMutex.post();
@@ -351,11 +366,15 @@ public:
         bool ret = true;
         for(int i=0; i<poses.size(); i++)
         {
-            char cmd[64];
-            sprintf(cmd, "gotoPose %d %d %d\n", 
-                   i, (int)(poses[i]*JOINTS_SCALE+JOINTS_MIN), times[i]);
-            pSerial->Write(cmd);
-            ret &= (string(pSerial->ReadLine(5000)) == "[ok]");
+            if(checkJointLimits(poses[i])) {
+                char cmd[64];
+                sprintf(cmd, "gotoPose %d %d %d\n", 
+                       i, (int)(poses[i]*JOINTS_SCALE+JOINTS_MIN), times[i]);
+                pSerial->Write(cmd);
+                ret &= (string(pSerial->ReadLine(5000)) == "[ok]");
+            }
+            else
+                ret = false;
         }
         serBusy = false;
         serMutex.post();
