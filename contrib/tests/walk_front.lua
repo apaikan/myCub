@@ -87,7 +87,7 @@ while true do
         move(steps_front)
     else
         print("Obstacle on the way! try to turn\n")
-        while getDistance() < 1500 do
+        while getDistance() < 500 do
             print("Turning... distance:", getDistance())
             move(steps_turn)
         end
