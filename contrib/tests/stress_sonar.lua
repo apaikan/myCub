@@ -33,9 +33,8 @@ while true do
     local cmd = yarp.Bottle()
     local rep = yarp.Bottle()
     cmd:clear()
-    cmd:addString("get")
-    cmd:addString("dist")
-    cmd:addString("0")
+    cmd:addString("getDistance")
+    cmd:addInt(0)
     sender:write(cmd, rep)
     print("Reply:", rep:toString())
     if (yarp.Time_now() - t_start > 600) or rep:toString() == "" then
