@@ -77,8 +77,13 @@ public:
  */
   virtual int32_t getDistance(const int32_t id = 0);
 /**
- * get digital compass value
- * @return true/false on success/failure
+ * get digital compass values
+ * @returna a vector of x,y,z
+ */
+  virtual std::vector<int32_t>  getOrientation();
+/**
+ * get absolute heading
+ * @return heading angle
  */
   virtual int32_t getHeading();
 /**

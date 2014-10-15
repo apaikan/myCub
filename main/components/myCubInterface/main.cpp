@@ -384,15 +384,44 @@ public:
      * get digital compass value
      * @return true/false on success/failure
      */
-    virtual int32_t getHeading(){
+    virtual std::vector<int32_t>  getOrientation() {
         serMutex.wait();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
-        pSerial->Write("getHeading\n");
-        int32_t head = atoi(pSerial->ReadLine(5000));
+        pSerial->Write("getOrientation\n");
+        string ret = pSerial->ReadLine(5000);
         serBusy = false;
         serMutex.post();
-        return head;
+        std::vector<int32_t> orit(3);
+        sscanf(ret.c_str(), "%d %d %d", &orit[0], &orit[1], &orit[2]);
+        return orit;
+    }
+
+    /**
+    * get absolute heading
+    * @return heading angle
+    */
+    virtual int32_t getHeading() {
+        std::vector<int32_t> orit(3);
+        orit = getOrientation();
+        // Hold the module so that Z is pointing 'up' and you can measure the heading with x&y
+        // Calculate heading when the magnetometer is level, then correct for signs of axis.
+        float heading = atan2(orit[1], orit[0]);
+
+        // Once you have your heading, you must then add your 'Declination Angle', which is the 'Error' of the magnetic field in your location.
+        // Find yours here: http://www.magnetic-declination.com/
+        // Mine is: -13* 2' W, which is ~13 Degrees, or (which we need) 0.22 radians
+        // If you cannot find your Declination, comment out these two lines, your compass will be slightly off.
+        heading += 0.22;
+        
+        // Correct for when signs are reversed.
+        if(heading < 0)
+            heading += 2*M_PI;
+
+        // Check for wrap due to addition of declination.
+        if(heading > 2*M_PI)
+            heading -= 2*M_PI;
+        return (int32_t) (heading * 180.0/M_PI);
     }
 
     /**

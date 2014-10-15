@@ -83,8 +83,14 @@ service myCubInterface_IDL
   i32 getDistance(1:i32 id=0);
 
   /**
-  * get digital compass value
-  * @return true/false on success/failure
+  * get digital compass values
+  * @returna a vector of x,y,z
+  */
+  list<i32> getOrientation();
+
+  /**
+  * get absolute heading 
+  * @return heading angle
   */
   i32 getHeading();
 
