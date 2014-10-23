@@ -21,6 +21,24 @@ service myCubInterface_IDL
   bool ping();
   
   /**
+  * move all joints to the home position
+  * @return true/false on success/failure
+  */
+  bool homeAll();
+
+  /**
+  * start motor controller 
+  * @return true/false on success/failure
+  */
+  bool startController();
+
+  /**
+  * stop motor controller 
+  * @return true/false on success/failure
+  */
+  bool stopController();
+
+  /**
   * Set joint pos
   * @joint joint id (0..3)
   * @pos   joint pos (0..90)

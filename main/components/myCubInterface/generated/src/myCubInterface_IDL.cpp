@@ -26,6 +26,66 @@ public:
   }
 };
 
+class myCubInterface_IDL_homeAll : public yarp::os::Portable {
+public:
+  bool _return;
+  virtual bool write(yarp::os::ConnectionWriter& connection) {
+    yarp::os::idl::WireWriter writer(connection);
+    if (!writer.writeListHeader(1)) return false;
+    if (!writer.writeTag("homeAll",1,1)) return false;
+    return true;
+  }
+  virtual bool read(yarp::os::ConnectionReader& connection) {
+    yarp::os::idl::WireReader reader(connection);
+    if (!reader.readListReturn()) return false;
+    if (!reader.readBool(_return)) {
+      reader.fail();
+      return false;
+    }
+    return true;
+  }
+};
+
+class myCubInterface_IDL_startController : public yarp::os::Portable {
+public:
+  bool _return;
+  virtual bool write(yarp::os::ConnectionWriter& connection) {
+    yarp::os::idl::WireWriter writer(connection);
+    if (!writer.writeListHeader(1)) return false;
+    if (!writer.writeTag("startController",1,1)) return false;
+    return true;
+  }
+  virtual bool read(yarp::os::ConnectionReader& connection) {
+    yarp::os::idl::WireReader reader(connection);
+    if (!reader.readListReturn()) return false;
+    if (!reader.readBool(_return)) {
+      reader.fail();
+      return false;
+    }
+    return true;
+  }
+};
+
+class myCubInterface_IDL_stopController : public yarp::os::Portable {
+public:
+  bool _return;
+  virtual bool write(yarp::os::ConnectionWriter& connection) {
+    yarp::os::idl::WireWriter writer(connection);
+    if (!writer.writeListHeader(1)) return false;
+    if (!writer.writeTag("stopController",1,1)) return false;
+    return true;
+  }
+  virtual bool read(yarp::os::ConnectionReader& connection) {
+    yarp::os::idl::WireReader reader(connection);
+    if (!reader.readListReturn()) return false;
+    if (!reader.readBool(_return)) {
+      reader.fail();
+      return false;
+    }
+    return true;
+  }
+};
+
 class myCubInterface_IDL_setPose : public yarp::os::Portable {
 public:
   int32_t joint;
@@ -349,6 +409,33 @@ bool myCubInterface_IDL::ping() {
   bool ok = yarp().write(helper,helper);
   return ok?helper._return:_return;
 }
+bool myCubInterface_IDL::homeAll() {
+  bool _return = false;
+  myCubInterface_IDL_homeAll helper;
+  if (!yarp().canWrite()) {
+    fprintf(stderr,"Missing server method '%s'?\n","bool myCubInterface_IDL::homeAll()");
+  }
+  bool ok = yarp().write(helper,helper);
+  return ok?helper._return:_return;
+}
+bool myCubInterface_IDL::startController() {
+  bool _return = false;
+  myCubInterface_IDL_startController helper;
+  if (!yarp().canWrite()) {
+    fprintf(stderr,"Missing server method '%s'?\n","bool myCubInterface_IDL::startController()");
+  }
+  bool ok = yarp().write(helper,helper);
+  return ok?helper._return:_return;
+}
+bool myCubInterface_IDL::stopController() {
+  bool _return = false;
+  myCubInterface_IDL_stopController helper;
+  if (!yarp().canWrite()) {
+    fprintf(stderr,"Missing server method '%s'?\n","bool myCubInterface_IDL::stopController()");
+  }
+  bool ok = yarp().write(helper,helper);
+  return ok?helper._return:_return;
+}
 bool myCubInterface_IDL::setPose(const int32_t joint, const int32_t pos) {
   bool _return = false;
   myCubInterface_IDL_setPose helper;
@@ -481,6 +568,39 @@ bool myCubInterface_IDL::read(yarp::os::ConnectionReader& connection) {
     if (tag == "ping") {
       bool _return;
       _return = ping();
+      yarp::os::idl::WireWriter writer(reader);
+      if (!writer.isNull()) {
+        if (!writer.writeListHeader(1)) return false;
+        if (!writer.writeBool(_return)) return false;
+      }
+      reader.accept();
+      return true;
+    }
+    if (tag == "homeAll") {
+      bool _return;
+      _return = homeAll();
+      yarp::os::idl::WireWriter writer(reader);
+      if (!writer.isNull()) {
+        if (!writer.writeListHeader(1)) return false;
+        if (!writer.writeBool(_return)) return false;
+      }
+      reader.accept();
+      return true;
+    }
+    if (tag == "startController") {
+      bool _return;
+      _return = startController();
+      yarp::os::idl::WireWriter writer(reader);
+      if (!writer.isNull()) {
+        if (!writer.writeListHeader(1)) return false;
+        if (!writer.writeBool(_return)) return false;
+      }
+      reader.accept();
+      return true;
+    }
+    if (tag == "stopController") {
+      bool _return;
+      _return = stopController();
       yarp::os::idl::WireWriter writer(reader);
       if (!writer.isNull()) {
         if (!writer.writeListHeader(1)) return false;
@@ -770,6 +890,9 @@ std::vector<std::string> myCubInterface_IDL::help(const std::string& functionNam
   if(showAll) {
     helpString.push_back("*** Available commands:");
     helpString.push_back("ping");
+    helpString.push_back("homeAll");
+    helpString.push_back("startController");
+    helpString.push_back("stopController");
     helpString.push_back("setPose");
     helpString.push_back("getPose");
     helpString.push_back("gotoPose");
@@ -788,6 +911,21 @@ std::vector<std::string> myCubInterface_IDL::help(const std::string& functionNam
     if (functionName=="ping") {
       helpString.push_back("bool ping() ");
       helpString.push_back("ping the control board ");
+      helpString.push_back("@return true/false on success/failure ");
+    }
+    if (functionName=="homeAll") {
+      helpString.push_back("bool homeAll() ");
+      helpString.push_back("move all joints to the home position ");
+      helpString.push_back("@return true/false on success/failure ");
+    }
+    if (functionName=="startController") {
+      helpString.push_back("bool startController() ");
+      helpString.push_back("start motor controller ");
+      helpString.push_back("@return true/false on success/failure ");
+    }
+    if (functionName=="stopController") {
+      helpString.push_back("bool stopController() ");
+      helpString.push_back("stop motor controller ");
       helpString.push_back("@return true/false on success/failure ");
     }
     if (functionName=="setPose") {

@@ -48,6 +48,7 @@ public:
         battery_volt = 0.0;
         battery_volt_count = 0;
         battery_plugged = false;
+        serBusy = false;
     }
     
     ~MyCubInterface(void) {
@@ -103,11 +104,9 @@ public:
                 return false;
       
         // ping the board 
-        pSerial->Write("ping\n");
-        std::string rep = pSerial->ReadLine(5000);
-        if(rep != "[ok]" )
+        if(!ping())
         {
-            printf("Cannot communicate with myCub control board! (got '%s')\n", rep.c_str());
+            printf("Cannot communicate with myCub control board!\n");
             pSerial->Close();
             return false;
         }
@@ -118,10 +117,8 @@ public:
             fprintf(stdout, "Cannot open display driver! (dose not exist)\n");            
             //return false;
         }
-        char cmd[64];
-        sprintf(cmd, "getBatteryVolt\n");
-        pSerial->Write(cmd);
-        battery_volt = (float)(atoi(pSerial->ReadLine(5000))/1000.0);
+
+        battery_volt = (float)(getBatteryVolt()/1000.0);
         battery_volt = (battery_volt-6.0) / (7.4-6.0) * 100.0;
         if(fdDisplay) {
             fprintf(fdDisplay, "\%bat\%% %d\n",(int)battery_volt); 
@@ -130,30 +127,16 @@ public:
 
         // start the controller
         printf("Staring motors controller...\n");
-        pSerial->Write("startControl\n");
-        rep = pSerial->ReadLine(10000);
-        if(rep != "[ok]" )
+        if(!startController())
         {
             printf("Cannot start the motors controller!\n");
             pSerial->Close();
             return false;
         }
+
         sleep(1);
         printf("Setting the joints to the default positions...\n");
-        // set the joints to the default positions
-        for(int i=0; i<4; i++)
-        {
-            char cmd[64];
-            sprintf(cmd, "gotoPose %d %d %d\n", 
-                    i, (int)JOINTS_MIN+2, 3000);
-            pSerial->Write(cmd);
-            rep = pSerial->ReadLine(10000);
-            printf("Joint %d ... %s\n", i, rep.c_str());
-            Time::delay(0.2);
-        }
-
-        battery_volt = 0.0;
-        serBusy = false;
+        homeAll();
 
         bool ret = cmdPort.open("/MyCubInterface/cmd:i");
         if(ret)
@@ -171,32 +154,23 @@ public:
     }
     
     bool updateModule() {
-        serMutex.wait();
-        while(serBusy) Time::delay(0.1);
-        serBusy = true;
-        char cmd[64];
-        bool ret;
 
         //update battery plug state 
-        sprintf(cmd, "getBatteryCurrent\n");
-        pSerial->Write(cmd);
-        string str = pSerial->ReadLine(5000);
-        if((atof(str.c_str()) >= 0.0) != battery_plugged )
+        int32_t cur = getBatteryCurrent();
+        if((cur >= 0) != battery_plugged )
         {
-            battery_plugged = (atof(str.c_str()) > 0.0);
+            battery_plugged = (cur > 0);
             if(fdDisplay) {            
-                ret = (fprintf(fdDisplay, "\%%plug\%% %d\n", (battery_plugged==true)?1:0) > 0); 
+                bool ret = (fprintf(fdDisplay, "\%%plug\%% %d\n", (battery_plugged==true)?1:0) > 0); 
                 fflush(fdDisplay);
             }     
-        }    
+        }
+
         Time::delay(0.05);
 
         // update battery voltage status
-        sprintf(cmd, "getBatteryVolt\n");
-        pSerial->Write(cmd);
-        str = pSerial->ReadLine(5000);
         //printf("updateModule(): battery : %s\n", str.c_str());
-        battery_volt += (float)(atoi(str.c_str())/1000.0);
+        battery_volt += (float)(getBatteryVolt()/1000.0);
         if(battery_volt_count++ >= 12)
         {
             battery_volt /= battery_volt_count;
@@ -208,9 +182,6 @@ public:
             battery_volt_count = 0;
             battery_volt = 0.0;
         }
-
-        serBusy = false;
-        serMutex.post();
         return true; 
     }
 
@@ -227,6 +198,48 @@ public:
         serBusy = false;
         serMutex.post();
         return ret;
+    }
+
+    /**
+     * start motor controller
+     * @return true/false on success/failure
+     */
+    virtual bool startController() {
+        serMutex.wait();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;        
+        pSerial->Write("startControl\n");
+        bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
+        serBusy = false;
+        serMutex.post();
+        return ret;
+    }
+
+    /**
+     * stop motor controller
+     * @return true/false on success/failure
+     */
+    virtual bool stopController() {
+        serMutex.wait();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;        
+        pSerial->Write("stopControl\n");
+        bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
+        serBusy = false;
+        serMutex.post();
+        return ret;
+    }
+
+    /**
+     * move all joints to the home position
+     * @return true/false on success/failure
+     */
+    virtual bool homeAll() {
+        vector<int32_t> pos(4);
+        vector<int32_t> speed(4);
+        pos[0] = pos[1] = pos[2] = pos[3] = 0;
+        speed[0] = speed[1] = speed[2] = speed[3] = 3000;
+        return gotoPoseAll(pos, speed); 
     }
 
     /**
@@ -786,7 +799,7 @@ public:
     void makeRealTime() {
 	    if(!bIsRT) {
 	        struct sched_param thread_param;
-    	    thread_param.sched_priority = 81;
+    	    thread_param.sched_priority = 30;
    	        pthread_setschedparam(pthread_self(), SCHED_FIFO, &thread_param);
             bIsRT = true;
 	    }
