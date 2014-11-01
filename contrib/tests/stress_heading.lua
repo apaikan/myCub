@@ -36,7 +36,7 @@ while true do
     cmd:addString("getHeading")
     sender:write(cmd, rep)
     print("Reply:", rep:toString())
-    yarp.Time_delay(0.2)
+    yarp.Time_delay(0.5)
     if (yarp.Time_now() - t_start > 600) or rep:toString() == "" then
         break
     end

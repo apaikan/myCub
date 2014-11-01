@@ -26,30 +26,39 @@ if ret == false then
     return
 end
 
-t_start = yarp.Time_now()
+
+speed_front = 1000
+
+steps_front = {
+        "15 20  0  20",
+        "0 70  15  70",
+        }
+
+function move(steps, speed)
+    for i=1,#steps do
+        cmd:clear()
+        rep:clear()
+        cmd:addString("gotoPoseAll")
+        pos = cmd:addList()
+        pos:clear()
+        pos:fromString(steps[i])
+        spd = cmd:addList()
+        spd:clear()
+        for s=1,4 do spd:addInt(speed) end 
+        sender:write(cmd, rep)
+        print(i, cmd:toString(), rep:toString())
+        yarp.Time_delay(1.0*speed/1000)
+    end
+end
+
+cmd = yarp.Bottle()
+rep = yarp.Bottle()
 
 while true do
-    -- write to the sender port
-    local cmd = yarp.Bottle()
-    local rep = yarp.Bottle()
-    cmd:clear()
-    cmd:addString("getBatteryVolt")
-    sender:write(cmd, rep)
-    volt = rep:get(0):asInt()
-
-    local cmd = yarp.Bottle()
-    local rep = yarp.Bottle()
-    cmd:clear()
-    cmd:addString("getBatteryCurrent")
-    sender:write(cmd, rep)
-    current = rep:get(0):asInt()
-
-    print(volt, current)
-    yarp.Time_delay(1.0)
-    --if (yarp.Time_now() - t_start > 600) or rep:toString() == "" then
-    --    break
-    --end
+        move(steps_front, speed_front)
+        --yarp.Time_delay(0.5)
 end
+
 
 -- disconnect sender from receiver
 yarp.NetworkBase_disconnect(sender:getName(), "/MyCubInterface/cmd:i")

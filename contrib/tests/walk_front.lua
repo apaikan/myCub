@@ -41,25 +41,24 @@ end
 
 
 
-speed = 500
+speed_front = 1500
+speed_back = 1500
 
 steps_front = {
         "30 0  10  0",
-        "30 30 10 30",
-        "0  30 10 30",
-        "0  0  10  0",
+        "30 20 10 20",
+        "0  20 0 20",
         "0  0  0  0",
         }
 
-steps_turn = {
-        "10 0  30 0",
-        "10 30 30 30",
-        "10 30 0  30",
-        "10 0  0  0",
-        "0  0  0  0",
+steps_back = {
+        "30 10 10 10",
+        "10 10 10 10",
+        "10 40 10  40",
+        "30 40 10  40",
         }
 
-function move(steps)
+function move(steps, speed)
     for i=1,#steps do
         cmd:clear()
         rep:clear()
@@ -84,12 +83,12 @@ while true do
     print("Front Obstacle:", front_obstacle, "\n")
     if front_obstacle > 150 then
         print("Moving forward...\n")
-        move(steps_front)
+        move(steps_front, speed_front)
     else
         print("Obstacle on the way! try to turn\n")
         while getDistance() < 500 do
             print("Turning... distance:", getDistance())
-            move(steps_turn)
+            move(steps_back, speed_back)
         end
         --yarp.Time_delay(1.0)
     end    
