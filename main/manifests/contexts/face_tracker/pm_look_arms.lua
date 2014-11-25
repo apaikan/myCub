@@ -23,17 +23,15 @@ PortMonitor.accept = function(thing)
 end
 
 PortMonitor.update = function(thing)
-
     val = math.random(3, 5) * 10
     bt = thing:asBottle()
     bt:clear()
-    bt:addString("goto")
-    bt:addString("posall")
+    bt:addString("gotoPoseAll")
     poses = bt:addList()
-    poses:addInt(5)
     poses:addInt(0)
     poses:addInt(5)
     poses:addInt(0)
+    poses:addInt(5)
     speeds = bt:addList()
     speeds:addInt(3000)
     speeds:addInt(3000)

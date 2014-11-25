@@ -154,8 +154,9 @@ public:
     }
     
     bool updateModule() {
-
+        
         //update battery plug state 
+        /*
         int32_t cur = getBatteryCurrent();
         if((cur >= 0) != battery_plugged )
         {
@@ -165,8 +166,7 @@ public:
                 fflush(fdDisplay);
             }     
         }
-
-        Time::delay(0.05);
+        */
 
         // update battery voltage status
         //printf("updateModule(): battery : %s\n", str.c_str());
@@ -190,13 +190,13 @@ public:
      * @return true/false on success/failure
      */
     virtual bool ping() {
-        serMutex.wait();
+        serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;        
         pSerial->Write("ping\n");
         bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
         serBusy = false;
-        serMutex.post();
+        serMutex.unlock();
         return ret;
     }
 
@@ -205,13 +205,13 @@ public:
      * @return true/false on success/failure
      */
     virtual bool startController() {
-        serMutex.wait();
+        serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;        
         pSerial->Write("startControl\n");
         bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
         serBusy = false;
-        serMutex.post();
+        serMutex.unlock();
         return ret;
     }
 
@@ -220,13 +220,13 @@ public:
      * @return true/false on success/failure
      */
     virtual bool stopController() {
-        serMutex.wait();
+        serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;        
         pSerial->Write("stopControl\n");
         bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
         serBusy = false;
-        serMutex.post();
+        serMutex.unlock();
         return ret;
     }
 
@@ -250,7 +250,7 @@ public:
      */
     virtual bool setPose(const int32_t joint, const int32_t pos) {
         if(!checkJointIDs(joint) || !checkJointLimits(pos)) return false;
-        serMutex.wait();
+        serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
         char cmd[64];
@@ -258,7 +258,7 @@ public:
         pSerial->Write(cmd);
         bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
         serBusy = false;
-        serMutex.post();
+        serMutex.unlock();
         return ret;
     }
 
@@ -269,7 +269,7 @@ public:
     */
     virtual int32_t getPose(const int32_t joint) {
        if(!checkJointIDs(joint)) return -1;
-        serMutex.wait();
+        serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
         char cmd[64];
@@ -277,7 +277,7 @@ public:
         pSerial->Write(cmd);
         int32_t pos = atoi(pSerial->ReadLine(5000));
         serBusy = false;
-        serMutex.post();
+        serMutex.unlock();
         return (int)((pos-JOINTS_MIN+1)/JOINTS_SCALE);
     }
 
@@ -303,7 +303,7 @@ public:
                             const int32_t pos, const int32_t t = 100) {
         if(!checkJointIDs(joint) || !checkJointLimits(pos)) return false;
 
-        serMutex.wait();
+        serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
         char cmd[64];
@@ -312,7 +312,7 @@ public:
         pSerial->Write(cmd);
         bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
         serBusy = false;
-        serMutex.post();
+        serMutex.unlock();
         return ret;
     }
 
@@ -338,7 +338,7 @@ public:
         if(poses.size() < 4)
             return false;
 
-        serMutex.wait();
+        serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
         
@@ -357,7 +357,7 @@ public:
                 ret = false;
         }
         serBusy = false;
-        serMutex.post();
+        serMutex.unlock();
         return ret;
     }
 
@@ -372,7 +372,7 @@ public:
         if((poses.size() < 4) || (times.size() != poses.size()))
             return false;
 
-        serMutex.wait();
+        serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
         
@@ -390,7 +390,7 @@ public:
                 ret = false;
         }
         serBusy = false;
-        serMutex.post();
+        serMutex.unlock();
         return ret;
       }
 
@@ -400,7 +400,7 @@ public:
      * @return true/false on success/failure
      */
     virtual int32_t getDistance(const int32_t id){
-        serMutex.wait();
+        serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
         char cmd[64];
@@ -408,7 +408,7 @@ public:
         pSerial->Write(cmd);
         int32_t dist = atoi(pSerial->ReadLine(5000));
         serBusy = false;
-        serMutex.post();
+        serMutex.unlock();
         return dist;
     }
 
@@ -417,13 +417,13 @@ public:
      * @return true/false on success/failure
      */
     virtual std::vector<int32_t>  getOrientation() {
-        serMutex.wait();
+        serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
         pSerial->Write("getOrientation\n");
         string ret = pSerial->ReadLine(5000);
         serBusy = false;
-        serMutex.post();
+        serMutex.unlock();
         std::vector<int32_t> orit(3);
         sscanf(ret.c_str(), "%d %d %d", &orit[0], &orit[1], &orit[2]);
         return orit;
@@ -461,13 +461,13 @@ public:
      * @return true/false on success/failure
      */
     virtual int32_t getBatteryVolt(){
-        serMutex.wait();
+        serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
         pSerial->Write("getBatteryVolt\n");
         int32_t volt = atoi(pSerial->ReadLine(5000));
         serBusy = false;
-        serMutex.post();
+        serMutex.unlock();
         return volt;
     }
 
@@ -476,13 +476,13 @@ public:
      * @return true/false on success/failure
      */
       virtual int32_t getBatteryCurrent() { 
-        serMutex.wait();
+        serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
         pSerial->Write("getBatteryCurrent\n");
         int32_t amp = atoi(pSerial->ReadLine(5000));
         serBusy = false;
-        serMutex.post();
+        serMutex.unlock();
         return amp;
       }
 
@@ -497,14 +497,14 @@ public:
         if(command.get(0).asString() == "ping" && 
             command.get(1).asString() == "board") 
         {
-            serMutex.wait();
+            serMutex.lock();
             while(serBusy) Time::delay(0.1);
             serBusy = true;
             pSerial->Write("ping\n");
             reply.clear();
             reply.addString(pSerial->ReadLine(5000));
             serBusy = false;
-            serMutex.post();
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "set" && 
@@ -515,7 +515,7 @@ public:
                 reply.addString("[error]");
                 return true;
             }
-            serMutex.wait();
+            serMutex.lock();
             while(serBusy) Time::delay(0.1);
             serBusy = true;
             char cmd[64];
@@ -524,7 +524,7 @@ public:
             reply.clear();
             reply.addString(pSerial->ReadLine(5000));
             serBusy = false;
-            serMutex.post();
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "goto" && 
@@ -535,7 +535,7 @@ public:
                 reply.addString("[error]");
                 return true;
             }
-            serMutex.wait();
+            serMutex.lock();
             while(serBusy) Time::delay(0.1);
             serBusy = true;
             char cmd[64];
@@ -552,7 +552,7 @@ public:
             reply.clear();
             reply.addString(pSerial->ReadLine(5000));
             serBusy = false;
-            serMutex.post();
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "goto" && 
@@ -563,7 +563,7 @@ public:
                 reply.addString("[error]");
                 return true;
             }
-            serMutex.wait();
+            serMutex.lock();
             while(serBusy) Time::delay(0.1);
             serBusy = true;
             char cmd[64];
@@ -580,7 +580,7 @@ public:
             reply.clear();
             reply.addString(pSerial->ReadLine(5000));
             serBusy = false;
-            serMutex.post();
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "set" && 
@@ -598,7 +598,7 @@ public:
             
             poses = command.get(2).asList(); 
 
-            serMutex.wait();
+            serMutex.lock();
             while(serBusy) Time::delay(0.1);
             serBusy = true;
             
@@ -616,7 +616,7 @@ public:
             reply.addString(rep);
 
             serBusy = false;
-            serMutex.post();
+            serMutex.unlock();
 
             return true;
         }
@@ -648,7 +648,7 @@ public:
             if(command.size() > 3 )
                 speeds = command.get(3).asList(); 
 
-            serMutex.wait();
+            serMutex.lock();
             while(serBusy) Time::delay(0.1);
             serBusy = true;
             
@@ -672,7 +672,7 @@ public:
             reply.addString(rep);
 
             serBusy = false;
-            serMutex.post();
+            serMutex.unlock();
 
             return true;
         }
@@ -684,7 +684,7 @@ public:
                 reply.addString("[error]");
                 return true;
             }
-            serMutex.wait();
+            serMutex.lock();
             while(serBusy) Time::delay(0.1);
             serBusy = true;
             char cmd[64];
@@ -693,34 +693,34 @@ public:
             reply.clear();
             reply.addString(pSerial->ReadLine(5000));
             serBusy = false;
-            serMutex.post();
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "get" && 
             command.get(1).asString() == "head") 
         {
-            serMutex.wait();
+            serMutex.lock();
             while(serBusy) Time::delay(0.1);
             serBusy = true;
             pSerial->Write("getHeading\n");
             reply.clear();
             reply.addString(pSerial->ReadLine(5000));
             serBusy = false;
-            serMutex.post();
+            serMutex.unlock();
             return true;
         }
 
         else if(command.get(0).asString() == "get" && 
             command.get(1).asString() == "meminfo") 
         {
-            serMutex.wait();
+            serMutex.lock();
             while(serBusy) Time::delay(0.1);
             serBusy = true;
             pSerial->Write("getMemoryInfo\n");
             reply.clear();
             reply.addString(pSerial->ReadLine(5000));
             serBusy = false;
-            serMutex.post();
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "get" && 
@@ -734,7 +734,7 @@ public:
                 return true;
             }
             
-            serMutex.wait();
+            serMutex.lock();
             while(serBusy) Time::delay(0.1);
             serBusy = true;
             char cmd[64];
@@ -746,7 +746,7 @@ public:
             reply.clear();
             reply.addString(pSerial->ReadLine(5000));
             serBusy = false;
-            serMutex.post();
+            serMutex.unlock();
             return true;
         }
         else if(command.get(0).asString() == "get" && 
@@ -757,7 +757,7 @@ public:
                 reply.addString("[error]");
                 return true;
             }
-            serMutex.wait();
+            serMutex.lock();
             while(serBusy) Time::delay(0.1);
             serBusy = true;
             char cmd[64];
@@ -767,7 +767,7 @@ public:
             reply.clear();
             reply.addString(pSerial->ReadLine());
             serBusy = false;
-            serMutex.post();
+            serMutex.unlock();
             return true;
         }
         else
@@ -809,7 +809,7 @@ public:
 private:
 	//PolyDriver driver;
     //ISerialDevice *pSerial;
-    yarp::os::Semaphore serMutex;
+    yarp::os::Mutex serMutex;
     bool serBusy; 
     SerialPort* pSerial; 
     FILE* fdDisplay;
