@@ -27,12 +27,21 @@
     </module>
 
     <module>
+        <name>feelScared.lua</name>
+        <parameters></parameters>
+        <node>raspberry</node>
+        <workdir>/home/pi/install/myCub/main/components/feelScared</workdir>
+        <deployer>lua</deployer>
+    </module>
+
+<!--
+    <module>
         <name>speechRecognizer</name>
         <parameters>--context speech_recognizer --adcdev plughw:1,0 --lm 4040.lm --dic 4040.dic</parameters>
         <node>raspberry</node>
         <workdir>/home/pi/install/myCub/main/components/speechRecognizer/build</workdir>
     </module>
-
+-->
     <connection>
         <from>/grabber</from>
         <to>/faceDetector/image:i</to>
@@ -70,7 +79,12 @@
         <to>/MyCubInterface/cmd:i</to>
         <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_look_arms</protocol>
     </connection>
-
+    <connection>
+        <from>/feelScared/speech:o</from>
+        <to>/gSpeak</to>
+        <protocol>tcp</protocol>
+    </connection>
+<!--    
     <connection>
         <from>/SpeechRecognizer/words:o</from>
         <to>/GazeControl/cmd:i</to>
@@ -81,5 +95,5 @@
         <to>/gSpeak</to>
         <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_voice_speak</protocol>
     </connection>
-
+-->
 </application>
