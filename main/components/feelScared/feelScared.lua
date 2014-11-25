@@ -16,7 +16,7 @@ yarp.Network()
 -- t = yarp.Time_now()
 
 -- create and open sender/receiver ports
-sender = yarp.RpcClient()
+sender = yarp.Port()
 sender:open("...")
 
 speech = yarp.Port()
