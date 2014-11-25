@@ -1,0 +1,38 @@
+<html>
+<head>
+<style> 
+a{text-decoration:none}
+#wrapper { width: 710px; height: 1420px; padding: 0; overflow: hidden; }
+#scaled-frame { width: 1000px; height: 2000px; border: 0px; }
+#scaled-frame {
+    zoom: 0.71;
+    -moz-transform: scale(2.71);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(2.71);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(2.71);
+    -webkit-transform-origin: 0 0;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+ #scaled-frame  { zoom: 1;  }
+}
+
+</style>
+<meta http-equiv="Content-Language" content="en-us">
+<title>IQeye Amsterdam Matrix Parking</title>
+</head>
+<body bgcolor="#000000" vlink="#FFFFFF" alink="#FFFFFF">
+<p align="center"><b><font color="#FFFFFF" face="Arial">
+<br>
+<br>
+<font size="1">This is a sample page for embedding an IQeye camera live stream 
+in a webpage.</font><br>
+<font size="1">This is downsampled 8x<br>
+</font> </font></b>
+<IFRAME id="scaled-frame" src="http://192.168.1.133:10005/?action=stream" align="center" width="320" height="240" scrolling="yes" frameborder=yes marginheight="10px"
+</IFRAME>
+</td>
+</tr>
+</p>
+</body>
