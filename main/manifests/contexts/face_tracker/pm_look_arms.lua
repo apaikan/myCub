@@ -13,7 +13,7 @@ require("yarp")
 --
 PortMonitor.create = function()
     -- set the constraint here 
-    PortMonitor.setConstraint("not e_face_detected")
+    PortMonitor.setConstraint("not e_face_detected and not e_scared")
     print('in pm_look_arms.lua')
     return true
 end

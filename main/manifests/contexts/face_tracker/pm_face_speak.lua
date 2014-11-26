@@ -13,10 +13,14 @@ require("yarp")
 --
 PortMonitor.create = function()
     -- set the constraint here 
-    PortMonitor.setConstraint("true")
+    PortMonitor.setConstraint("not e_scared")
     print('in pm_speak.lua')
     prev_spk = 0
-    greetings = {"Hello", "Hi there", "Hey you", "TIME", "How are you?", "How are you doing?", "How is going?"}
+    greetings = {"Hello", 
+                 "Hi there", "Hey you", 
+                 "TIME", "How are you?", 
+                 "How are you doing?", 
+                 "How is going?"}
     return true
 end
 

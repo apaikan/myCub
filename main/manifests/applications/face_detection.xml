@@ -79,11 +79,18 @@
         <to>/MyCubInterface/cmd:i</to>
         <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_look_arms</protocol>
     </connection>
+
     <connection>
         <from>/feelScared/speech:o</from>
         <to>/gSpeak</to>
-        <protocol>tcp</protocol>
+        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_scared_speak</protocol>
     </connection>
+     <connection>
+        <from>/feelScared/speech:o</from>
+        <to>/MyCubInterface/cmd:i</to>
+        <protocol>tcp+recv.portmonitor+context.face_tracker+file.pm_scared_arms</protocol>
+    </connection>
+
 <!--    
     <connection>
         <from>/SpeechRecognizer/words:o</from>
