@@ -20,6 +20,7 @@ end
 
 PortMonitor.accept = function(thing)    
     PortMonitor.setEvent('e_scared', 5.0)
+    return true
 end
 
 

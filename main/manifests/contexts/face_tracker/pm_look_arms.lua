@@ -15,6 +15,7 @@ PortMonitor.create = function()
     -- set the constraint here 
     PortMonitor.setConstraint("not e_face_detected and not e_scared")
     print('in pm_look_arms.lua')
+    prev_streching = yarp.Time_now()
     return true
 end
 
@@ -23,7 +24,15 @@ PortMonitor.accept = function(thing)
 end
 
 PortMonitor.update = function(thing)
-    val = math.random(3, 5) * 10
+    val = math.random(5, 10) * 60
+    if (yarp.Time_now() - prev_streching) > val then
+        prev_streching = yarp.Time_now()
+        return stretch(thing)
+    end
+    return relax(thing)
+end
+
+function relax(thing)
     bt = thing:asBottle()
     bt:clear()
     bt:addString("gotoPoseAll")
@@ -37,10 +46,22 @@ PortMonitor.update = function(thing)
     speeds:addInt(3000)
     speeds:addInt(3000)
     speeds:addInt(3000)
-    --th = yarp.Things()
-    --msg = yarp.Bottle()
-    --msg:addString("Hello!")
-    --th:setPortWriter(msg)
     return thing
 end
 
+function stretch(thing)
+    bt = thing:asBottle()
+    bt:clear()
+    bt:addString("gotoPoseAll")
+    poses = bt:addList()
+    poses:addInt(20)
+    poses:addInt(20)
+    poses:addInt(20)
+    poses:addInt(20)
+    speeds = bt:addList()
+    speeds:addInt(3000)
+    speeds:addInt(3000)
+    speeds:addInt(3000)
+    speeds:addInt(3000)
+    return thing
+end
