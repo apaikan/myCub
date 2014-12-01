@@ -1,0 +1,89 @@
+/*!
+ * Copyright 2014 Ali Paikan. 
+ * All Rights Reserved.
+ */
+
+body {
+    background-color: #f0f0f0;
+    color: #3c3c3c;
+}
+
+.my_window {
+    text-align:center;
+	background: #F0F0F0; /* Old browsers */
+    background-color: #F0F0F0;
+	border: solid 1px #C5C5C5;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	color: #3c3c3c;
+	font: normal 12px Arial, sans-serif;
+	list-style: none;
+	margin: 0 0 10px;
+	padding: 0px;
+	position: relative;
+}
+
+.my_window_head {
+	background: #F7F7F7; /* Old browsers */
+	background: -moz-linear-gradient(top,  #F7F7F7 0%, #e3e3e3 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F7F7F7), color-stop(100%,#e3e3e3)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #F7F7F7 0%,#e3e3e3 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #F7F7F7 0%,#e3e3e3 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #F7F7F7 0%,#e3e3e3 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #F7F7F7 0%,#e3e3e3 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#F7F7F7', endColorstr='#e3e3e3',GradientType=0 ); /* IE6-9 */
+	border-bottom: solid 1px #C5C5C5;
+	color: #555;
+	font: bold 12px Arial, sans-serif;
+	list-style: none;
+	margin: 0 0 10px;
+	padding: 5px;
+	position: relative;
+}
+
+#footer {
+    text-align:center;
+	background: #F0F0F0; /* Old browsers */
+    background-color: #F0F0F0;
+	border: solid 1px #C5C5C5;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	color: #3c3c3c;
+	font: normal 12px Arial, sans-serif;
+	list-style: none;
+	margin: 0 0 10px;
+	padding: 5px;
+	position: relative;
+}
+
+
+#scaled-frame {
+    background: #000000; /* Old browsers */
+    width: 160px; 
+    height: 120px; 
+    border: 0px; 
+    position: relative;
+    left: -80px;
+    top: -8px;
+    }
+#scaled-frame {
+    -moz-transform: scale(2.0);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(2.0);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(2.0);
+    -webkit-transform-origin: 0 0;
+}
+
+.canvas_title {
+    text-align:center;
+	color: #000000;
+	font: bold 12px Arial, sans-serif;
+	list-style: none;
+	padding: 5px;
+	position: relative;
+}
+
+

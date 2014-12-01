@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>myCubWebGui</title>
+    <meta name="description" content="Creates nestable menus, accessible via keyboard.">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="stylesheet" href="/zino-ui-1.4/themes/silver/zino.core.css">
+    <link rel="stylesheet" href="/zino-ui-1.4/themes/silver/zino.menu.css">
+    <link rel="stylesheet" href="/zino-ui-1.4/themes/silver/zino.spinner.css">
+    <link rel="stylesheet" href="/zino-ui-1.4/themes/silver/zino.slider.css">
+    <link rel="stylesheet" href="/zino-ui-1.4/themes/silver/zino.chart.css">
+    <link rel="stylesheet" href="/zino-ui-1.4/themes/silver/zino.canvas.css">
+    <link rel="stylesheet" href="/main.css">
+    <script src="/zino-ui-1.4/jquery.min.js"></script>
+    <script src="/zino-ui-1.4/zino.datasource.min.js"></script>
+    <script src="/zino-ui-1.4/zino.menu.min.js"></script>
+    <script src="/zino-ui-1.4/zino.spinner.min.js"></script>
+    <script src="/zino-ui-1.4/zino.position.min.js"></script>
+    <script src="/zino-ui-1.4/zino.draggable.min.js"></script>
+    <script src="/zino-ui-1.4/zino.slider.min.js"></script>
+    <script src="/zino-ui-1.4/zino.canvas.min.js"></script>
+    <script src="/zino-ui-1.4/zino.svg.min.js"></script>
+    <script src="/zino-ui-1.4/zino.chart.min.js"></script>
+    <style type="text/css">body{padding: 5px; font: normal 12px Arial, sans-serif;}</style>
+</head>
+
+<body>
+    <ul id="menu_main">
+        <li><a href="#">File</a>
+        	<ul>
+			    <li><a href="#">connect</a></li>
+			    <li><a href="#">Exit</a></li>
+		    </ul>
+	    </li>
+	    <li><a href="#">Demos</a>
+		    <ul>
+			    <li><a href="#">Walk</a></li>
+			    <li><a href="#">Dance</a></li>
+			    <li><a href="#">Fly</a></li>
+		    </ul>
+	    </li>
+	    <li><a href="#">Help</a>
+		    <ul>
+			    <li><a href="#">About</a></li>
+		    </ul>
+	    </li>
+    </ul>
+
+    <table align="center" border="0" width="80%" cellpadding="0"  cellspacing="0">    
+    <tr>
+        <td valign="top" width="470px">
+            <div class="my_window" style="height:330px; width:450px;">
+            <div class="my_window_head">Arms Control</div>
+            <div style="padding:10px;">
+                <!-- Joint 1-->
+                <table border="0" width="100%" cellpadding="0"  cellspacing="0">
+                    <tr>
+                        <td align="left"> <strong>Front :</strong></td>
+                        <td width="300px"> <div id="slider_j1"></div> </td>
+                        <td> <input type="text" id="value_j1" style="width: 30px; text-align:center;"/> </td>
+                    </tr>
+                    <tr>
+                        <td align="right"> speed:</td>
+                        <td colspan="2" align="left">&nbsp;&nbsp;<input type="text" id="spinner_j1" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
+                    </tr>
+                </table>
+                <br>
+                <!-- Joint 2-->
+                <table border="0" width="100%" cellpadding="0"  cellspacing="0">
+                    <tr>
+                        <td align="left"> <strong>Right :</strong></td>
+                        <td width="300px"> <div id="slider_j2"></div> </td>
+                        <td> <input type="text" id="value_j2" style="width: 30px; text-align:center;"/> </td>
+                    </tr>
+                    <tr>
+                        <td align="right"> speed: </td>
+                        <td colspan="2" align="left">&nbsp;&nbsp;<input type="text" id="spinner_j2" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
+                    </tr>
+                </table>
+                <br>
+                <!-- Joint 3-->
+                <table border="0" width="100%" cellpadding="0"  cellspacing="0">
+                    <tr>
+                        <td align="left"> <strong>Back :</strong></td>
+                        <td width="300px"> <div id="slider_j3"></div> </td>
+                        <td> <input type="text" id="value_j3" style="width: 30px; text-align:center;"/> </td>
+                    </tr>
+                    <tr>
+                        <td align="right"> speed: </td>
+                        <td colspan="2" align="left">&nbsp;&nbsp;<input type="text" id="spinner_j3" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
+                    </tr>
+                </table>
+                <br>
+                <!-- Joint 4-->
+                <table border="0" width="100%" cellpadding="0"  cellspacing="0">
+                    <tr>
+                        <td align="left"> <strong>Left :</strong></td>
+                        <td width="300px"> <div id="slider_j4"></div> </td>
+                        <td> <input type="text" id="value_j4" style="width: 30px; text-align:center;"/> </td>
+                    </tr>
+                    <tr>
+                        <td align="right"> speed: </td>
+                        <td colspan="2" align="left">&nbsp;&nbsp;<input type="text" id="spinner_j4" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
+                    </tr>
+                </table>
+
+            </div>
+            </div>
+        </td>
+        <td  valign="top" rowspan="2">
+            <table border="0" width="100%" cellpadding="0"  cellspacing="0">    
+            <tr> <td>
+                <div class="my_window" style="height:245px; width:325px; background-color:#ffffff">
+                <div class="my_window_head">Robot View</div>
+                <div style="padding:0px; position:relative; top:-9px;">
+                    <table border="0" width="100%" cellpadding="0"  cellspacing="0"> 
+                    <tr> 
+                        <td align="left" style="border-right: solid 2px #C5C5C5;"> 
+                            <div class="canvas_title">Front</div> 
+                            <div id="canvas_front" style="position: relative;"></div> 
+                        </td>
+                        <td align="left"> 
+                            <div class="canvas_title">Rear</div> 
+                            <div id="canvas_rear" style="position: relative;"></div>             
+                        </td>
+                    </tr>
+                    <tr> 
+                        <td align="center" colspan="2" style="border-top: solid 2px #C5C5C5;"> 
+                            <div class="canvas_title">Top</div> 
+                            <div id="canvas_top" style="position: relative; top:-26px"></div> 
+                        </td>
+                    </tr>
+                    </table>
+                </div>
+                </div>
+            </td> </tr>
+            <tr> <td align="left">
+                <div class="my_window" style="height:270px; width:325px; background-color:#333333;">
+                <div class="my_window_head" >Camera View</div>                
+                <IFRAME id="scaled-frame" src="http://192.168.1.133:10005/?action=stream" marginheight="0px"></IFRAME>
+                <!--<span style="color:white;">Video is not available!</span> -->
+                </div>
+            </td> </tr>
+            </table>
+        </td>
+
+        <td valign="top" align="right">
+            <div class="my_window" style="height:200px; width:200px; background-color:#ffffff">
+            <div class="my_window_head">Compass View</div>
+            <div id="chart_compass" style="padding:0px;"></div>
+            </div>
+        </td>
+    </tr>
+        <td valign="top">
+            <div class="my_window" style="height:185px; width:450px;">
+            <div class="my_window_head">Head Control</div>
+            <div style="padding:10px;">
+                <!-- Joint 1-->
+                <table border="0" width="100%" cellpadding="0"  cellspacing="0">
+                    <tr>
+                        <td align="left"> <strong>Yaw :</strong></td>
+                        <td width="300px"> <div id="slider_h1"></div> </td>
+                        <td> <input type="text" id="value_h1" style="width: 30px; text-align:center;"/> </td>
+                    </tr>
+                    <tr>
+                        <td align="right"> speed:</td>
+                        <td colspan="2" align="left">&nbsp;&nbsp;<input type="text" id="spinner_h1" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
+                    </tr>
+                </table>
+                <br>
+                <!-- Joint 2-->
+                <table border="0" width="100%" cellpadding="0"  cellspacing="0">
+                    <tr>
+                        <td align="left"> <strong>Roll :</strong></td>
+                        <td width="300px"> <div id="slider_h2"></div> </td>
+                        <td> <input type="text" id="value_h2" style="width: 30px; text-align:center;"/> </td>
+                    </tr>
+                    <tr>
+                        <td align="right"> speed: </td>
+                        <td colspan="2" align="left">&nbsp;&nbsp;<input type="text" id="spinner_h2" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
+                    </tr>
+                </table>
+                <br>
+            </div>
+            </div>
+        </td>
+    </tr>
+    </table>
+
+    <div id="footer">
+    Copyright © www.alipaikan.com
+    </div>
+
+    <script type="text/javascript" src="./main.js"> </script>    
+</body>
+</html>
+

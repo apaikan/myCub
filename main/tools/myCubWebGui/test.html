@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery.getJSON demo</title>
+  <script src="./zino-ui-1.4/jquery.min.js""></script>
+</head>
+<body>
+ 
+<div id="info"></div>
+ 
+<script>
+(function() {
+  var request = "http://192.168.1.133:10004";
+    $.getJSON( request, 
+                { req:   'gotoPose $joint $pose $speed', 
+                  joint: "0",
+                  pose:  "50",
+                  speed: "1000"
+                } )
+    .done(function( data ) {
+        window.alert(data[0])//mycub_ports['/MyCubInterface/cmd:i'] = data["port_number"];
+    });
+
+  /*
+  $.getJSON( request, {req: 'query $port', port: '/read' } )
+    .done(function( data ) {
+         $('#info').html(data["port_number"]);
+    });
+    */
+
+})();
+</script>
+ 
+</body>
+</html>
+
+
