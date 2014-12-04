@@ -133,6 +133,7 @@ $(document).ready(function(){
         height: 120
     });
 
+    /*
     $("#chart_compass").zinoChart({
         type: "rose",
         width: 160,
@@ -161,6 +162,7 @@ $(document).ready(function(){
             ]
         }]
     });
+    */
 
     drawFront(canvas_front, 0, 0);
     drawFront(canvas_rear, 0, 0);
@@ -168,9 +170,8 @@ $(document).ready(function(){
     resolvesAdress(mycub_address, mycub_ports);
 
     setInterval(function() {
-        for (j = 0; j < 4; j++) { 
-            updateJointPose(j);
-        }
+        updateAllStatus();
+        updateCamPose();
     }, 1000);
 
 });
@@ -256,36 +257,31 @@ function moveJoint(j, p, s) {
 }
 
 
-//var bStopUpdate = false;
-function updateJointPose(j) {
-    //if(bStopUpdate == true) return;
-    //bStopUpdate = true;
+function updateAllStatus() {
     var request = "http://" + mycub_address + ":" + mycub_ports['/MyCubInterface/cmd:i'];
     $.getJSON( request, 
-                { req:   'getPose $joint', 
-                  joint: j,
-                } )
+                { req:   'getAll'} )
     .done(function( data ) {
-            bStopUpdate = false;
-            pos = data[0];
-            switch(j) {
-                case(0):
-		            $("#value_j1").val(pos);
-                    drawFront(canvas_rear, pos,  $("#value_j3").val());
-                    break;
-                case(1):
-		            $("#value_j2").val(pos);
-                    drawFront(canvas_front, pos,  $("#value_j4").val());
-                    break;
-                case(2):
-		            $("#value_j3").val(pos);
-                    drawFront(canvas_rear, $("#value_j1").val(), pos);
-                    break;
-                case(3):
-		            $("#value_j4").val(pos);
-                    drawFront(canvas_front, $("#value_j2").val(), pos);
-                    break;
-            }
+            //vector of j0, j1, j2, j3, dist, heading, volt
+            $("#value_j1").val(data[0][0]);
+            $("#value_j2").val(data[0][1]);
+            $("#value_j3").val(data[0][2]);
+            $("#value_j4").val(data[0][3]);
+            drawFront(canvas_rear, data[0][0], data[0][2]);
+            drawFront(canvas_front, data[0][1], data[0][3]);
+            //$("#arrow").rotate(80);
+            $("#arrow").attr("style","-webkit-transform:rotate("+data[0][5]+"deg);");
+    });
+}
+
+
+function updateCamPose() {
+    var request = "http://" + mycub_address + ":" + mycub_ports['/GazeControl/cmd:i'];
+    $.getJSON( request, 
+                { req:   'get joints'} )
+    .done(function( data ) {
+            $("#value_h1").val(data[0]);
+            $("#value_h2").val(data[1]);
     });
 }
 
