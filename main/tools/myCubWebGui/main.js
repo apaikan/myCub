@@ -270,7 +270,7 @@ function updateAllStatus() {
             drawFront(canvas_rear, data[0][0], data[0][2]);
             drawFront(canvas_front, data[0][1], data[0][3]);
             //$("#arrow").rotate(80);
-            $("#arrow").attr("style","-webkit-transform:rotate("+data[0][5]+"deg);");
+            $("#arrow").attr("style","-webkit-transform:rotate("+data[0][5]+"deg); -moz-transform:rotate("+data[0][5]+"deg); -o-transform:rotate("+data[0][5]+"deg); -ms--transform:rotate("+data[0][5]+"deg);");
     });
 }
 
