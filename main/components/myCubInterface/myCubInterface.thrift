@@ -124,4 +124,10 @@ service myCubInterface_IDL
   */
   i32 getBatteryCurrent();
 
+  /**
+  * get all important status
+  * @returna a vector of j0, j1, j2, j3, dist, heading, volt
+  */
+  list<i32> getAll();
+
 }

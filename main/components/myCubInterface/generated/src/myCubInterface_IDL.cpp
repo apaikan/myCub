@@ -400,6 +400,38 @@ public:
   }
 };
 
+class myCubInterface_IDL_getAll : public yarp::os::Portable {
+public:
+  std::vector<int32_t>  _return;
+  virtual bool write(yarp::os::ConnectionWriter& connection) {
+    yarp::os::idl::WireWriter writer(connection);
+    if (!writer.writeListHeader(1)) return false;
+    if (!writer.writeTag("getAll",1,1)) return false;
+    return true;
+  }
+  virtual bool read(yarp::os::ConnectionReader& connection) {
+    yarp::os::idl::WireReader reader(connection);
+    if (!reader.readListReturn()) return false;
+    {
+      _return.clear();
+      uint32_t _size13;
+      yarp::os::idl::WireState _etype16;
+      reader.readListBegin(_etype16, _size13);
+      _return.resize(_size13);
+      uint32_t _i17;
+      for (_i17 = 0; _i17 < _size13; ++_i17)
+      {
+        if (!reader.readI32(_return[_i17])) {
+          reader.fail();
+          return false;
+        }
+      }
+      reader.readListEnd();
+    }
+    return true;
+  }
+};
+
 bool myCubInterface_IDL::ping() {
   bool _return = false;
   myCubInterface_IDL_ping helper;
@@ -557,6 +589,15 @@ int32_t myCubInterface_IDL::getBatteryCurrent() {
   bool ok = yarp().write(helper,helper);
   return ok?helper._return:_return;
 }
+std::vector<int32_t>  myCubInterface_IDL::getAll() {
+  std::vector<int32_t>  _return;
+  myCubInterface_IDL_getAll helper;
+  if (!yarp().canWrite()) {
+    fprintf(stderr,"Missing server method '%s'?\n","std::vector<int32_t>  myCubInterface_IDL::getAll()");
+  }
+  bool ok = yarp().write(helper,helper);
+  return ok?helper._return:_return;
+}
 
 bool myCubInterface_IDL::read(yarp::os::ConnectionReader& connection) {
   yarp::os::idl::WireReader reader(connection);
@@ -700,14 +741,14 @@ bool myCubInterface_IDL::read(yarp::os::ConnectionReader& connection) {
       std::vector<int32_t>  poses;
       {
         poses.clear();
-        uint32_t _size13;
-        yarp::os::idl::WireState _etype16;
-        reader.readListBegin(_etype16, _size13);
-        poses.resize(_size13);
-        uint32_t _i17;
-        for (_i17 = 0; _i17 < _size13; ++_i17)
+        uint32_t _size18;
+        yarp::os::idl::WireState _etype21;
+        reader.readListBegin(_etype21, _size18);
+        poses.resize(_size18);
+        uint32_t _i22;
+        for (_i22 = 0; _i22 < _size18; ++_i22)
         {
-          if (!reader.readI32(poses[_i17])) {
+          if (!reader.readI32(poses[_i22])) {
             reader.fail();
             return false;
           }
@@ -732,10 +773,10 @@ bool myCubInterface_IDL::read(yarp::os::ConnectionReader& connection) {
         if (!writer.writeListHeader(1)) return false;
         {
           if (!writer.writeListBegin(BOTTLE_TAG_INT, static_cast<uint32_t>(_return.size()))) return false;
-          std::vector<int32_t> ::iterator _iter18;
-          for (_iter18 = _return.begin(); _iter18 != _return.end(); ++_iter18)
+          std::vector<int32_t> ::iterator _iter23;
+          for (_iter23 = _return.begin(); _iter23 != _return.end(); ++_iter23)
           {
-            if (!writer.writeI32((*_iter18))) return false;
+            if (!writer.writeI32((*_iter23))) return false;
           }
           if (!writer.writeListEnd()) return false;
         }
@@ -748,14 +789,14 @@ bool myCubInterface_IDL::read(yarp::os::ConnectionReader& connection) {
       std::vector<int32_t>  times;
       {
         poses.clear();
-        uint32_t _size19;
-        yarp::os::idl::WireState _etype22;
-        reader.readListBegin(_etype22, _size19);
-        poses.resize(_size19);
-        uint32_t _i23;
-        for (_i23 = 0; _i23 < _size19; ++_i23)
+        uint32_t _size24;
+        yarp::os::idl::WireState _etype27;
+        reader.readListBegin(_etype27, _size24);
+        poses.resize(_size24);
+        uint32_t _i28;
+        for (_i28 = 0; _i28 < _size24; ++_i28)
         {
-          if (!reader.readI32(poses[_i23])) {
+          if (!reader.readI32(poses[_i28])) {
             reader.fail();
             return false;
           }
@@ -764,14 +805,14 @@ bool myCubInterface_IDL::read(yarp::os::ConnectionReader& connection) {
       }
       {
         times.clear();
-        uint32_t _size24;
-        yarp::os::idl::WireState _etype27;
-        reader.readListBegin(_etype27, _size24);
-        times.resize(_size24);
-        uint32_t _i28;
-        for (_i28 = 0; _i28 < _size24; ++_i28)
+        uint32_t _size29;
+        yarp::os::idl::WireState _etype32;
+        reader.readListBegin(_etype32, _size29);
+        times.resize(_size29);
+        uint32_t _i33;
+        for (_i33 = 0; _i33 < _size29; ++_i33)
         {
-          if (!reader.readI32(times[_i28])) {
+          if (!reader.readI32(times[_i33])) {
             reader.fail();
             return false;
           }
@@ -811,10 +852,10 @@ bool myCubInterface_IDL::read(yarp::os::ConnectionReader& connection) {
         if (!writer.writeListHeader(1)) return false;
         {
           if (!writer.writeListBegin(BOTTLE_TAG_INT, static_cast<uint32_t>(_return.size()))) return false;
-          std::vector<int32_t> ::iterator _iter29;
-          for (_iter29 = _return.begin(); _iter29 != _return.end(); ++_iter29)
+          std::vector<int32_t> ::iterator _iter34;
+          for (_iter34 = _return.begin(); _iter34 != _return.end(); ++_iter34)
           {
-            if (!writer.writeI32((*_iter29))) return false;
+            if (!writer.writeI32((*_iter34))) return false;
           }
           if (!writer.writeListEnd()) return false;
         }
@@ -851,6 +892,25 @@ bool myCubInterface_IDL::read(yarp::os::ConnectionReader& connection) {
       if (!writer.isNull()) {
         if (!writer.writeListHeader(1)) return false;
         if (!writer.writeI32(_return)) return false;
+      }
+      reader.accept();
+      return true;
+    }
+    if (tag == "getAll") {
+      std::vector<int32_t>  _return;
+      _return = getAll();
+      yarp::os::idl::WireWriter writer(reader);
+      if (!writer.isNull()) {
+        if (!writer.writeListHeader(1)) return false;
+        {
+          if (!writer.writeListBegin(BOTTLE_TAG_INT, static_cast<uint32_t>(_return.size()))) return false;
+          std::vector<int32_t> ::iterator _iter35;
+          for (_iter35 = _return.begin(); _iter35 != _return.end(); ++_iter35)
+          {
+            if (!writer.writeI32((*_iter35))) return false;
+          }
+          if (!writer.writeListEnd()) return false;
+        }
       }
       reader.accept();
       return true;
@@ -905,6 +965,7 @@ std::vector<std::string> myCubInterface_IDL::help(const std::string& functionNam
     helpString.push_back("getHeading");
     helpString.push_back("getBatteryVolt");
     helpString.push_back("getBatteryCurrent");
+    helpString.push_back("getAll");
     helpString.push_back("help");
   }
   else {
@@ -1001,6 +1062,11 @@ std::vector<std::string> myCubInterface_IDL::help(const std::string& functionNam
       helpString.push_back("int32_t getBatteryCurrent() ");
       helpString.push_back("get battery current status ");
       helpString.push_back("@return true/false on success/failure ");
+    }
+    if (functionName=="getAll") {
+      helpString.push_back("std::vector<int32_t>  getAll() ");
+      helpString.push_back("get all important status ");
+      helpString.push_back("@returna a vector of j0, j1, j2, j3, dist, heading, volt ");
     }
     if (functionName=="help") {
       helpString.push_back("std::vector<std::string> help(const std::string& functionName=\"--all\")");

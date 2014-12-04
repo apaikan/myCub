@@ -138,6 +138,27 @@ public:
             return false;
         }
 
+        // command get joints
+        if(cmd.get(0).asString() == "get")
+        {
+            if(cmd.size() < 2) {
+                rep.addString("[nack]");
+                setReply(rep);                
+                return false;
+            }
+
+            if(cmd.get(1).asString() == "joints") {
+                rep.addInt(joints_pos[0]);
+                rep.addInt(joints_pos[1]);
+                setReply(rep); 
+                return true;
+            }
+
+            rep.addString("[nack]");
+            setReply(rep);                
+            return true;
+        }
+
         string mode = cmd.get(0).asString();
         // Controlling in the joint mode
         if(mode == "joint")

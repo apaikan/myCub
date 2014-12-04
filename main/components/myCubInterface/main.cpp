@@ -486,6 +486,26 @@ public:
         return amp;
       }
 
+    /**
+     * get all important status
+     * @returna a vector of j0, j1, j2, j3, dist, heading, volt
+     */
+     virtual std::vector<int32_t>  getAll() {
+        std::vector<int32_t> status;
+        std::vector<int32_t> pos = getPoseAll();
+        status.push_back(pos[0]);
+        status.push_back(pos[1]);
+        status.push_back(pos[2]);
+        status.push_back(pos[3]);
+        yarp::os::Time::delay(0.01);
+        status.push_back(getDistance(0));
+        yarp::os::Time::delay(0.01);
+        status.push_back(getHeading());
+        yarp::os::Time::delay(0.01);
+        status.push_back(getBatteryVolt());
+        return status;
+     }
+
     /*
     bool respond(const Bottle &command, Bottle &reply) {
         reply.clear();        

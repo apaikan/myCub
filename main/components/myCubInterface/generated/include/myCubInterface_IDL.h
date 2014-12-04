@@ -111,6 +111,11 @@ public:
  * @return true/false on success/failure
  */
   virtual int32_t getBatteryCurrent();
+/**
+ * get all important status
+ * @returna a vector of j0, j1, j2, j3, dist, heading, volt
+ */
+  virtual std::vector<int32_t>  getAll();
   virtual bool read(yarp::os::ConnectionReader& connection);
   virtual std::vector<std::string> help(const std::string& functionName="--all");
 };
