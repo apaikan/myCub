@@ -129,8 +129,8 @@ $(document).ready(function(){
 
     canvas_top = zino.Canvas({
         target: document.getElementById("canvas_top"),
-        width: 160,
-        height: 120
+        width: 320,
+        height: 290
     });
 
     /*
@@ -170,8 +170,7 @@ $(document).ready(function(){
     resolvesAdress(mycub_address, mycub_ports);
 
     setInterval(function() {
-        updateAllStatus();
-        updateCamPose();
+        updateAllStatus();        
     }, 1000);
 
 });
@@ -182,9 +181,6 @@ function drawFront(canvas, j1, j2) {
     var x2 = 50 * Math.cos((90-j2)*Math.PI/180);
     var y2 = 50 * Math.sin((90-j2)*Math.PI/180);
     
-    $('#x').html(j1);
-    $('#y').html(j2);
-
     canvas.clear();
     canvas.attr({
         lineWidth: 3,
@@ -211,6 +207,7 @@ function resolvesAdress(mycub_address, mycub_ports) {
     $.getJSON( request, {req: 'query $port', port: '/GazeControl/cmd:i' } )
     .done(function( data ) {
         mycub_ports['/GazeControl/cmd:i'] = data["port_number"];
+        updateCamPose();
     });
 
     $.getJSON( request, {req: 'query $port', port: '/grabber' } )
@@ -271,6 +268,8 @@ function updateAllStatus() {
             drawFront(canvas_front, data[0][1], data[0][3]);
             //$("#arrow").rotate(80);
             $("#arrow").attr("style","-webkit-transform:rotate("+data[0][5]+"deg); -moz-transform:rotate("+data[0][5]+"deg); -o-transform:rotate("+data[0][5]+"deg); -ms--transform:rotate("+data[0][5]+"deg);");
+            setBatteryLevel(data[0][6]);
+            setSonarLevel(data[0][4]);
     });
 }
 
@@ -283,5 +282,27 @@ function updateCamPose() {
             $("#value_h1").val(data[0]);
             $("#value_h2").val(data[1]);
     });
+}
+
+function setBatteryLevel(milivolt) {
+    $('#battery_voltage').text(milivolt/1000 + " V");
+    level = (milivolt-6000) / (7400-6000) * 250;
+    if(level>250) {
+        level = 250;
+    }
+    if(level<0) {
+        level=0;
+    }
+    width = 250 - level;
+    left = 111 + level;
+    $("#battery_value").attr("style", "width:"+width+"px; left:"+left+"px;");
+}
+
+function setSonarLevel(dist) {
+    $('#sonar_value').text(dist/10 + " cm");
+    h = 165 - (dist*175/3000 - 5);
+    if(h>165) { h = 165; }
+    if(h<-10) { h = -10; }    
+    $("#bullet").attr("style", "top:"+h+"px;");    
 }
 

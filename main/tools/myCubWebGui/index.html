@@ -47,7 +47,7 @@
 	    </li>
     </ul>
 
-    <table align="center" border="0" width="76%" cellpadding="0"  cellspacing="0">    
+    <table align="center" border="0" width="90%" cellpadding="0"  cellspacing="0">    
     <tr>
         <td valign="top" width="470px">
             <div class="my_window" style="height:330px; width:450px;">
@@ -110,8 +110,40 @@
         </td>
         <td  valign="top" rowspan="2">
             <table border="0" width="100%" cellpadding="0"  cellspacing="0">    
-            <tr> <td>
-                <div class="my_window" style="height:245px; width:325px; background-color:#ffffff">
+            <tr> <td colspan="2" align=center>
+                <div class="my_window" style="height:270px; width:325px; background-color:#333333;">
+                <div class="my_window_head" >Camera View</div>                
+                <IFRAME id="scaled-frame" src="http://192.168.1.133:10005/?action=stream" marginheight="0px"></IFRAME>
+                <!--<span style="color:white;">Video is not available!</span> -->
+                </div>
+            </td> </tr>
+            <tr> 
+                <td align="center">
+                <div class="my_window" style="height:210px; width:200px; background-color:#ffffff">
+                <div class="my_window_head">Compass View</div>
+                <div id="compass" style="padding:0px;"> <img id="arrow" src="arrow.png" style="-webkit-transform:rotate(0deg);"> </div>
+                </td> 
+                <td align="center">
+                <div class="my_window" style="height:210px; width:150px; background-color:#ffffff">
+                <div class="my_window_head">Sonar View</div>
+                <div id="sonar" style="padding:0px;"><img id="bullet" src="bullet.png"><div id="sonar_value">3000 cm</div></div>
+                </td> 
+            </tr>
+            <tr> 
+                <td align="center" colspan="2">
+                <div class="my_window" style="height:25px; width:360px; background-color:#ffffff">
+                <div class="battery_head">Battery View</div>
+                <div id="battery"></div>
+                <div id="battery_value"></div>
+                <div id="battery_voltage">0 V</div>
+                </div>
+                </td> 
+            </tr>
+            </table>
+        </td>
+
+        <td valign="top" align="right" rowspan="2">
+                <div class="my_window" style="height:445px; width:325px; background-color:#ffffff">
                 <div class="my_window_head">Robot View</div>
                 <div style="padding:0px; position:relative; top:-9px;">
                     <table border="0" width="100%" cellpadding="0"  cellspacing="0"> 
@@ -134,21 +166,6 @@
                     </table>
                 </div>
                 </div>
-            </td> </tr>
-            <tr> <td align="left">
-                <div class="my_window" style="height:270px; width:325px; background-color:#333333;">
-                <div class="my_window_head" >Camera View</div>                
-                <IFRAME id="scaled-frame" src="http://192.168.1.133:10005/?action=stream" marginheight="0px"></IFRAME>
-                <!--<span style="color:white;">Video is not available!</span> -->
-                </div>
-            </td> </tr>
-            </table>
-        </td>
-
-        <td valign="top" align="right">
-            <div class="my_window" style="height:210px; width:200px; background-color:#ffffff">
-            <div class="my_window_head">Compass View</div>
-            <div id="compass" style="padding:0px;"> <img id="arrow" src="arrow.png" style="-webkit-transform:rotate(0deg);"> </div>
             </div>
         </td>
     </tr>

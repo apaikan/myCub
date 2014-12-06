@@ -42,6 +42,81 @@ body {
 	position: relative;
 }
 
+.battery_head {
+	background: #F7F7F7; /* Old browsers */
+	background: -moz-linear-gradient(top,  #F7F7F7 0%, #e3e3e3 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F7F7F7), color-stop(100%,#e3e3e3)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #F7F7F7 0%,#e3e3e3 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #F7F7F7 0%,#e3e3e3 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #F7F7F7 0%,#e3e3e3 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #F7F7F7 0%,#e3e3e3 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#F7F7F7', endColorstr='#e3e3e3',GradientType=0 ); /* IE6-9 */
+	border-right: solid 1px #C5C5C5;
+	color: #555;
+	font: bold 12px Arial, sans-serif;
+	list-style: none;
+	margin: 0 0 10px;
+	padding: 5px;
+	position: relative;
+    width: 100px;
+    height: 15px;
+}
+
+#battery {
+    text-align:center;
+	border: solid 0px #C5C5C5;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	color: #3c3c3c;
+	font: normal 12px Arial, sans-serif;
+	list-style: none;
+	margin: 0 0 10px;
+	padding: 0px;
+	position: relative;
+    background: -webkit-linear-gradient(left, red, yellow, green); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(left, red, yellow, green); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(left, red, yellow, green); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(left, red, yellow, green); /* Standard syntax */
+    width: 250px;
+    height: 25px;
+    left: 111px;
+    top: -35px;
+}
+
+#battery_value {
+    text-align:center;
+	border-right: solid 1px #C5C5C5;
+	-webkit-border-radius: 0px;
+	-moz-border-radius: 0px;
+	border-radius: 0px;
+	color: #FFFFFF;
+	list-style: none;
+	margin: 0 0 10px;
+	padding: 0px;
+	position: relative;
+	background: #FFFFFF; /* Old browsers */
+    background-color: #FFFFFF;
+    width: 249px;
+    height: 25px;
+    left: 111px; /* 111 + 150*/
+    top: -70px;
+}
+
+#battery_voltage {
+    text-align:center;
+	color: #555;
+	font: bold 12px Arial, sans-serif;
+	list-style: none;
+	margin: 0 0 10px;
+	padding: 0px;
+	position: relative;
+    width: 249px;
+    height: 25px;
+    left: 111px; /* 111 + 150*/
+    top: -100px;
+}
+
 #footer {
     text-align:center;
 	background: #F0F0F0; /* Old browsers */
@@ -113,12 +188,34 @@ body {
   transition: all 1s ease;
 }
 
-/*
-#compass:hover #arrow {
-  -webkit-transform:rotate(80deg);
-  -moz-transform:rotate(80deg);
-  -o-transform:rotate(80deg);
-  -ms-transform:rotate(80deg);
+#bullet {
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  top: -10px; /* top from -10 to 165*/
+  left: 69px;
 }
-*/
+
+#sonar {
+  width: 150px;
+  height: 180px;
+  background-image:url('polar.jpg');
+  background-size: 100% 100%;
+  position: relative;
+  top:0px;
+  left:0px;
+}
+
+#sonar_value {
+    text-align:center;
+	color: #214478;
+    text-shadow: 1px 1px #ffffff;
+	font: bold 12px Arial, sans-serif;
+	list-style: none;
+	margin: 0 0 10px;
+	padding: 0px;
+	position: relative;
+    left: 45px; /* 111 + 150*/
+    top: 160px;
+}
 
