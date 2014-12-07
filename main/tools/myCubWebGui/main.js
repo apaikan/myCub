@@ -9,9 +9,11 @@ mycub_ports['/mycub'] = "10000";
 mycub_ports['/MyCubInterface/cmd:i'] = "";
 mycub_ports['/GazeControl/cmd:i'] = "";
 
+var isConnected = false;
 var canvas_front;
 var canvas_rear;
-var canvas_top;
+var canvas_3d;
+
 
 //$(function () {
 $(document).ready(function(){
@@ -127,40 +129,11 @@ $(document).ready(function(){
         height: 70
     });
 
+    /*
     canvas_top = zino.Canvas({
         target: document.getElementById("canvas_top"),
         width: 320,
         height: 290
-    });
-
-    /*
-    $("#chart_compass").zinoChart({
-        type: "rose",
-        width: 160,
-        height:160,
-        radius: 50,
-        legend: false,
-        categories: [{
-            "category": [
-                {"label": 2011},
-                {"label": 2013}
-            ]
-        }],
-        series: [{
-            "label": "NY Knicks",
-            "color": "#3366CC",
-            "data": [
-                {"value": 9},
-                {"value": 2}
-            ]
-        },{
-            "label": "LA Clippers",
-            "color": "#067A06",
-            "data": [
-                {"value": 0},
-                {"value": 0}
-            ]
-        }]
     });
     */
 
@@ -169,7 +142,10 @@ $(document).ready(function(){
 
     resolvesAdress(mycub_address, mycub_ports);
 
+    onloadHandler()
+
     setInterval(function() {
+        updateConnectionStatus();
         updateAllStatus();        
     }, 1000);
 
@@ -255,15 +231,33 @@ function moveJoint(j, p, s) {
 
 
 function updateAllStatus() {
+    isConnected = false;
     var request = "http://" + mycub_address + ":" + mycub_ports['/MyCubInterface/cmd:i'];
     $.getJSON( request, 
                 { req:   'getAll'} )
     .done(function( data ) {
+            isConnected = true;
             //vector of j0, j1, j2, j3, dist, heading, volt
             $("#value_j1").val(data[0][0]);
+            r = data[0][0]*Phoria.RADIANS - plate_front.angle;
+            plate_front.angle = data[0][0]*Phoria.RADIANS;
+            plate_front.rotateZ(r);
+
             $("#value_j2").val(data[0][1]);
+            r = data[0][1]*Phoria.RADIANS - plate_right.angle;
+            plate_right.angle = data[0][1]*Phoria.RADIANS;
+            plate_right.rotateZ(-r);
+
             $("#value_j3").val(data[0][2]);
+            r = data[0][2]*Phoria.RADIANS - plate_back.angle;
+            plate_back.angle = data[0][2]*Phoria.RADIANS;
+            plate_back.rotateZ(-r);
+
             $("#value_j4").val(data[0][3]);
+            r = data[0][3]*Phoria.RADIANS - plate_left.angle;
+            plate_left.angle = data[0][3]*Phoria.RADIANS;
+            plate_left.rotateZ(r);
+
             drawFront(canvas_rear, data[0][0], data[0][2]);
             drawFront(canvas_front, data[0][1], data[0][3]);
             //$("#arrow").rotate(80);
@@ -304,5 +298,16 @@ function setSonarLevel(dist) {
     if(h>165) { h = 165; }
     if(h<-10) { h = -10; }    
     $("#bullet").attr("style", "top:"+h+"px;");    
+}
+
+function updateConnectionStatus() {
+    if(isConnected == true) {
+        $("#connection_status").attr("style", "color:#447821;");
+        $('#connection_status').text("Connected");
+    }
+    else {
+        $("#connection_status").attr("style", "color:#784421;");
+        $('#connection_status').text("Disconnected");
+    }
 }
 

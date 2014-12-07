@@ -131,6 +131,7 @@ body {
 	margin: 0 0 10px;
 	padding: 5px;
 	position: relative;
+    height: 15px;
 }
 
 
@@ -217,5 +218,18 @@ body {
 	position: relative;
     left: 45px; /* 111 + 150*/
     top: 160px;
+}
+
+#connection_status {
+    text-align:left;
+	color: #784421; /* green: #447821 */
+    text-shadow: 1px 1px #ffffff;
+	font: bold 12px Arial, sans-serif;
+	list-style: none;
+	margin: 0 0 10px;
+	padding: 0px;
+	position: relative;
+    left: 10px; /* 111 + 150*/
+    top: -13px;
 }
 

@@ -22,6 +22,14 @@
     <script src="/zino-ui-1.4/zino.canvas.min.js"></script>
     <script src="/zino-ui-1.4/zino.svg.min.js"></script>
     <script src="/zino-ui-1.4/zino.chart.min.js"></script>
+    <script src="/phoria.js-0.9.16/gl-matrix.js"></script>
+    <script src="/phoria.js-0.9.16/phoria-util.js"></script>
+    <script src="/phoria.js-0.9.16/phoria-entity.js"></script>
+    <script src="/phoria.js-0.9.16/phoria-scene.js"></script>
+    <script src="/phoria.js-0.9.16/phoria-renderer.js"></script>
+    <script src="/phoria.js-0.9.16/phoria-view.js"></script>
+    <script src='/phoria.js-0.9.16/dat.gui.min.js'></script>
+
     <style type="text/css">body{padding: 5px; font: normal 12px Arial, sans-serif;}</style>
 </head>
 
@@ -160,7 +168,7 @@
                     <tr> 
                         <td align="center" colspan="2" style="border-top: solid 2px #C5C5C5;"> 
                             <div class="canvas_title">Top</div> 
-                            <div id="canvas_top" style="position: relative; top:-26px"></div> 
+                            <canvas id="canvas_3d" width="320" height="290" style="position: relative; top:0px; background-color: #ffffff;"></cancas> 
                         </td>
                     </tr>
                     </table>
@@ -206,10 +214,13 @@
     </table>
 
     <div id="footer">
-    Copyright © www.alipaikan.com
+    <div>Copyright © www.alipaikan.com</div>
+    <div id="connection_status">Disconnected</div>
     </div>
 
+    <script type="text/javascript" src="./model_3d.js"></script>
     <script type="text/javascript" src="./main.js"> </script>    
+   
 </body>
 </html>
 
