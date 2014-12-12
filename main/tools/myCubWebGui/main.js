@@ -33,7 +33,7 @@ $(document).ready(function(){
         decimal: true,
         step: 100
     });
-   var $pbar = $("#slider_j1").zinoSlider({
+   var pbar = $("#slider_j1").zinoSlider({
 	    bounds: [1],
 	    maxValue: 70,
 	    slide: function (event, ui) {
@@ -115,6 +115,59 @@ $(document).ready(function(){
 		    $("#value_h2").val(ui.data.rightX);
             moveCamJoint($("#value_h1").val(), ui.data.rightX, 200);
 	    }
+    });
+
+    $( "#btnminos_j1" ).click(function() {      
+      moveJoint(0, $("#value_j1").val() - 5, $("#spinner_j1").val());
+    });
+
+    $( "#btnplus_j1" ).click(function() {  
+      moveJoint(0, parseInt($("#value_j1").val()) + 5, $("#spinner_j1").val());
+    });
+
+    $( "#btnminos_j2" ).click(function() {      
+      moveJoint(1, $("#value_j2").val() - 5, $("#spinner_j2").val());
+    });
+
+    $( "#btnplus_j2" ).click(function() {      
+      moveJoint(1, parseInt($("#value_j2").val()) + 5, $("#spinner_j2").val());
+    });
+
+    $( "#btnminos_j3" ).click(function() {      
+        moveJoint(2, $("#value_j3").val() - 5, $("#spinner_j3").val());
+    });
+
+    $( "#btnplus_j3" ).click(function() {      
+      moveJoint(2, parseInt($("#value_j3").val()) + 5, $("#spinner_j3").val());
+    });
+
+    $( "#btnminos_j4" ).click(function() {      
+      moveJoint(3, $("#value_j4").val() - 5, $("#spinner_j4").val());
+    });
+
+    $( "#btnplus_j4" ).click(function() {      
+        moveJoint(3, parseInt($("#value_j4").val()) + 5, $("#spinner_j4").val());
+    });
+
+
+    $( "#btnminos_h1" ).click(function() {      
+        moveCamJoint($("#value_h1").val() - 5, $("#value_h2").val(), 200);
+        $("#value_h1").val($("#value_h1").val() - 5);
+    });
+
+    $( "#btnplus_h1" ).click(function() {  
+        moveCamJoint(parseInt($("#value_h1").val()) + 5, $("#value_h2").val(), 200);
+        $("#value_h1").val(parseInt($("#value_h1").val()) + 5);
+    });
+
+    $( "#btnminos_h2" ).click(function() {      
+        moveCamJoint($("#value_h1").val() , $("#value_h2").val() - 5, 200);
+        $("#value_h2").val($("#value_h2").val() - 5);
+    });
+
+    $( "#btnplus_h2" ).click(function() {  
+        moveCamJoint($("#value_h1").val() , parseInt($("#value_h2").val()) + 5, 200);
+        $("#value_h2").val(parseInt($("#value_h2").val()) + 5);
     });
 
     canvas_front = zino.Canvas({
@@ -262,6 +315,14 @@ function updateAllStatus() {
             drawFront(canvas_front, data[0][1], data[0][3]);
             //$("#arrow").rotate(80);
             $("#arrow").attr("style","-webkit-transform:rotate("+data[0][5]+"deg); -moz-transform:rotate("+data[0][5]+"deg); -o-transform:rotate("+data[0][5]+"deg); -ms--transform:rotate("+data[0][5]+"deg);");
+            /*
+            r = (data[0][5]%180)*Phoria.RADIANS - plate_top.Zangle;
+            plate_top.Zangle = (data[0][5]%180)*Phoria.RADIANS;
+            plate_top.rotateY(r);
+            //plate_front.rotateX(r);
+            //plate_back.rotateX(-r);
+            //plate_right.rotateX(-r);
+            */
             setBatteryLevel(data[0][6]);
             setSonarLevel(data[0][4]);
     });

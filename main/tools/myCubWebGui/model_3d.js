@@ -79,7 +79,7 @@ function init()
    plate_right.translateX(-2.05);
    plate_right.translateY(-2.0);
 
-
+   plate_top.Zangle = 0;
    plate_front.angle = 0;   
    plate_right.angle = 0;   
    plate_back.angle = 0;   
@@ -240,7 +240,7 @@ function createSidePart() {
       showAxis: true
       //showPosition: true
    });
-   */ 
+   */
    return plate;
 }
 

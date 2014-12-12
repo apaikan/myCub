@@ -55,61 +55,66 @@
 	    </li>
     </ul>
 
-    <table align="center" border="0" width="90%" cellpadding="0"  cellspacing="0">    
+    <table align="center" border="0" width="93%" cellpadding="0"  cellspacing="0">    
     <tr>
         <td valign="top" width="470px">
-            <div class="my_window" style="height:330px; width:450px;">
+            <div class="my_window" style="height:330px; width:500px;">
             <div class="my_window_head">Arms Control</div>
             <div style="padding:10px;">
                 <!-- Joint 1-->
-                <table border="0" width="100%" cellpadding="0"  cellspacing="0">
+                <table border="0" width="100%" cellpadding="3"  cellspacing="0">
                     <tr>
                         <td align="left"> <strong>Front :</strong></td>
-                        <td width="300px"> <div id="slider_j1"></div> </td>
+                        <td><button type="button" id="btnminos_j1" tabindex="2">-</button> </td>
+                        <td width="300px"> <div id="slider_j1"></div></td>
+                        <td><button type="button" id="btnplus_j1" tabindex="2">+</button> </td>
                         <td> <input type="text" id="value_j1" style="width: 30px; text-align:center;"/> </td>
                     </tr>
                     <tr>
                         <td align="right"> speed:</td>
-                        <td colspan="2" align="left">&nbsp;&nbsp;<input type="text" id="spinner_j1" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
+                        <td colspan="4" align="left">&nbsp;&nbsp;<input type="text" id="spinner_j1" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
                     </tr>
                 </table>
-                <br>
                 <!-- Joint 2-->
-                <table border="0" width="100%" cellpadding="0"  cellspacing="0">
+                <table border="0" width="100%" cellpadding="3"  cellspacing="0">
                     <tr>
                         <td align="left"> <strong>Right :</strong></td>
-                        <td width="300px"> <div id="slider_j2"></div> </td>
+                        <td><button type="button" id="btnminos_j2" tabindex="2">-</button> </td>
+                        <td width="300px"> <div id="slider_j2"></div></td>
+                        <td><button type="button" id="btnplus_j2" tabindex="2">+</button> </td>
                         <td> <input type="text" id="value_j2" style="width: 30px; text-align:center;"/> </td>
                     </tr>
                     <tr>
                         <td align="right"> speed: </td>
-                        <td colspan="2" align="left">&nbsp;&nbsp;<input type="text" id="spinner_j2" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
+                        <td colspan="4" align="left">&nbsp;&nbsp;<input type="text" id="spinner_j2" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
                     </tr>
                 </table>
-                <br>
                 <!-- Joint 3-->
-                <table border="0" width="100%" cellpadding="0"  cellspacing="0">
+                <table border="0" width="100%" cellpadding="3"  cellspacing="0">
                     <tr>
                         <td align="left"> <strong>Back :</strong></td>
-                        <td width="300px"> <div id="slider_j3"></div> </td>
+                        <td><button type="button" id="btnminos_j3" tabindex="2">-</button> </td>
+                        <td width="300px"> <div id="slider_j3"></div></td>
+                        <td><button type="button" id="btnplus_j3" tabindex="2">+</button> </td>
                         <td> <input type="text" id="value_j3" style="width: 30px; text-align:center;"/> </td>
                     </tr>
                     <tr>
                         <td align="right"> speed: </td>
-                        <td colspan="2" align="left">&nbsp;&nbsp;<input type="text" id="spinner_j3" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
+                        <td colspan="4" align="left">&nbsp;&nbsp;<input type="text" id="spinner_j3" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
                     </tr>
                 </table>
-                <br>
                 <!-- Joint 4-->
-                <table border="0" width="100%" cellpadding="0"  cellspacing="0">
+                <table border="0" width="100%" cellpadding="3"  cellspacing="0">
                     <tr>
                         <td align="left"> <strong>Left :</strong></td>
-                        <td width="300px"> <div id="slider_j4"></div> </td>
+                        <td><button type="button" id="btnminos_j4" tabindex="2">-</button> </td>
+                        <td width="300px"> <div id="slider_j4"></div></td>
+                        <td><button type="button" id="btnplus_j4" tabindex="2">+</button> </td>
                         <td> <input type="text" id="value_j4" style="width: 30px; text-align:center;"/> </td>
                     </tr>
                     <tr>
                         <td align="right"> speed: </td>
-                        <td colspan="2" align="left">&nbsp;&nbsp;<input type="text" id="spinner_j4" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
+                        <td colspan="4" align="left">&nbsp;&nbsp;<input type="text" id="spinner_j4" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
                     </tr>
                 </table>
 
@@ -150,7 +155,7 @@
             </table>
         </td>
 
-        <td valign="top" align="right" rowspan="2">
+        <td valign="top" align="left" rowspan="2">
                 <div class="my_window" style="height:445px; width:325px; background-color:#ffffff">
                 <div class="my_window_head">Robot View</div>
                 <div style="padding:0px; position:relative; top:-9px;">
@@ -178,32 +183,35 @@
         </td>
     </tr>
         <td valign="top">
-            <div class="my_window" style="height:185px; width:450px;">
+            <div class="my_window" style="height:185px; width:500px;">
             <div class="my_window_head">Head Control</div>
             <div style="padding:10px;">
                 <!-- Joint 1-->
-                <table border="0" width="100%" cellpadding="0"  cellspacing="0">
+                <table border="0" width="100%" cellpadding="3"  cellspacing="0">
                     <tr>
                         <td align="left"> <strong>Yaw :</strong></td>
-                        <td width="300px"> <div id="slider_h1"></div> </td>
+                        <td><button type="button" id="btnminos_h1" tabindex="2">-</button> </td>
+                        <td width="300px"> <div id="slider_h1"></div></td>
+                        <td><button type="button" id="btnplus_h1" tabindex="2">+</button> </td>
                         <td> <input type="text" id="value_h1" style="width: 30px; text-align:center;"/> </td>
                     </tr>
                     <tr>
                         <td align="right"> speed:</td>
-                        <td colspan="2" align="left">&nbsp;&nbsp;<input type="text" id="spinner_h1" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
+                        <td colspan="4" align="left">&nbsp;&nbsp;<input type="text" id="spinner_h1" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
                     </tr>
                 </table>
-                <br>
                 <!-- Joint 2-->
-                <table border="0" width="100%" cellpadding="0"  cellspacing="0">
+                <table border="0" width="100%" cellpadding="3"  cellspacing="0">
                     <tr>
                         <td align="left"> <strong>Roll :</strong></td>
-                        <td width="300px"> <div id="slider_h2"></div> </td>
+                        <td><button type="button" id="btnminos_h2" tabindex="2">-</button> </td>
+                        <td width="300px"> <div id="slider_h2"></div></td>
+                        <td><button type="button" id="btnplus_h2" tabindex="2">+</button> </td>
                         <td> <input type="text" id="value_h2" style="width: 30px; text-align:center;"/> </td>
                     </tr>
                     <tr>
                         <td align="right"> speed: </td>
-                        <td colspan="2" align="left">&nbsp;&nbsp;<input type="text" id="spinner_h2" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
+                        <td colspan="4" align="left">&nbsp;&nbsp;<input type="text" id="spinner_h2" value="100" style="width:50px; text-align:center; padding:6px 0; margin:0 0 0px"/></td>                
                     </tr>
                 </table>
                 <br>
