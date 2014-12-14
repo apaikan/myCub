@@ -10,7 +10,6 @@
  *
  */
 
-#include <SerialPort.h> 
 
 #include <stdio.h>
 #include <string>
@@ -26,12 +25,12 @@
 #include <yarp/os/all.h>
 #include <yarp/os/Log.h>
 #include <yarp/dev/SerialInterfaces.h>
-//#include <yarp/dev/PolyDriver.h>
+#include <yarp/dev/PolyDriver.h>
 
 #include <myCubInterface_IDL.h>
 
 using namespace yarp::os;
-//using namespace yarp::dev;
+using namespace yarp::dev;
 using namespace std;
 
 #define JOINTS_SPEED            0.200     // sec
@@ -44,7 +43,6 @@ public:
 
     MyCubInterface(void) {
         bIsRT = false;
-        pSerial = NULL;
         battery_volt = 0.0;
         battery_volt_count = 0;
         battery_plugged = false;
@@ -52,8 +50,6 @@ public:
     }
     
     ~MyCubInterface(void) {
-        if(pSerial)
-            delete pSerial;
     }
     
     inline bool checkJointLimits(int32_t pos) {
@@ -66,48 +62,33 @@ public:
 
     bool configure(ResourceFinder &rf) {
 
-        /*
+        
         Property prop;        
         prop.put("device", "serialport");
         prop.put("comport", "/dev/ttyAMA0");
-        prop.put("baudrate", "115200");
-        //bool ret = prop.fromConfigFile(serial_filename.c_str(),config,false);
-        //if (!ret) {
-        //    fprintf(stderr, "Unable to read from serial port configuration file\n");
-        //    return false;
-        //}
-        pSerial = NULL;
+        prop.put("baudrate", 115200);
+        prop.put("paritymode", "NONE");
+        prop.put("databits", 8);
+        prop.put("readtimeoutmsec", 1000);
+        prop.put("verbose", 0);
+
         driver.open(prop);
         if(!driver.isValid()){
             fprintf(stderr, "Error opening PolyDriver check parameters\n");
             return false;
         }
 
-        driver.view(pSerial);  
-        if(!pSerial)
+        driver.view(iSerial);  
+        if(!iSerial)
         {
             fprintf(stderr, "Error opening serial driver. Device not available\n");
             return false;
         }
 
         // ping the board 
-        Bottle msg, reply;
-        msg.addString("ping\n");
-        pSerial->send(msg);
-        Time::delay(0.1);
-        pSerial->receive(reply);
-        printf("Recevived '%s'\n", reply.toString().c_str());
-        */
-        pSerial = new SerialPort("/dev/ttyAMA0");
-        pSerial->Open();
-        if(!pSerial->IsOpen())
-                return false;
-      
-        // ping the board 
         if(!ping())
         {
             printf("Cannot communicate with myCub control board!\n");
-            pSerial->Close();
             return false;
         }
 
@@ -130,7 +111,6 @@ public:
         if(!startController())
         {
             printf("Cannot start the motors controller!\n");
-            pSerial->Close();
             return false;
         }
 
@@ -155,8 +135,8 @@ public:
     
     bool updateModule() {
         
-        //update battery plug state 
         /*
+        //update battery plug state 
         int32_t cur = getBatteryCurrent();
         if((cur >= 0) != battery_plugged )
         {
@@ -167,7 +147,7 @@ public:
             }     
         }
         */
-
+        
         // update battery voltage status
         //printf("updateModule(): battery : %s\n", str.c_str());
         battery_volt += (float)(getBatteryVolt()/1000.0);
@@ -182,6 +162,7 @@ public:
             battery_volt_count = 0;
             battery_volt = 0.0;
         }
+        
         return true; 
     }
 
@@ -192,9 +173,8 @@ public:
     virtual bool ping() {
         serMutex.lock();
         while(serBusy) Time::delay(0.1);
-        serBusy = true;        
-        pSerial->Write("ping\n");
-        bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
+        serBusy = true;                
+        bool ret = (getSerialData("ping\n") == "[ok]");
         serBusy = false;
         serMutex.unlock();
         return ret;
@@ -208,8 +188,7 @@ public:
         serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;        
-        pSerial->Write("startControl\n");
-        bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
+        bool ret = (getSerialData("startControl\n") == "[ok]");
         serBusy = false;
         serMutex.unlock();
         return ret;
@@ -223,8 +202,7 @@ public:
         serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;        
-        pSerial->Write("stopControl\n");
-        bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
+        bool ret = (getSerialData("stopControl\n") == "[ok]");
         serBusy = false;
         serMutex.unlock();
         return ret;
@@ -255,8 +233,7 @@ public:
         serBusy = true;
         char cmd[64];
         sprintf(cmd, "setPose %d %d\n", joint, (int)(pos*JOINTS_SCALE+JOINTS_MIN));
-        pSerial->Write(cmd);
-        bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
+        bool ret = (getSerialData(cmd) == "[ok]");
         serBusy = false;
         serMutex.unlock();
         return ret;
@@ -274,8 +251,7 @@ public:
         serBusy = true;
         char cmd[64];
         sprintf(cmd, "getPose %d\n", joint);
-        pSerial->Write(cmd);
-        int32_t pos = atoi(pSerial->ReadLine(5000));
+        int32_t pos = atoi(getSerialData(cmd).c_str());
         serBusy = false;
         serMutex.unlock();
         return (int)((pos-JOINTS_MIN+1)/JOINTS_SCALE);
@@ -309,8 +285,7 @@ public:
         char cmd[64];
         sprintf(cmd, "gotoPose %d %d %d\n", 
                 joint, (int)(pos*JOINTS_SCALE+JOINTS_MIN), t);
-        pSerial->Write(cmd);
-        bool ret = (string(pSerial->ReadLine(5000)) == "[ok]");
+        bool ret = (getSerialData(cmd) == "[ok]");
         serBusy = false;
         serMutex.unlock();
         return ret;
@@ -350,8 +325,7 @@ public:
                 sprintf(cmd, "setPose %d %d\n", 
                        i, 
                        (int)(poses[i]*JOINTS_SCALE+JOINTS_MIN));
-                pSerial->Write(cmd);
-                ret &= (string(pSerial->ReadLine(5000)) == "[ok]");
+                ret &= (getSerialData(cmd) == "[ok]");
             } 
             else 
                 ret = false;
@@ -383,8 +357,7 @@ public:
                 char cmd[64];
                 sprintf(cmd, "gotoPose %d %d %d\n", 
                        i, (int)(poses[i]*JOINTS_SCALE+JOINTS_MIN), times[i]);
-                pSerial->Write(cmd);
-                ret &= (string(pSerial->ReadLine(5000)) == "[ok]");
+                ret &= (getSerialData(cmd) == "[ok]");
             }
             else
                 ret = false;
@@ -405,8 +378,7 @@ public:
         serBusy = true;
         char cmd[64];
         sprintf(cmd, "getDistance %d\n", id);
-        pSerial->Write(cmd);
-        int32_t dist = atoi(pSerial->ReadLine(5000));
+        int32_t dist = atoi(getSerialData(cmd).c_str());
         serBusy = false;
         serMutex.unlock();
         return dist;
@@ -420,8 +392,7 @@ public:
         serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
-        pSerial->Write("getOrientation\n");
-        string ret = pSerial->ReadLine(5000);
+        string ret = getSerialData("getOrientation\n");
         serBusy = false;
         serMutex.unlock();
         std::vector<int32_t> orit(3);
@@ -444,7 +415,8 @@ public:
         // Find yours here: http://www.magnetic-declination.com/
         // Mine is: -13* 2' W, which is ~13 Degrees, or (which we need) 0.22 radians
         // If you cannot find your Declination, comment out these two lines, your compass will be slightly off.
-        heading += 0.22;
+        // Genova ~= 1* 58'
+        heading += 0.027;
         
         // Correct for when signs are reversed.
         if(heading < 0)
@@ -464,8 +436,7 @@ public:
         serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
-        pSerial->Write("getBatteryVolt\n");
-        int32_t volt = atoi(pSerial->ReadLine(5000));
+        int32_t volt = atoi(getSerialData("getBatteryVolt\n").c_str());
         serBusy = false;
         serMutex.unlock();
         return volt;
@@ -479,8 +450,7 @@ public:
         serMutex.lock();
         while(serBusy) Time::delay(0.1);
         serBusy = true;
-        pSerial->Write("getBatteryCurrent\n");
-        int32_t amp = atoi(pSerial->ReadLine(5000));
+        int32_t amp = atoi(getSerialData("getBatteryCurrent\n").c_str());
         serBusy = false;
         serMutex.unlock();
         return amp;
@@ -506,300 +476,6 @@ public:
         return status;
      }
 
-    /*
-    bool respond(const Bottle &command, Bottle &reply) {
-        reply.clear();        
-        if (command.size() < 2 ){
-            reply.addString("[error]");
-            return true;
-        }
-
-        if(command.get(0).asString() == "ping" && 
-            command.get(1).asString() == "board") 
-        {
-            serMutex.lock();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            pSerial->Write("ping\n");
-            reply.clear();
-            reply.addString(pSerial->ReadLine(5000));
-            serBusy = false;
-            serMutex.unlock();
-            return true;
-        }
-        else if(command.get(0).asString() == "set" && 
-            command.get(1).asString() == "pos") 
-        {
-            if(command.size() < 4) {
-                reply.clear();
-                reply.addString("[error]");
-                return true;
-            }
-            serMutex.lock();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            char cmd[64];
-            sprintf(cmd, "setPose %d %d\n", command.get(2).asInt(), command.get(3).asInt());
-            pSerial->Write(cmd);
-            reply.clear();
-            reply.addString(pSerial->ReadLine(5000));
-            serBusy = false;
-            serMutex.unlock();
-            return true;
-        }
-        else if(command.get(0).asString() == "goto" && 
-            command.get(1).asString() == "pos") 
-        {
-            if(command.size() < 4) {
-                reply.clear();
-                reply.addString("[error]");
-                return true;
-            }
-            serMutex.lock();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            char cmd[64];
-            if(command.size() > 4 )
-                sprintf(cmd, "gotoPose %d %d %d\n", 
-                        command.get(2).asInt(), 
-                        (int)(command.get(3).asInt()*JOINTS_SCALE+JOINTS_MIN), 
-                        command.get(4).asInt());
-            else
-                sprintf(cmd, "gotoPose %d %d\n", 
-                       command.get(2).asInt(), 
-                       (int)(command.get(3).asInt()*JOINTS_SCALE+JOINTS_MIN));
-            pSerial->Write(cmd);
-            reply.clear();
-            reply.addString(pSerial->ReadLine(5000));
-            serBusy = false;
-            serMutex.unlock();
-            return true;
-        }
-        else if(command.get(0).asString() == "goto" && 
-            command.get(1).asString() == "syncpos") 
-        {
-            if(command.size() < 4) {
-                reply.clear();
-                reply.addString("[error]");
-                return true;
-            }
-            serMutex.lock();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            char cmd[64];
-            if(command.size() > 4 )
-                sprintf(cmd, "gotoPoseSync %d %d %d\n",
-                        command.get(2).asInt(), 
-                        (int)(command.get(3).asInt()*JOINTS_SCALE+JOINTS_MIN), 
-                        command.get(4).asInt());
-            else
-                sprintf(cmd, "gotoPoseSync %d %d\n",
-                        command.get(2).asInt(), 
-                        (int)(command.get(3).asInt()*JOINTS_SCALE+JOINTS_MIN)); 
-            pSerial->Write(cmd);
-            reply.clear();
-            reply.addString(pSerial->ReadLine(5000));
-            serBusy = false;
-            serMutex.unlock();
-            return true;
-        }
-        else if(command.get(0).asString() == "set" && 
-            command.get(1).asString() == "posall") 
-        {
-            Bottle* poses = NULL;
-
-            if((command.size() < 3) || 
-               !command.get(2).asList() || 
-               (command.get(2).asList()->size() != 4) ) {
-                reply.clear();
-                reply.addString("[error]");
-                return true;
-            }
-            
-            poses = command.get(2).asList(); 
-
-            serMutex.lock();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            
-            string rep;
-            for(int i=0; i<4; i++)
-            {
-                char cmd[64];
-                sprintf(cmd, "setPose %d %d\n", 
-                       i, 
-                       (int)(poses->get(i).asInt()*JOINTS_SCALE+JOINTS_MIN));
-                pSerial->Write(cmd);
-                rep = pSerial->ReadLine(5000);
-            }
-            reply.clear();
-            reply.addString(rep);
-
-            serBusy = false;
-            serMutex.unlock();
-
-            return true;
-        }
-
-
-        else if(command.get(0).asString() == "goto" && 
-            command.get(1).asString() == "posall") 
-        {
-            Bottle* poses = NULL;
-            Bottle* speeds = NULL;
-
-            if((command.size() < 3) || 
-               !command.get(2).asList() || 
-               (command.get(2).asList()->size() != 4) ) {
-                reply.clear();
-                reply.addString("[error]");
-                return true;
-            }
-
-            if((command.size() > 3) && 
-               (!command.get(3).asList() || (command.get(3).asList()->size() != 4)) )
-            {
-                reply.clear();
-                reply.addString("[error]");
-                return true;
-            }
-             
-            poses = command.get(2).asList(); 
-            if(command.size() > 3 )
-                speeds = command.get(3).asList(); 
-
-            serMutex.lock();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            
-            string rep;
-            for(int i=0; i<4; i++)
-            {
-                char cmd[64];
-                if(speeds != NULL)
-                    sprintf(cmd, "gotoPose %d %d %d\n", 
-                            i,
-                            (int)(poses->get(i).asInt()*JOINTS_SCALE+JOINTS_MIN), 
-                            speeds->get(i).asInt());
-                else
-                    sprintf(cmd, "gotoPose %d %d\n", 
-                           i, 
-                           (int)(poses->get(i).asInt()*JOINTS_SCALE+JOINTS_MIN));
-                pSerial->Write(cmd);
-                rep = pSerial->ReadLine(5000);
-            }
-            reply.clear();
-            reply.addString(rep);
-
-            serBusy = false;
-            serMutex.unlock();
-
-            return true;
-        }
-        else if(command.get(0).asString() == "get" && 
-            command.get(1).asString() == "dist") 
-        {
-            if(command.size() < 3) {
-                reply.clear();
-                reply.addString("[error]");
-                return true;
-            }
-            serMutex.lock();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            char cmd[64];
-            sprintf(cmd, "getDistance %d\n", command.get(2).asInt());
-            pSerial->Write(cmd);
-            reply.clear();
-            reply.addString(pSerial->ReadLine(5000));
-            serBusy = false;
-            serMutex.unlock();
-            return true;
-        }
-        else if(command.get(0).asString() == "get" && 
-            command.get(1).asString() == "head") 
-        {
-            serMutex.lock();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            pSerial->Write("getHeading\n");
-            reply.clear();
-            reply.addString(pSerial->ReadLine(5000));
-            serBusy = false;
-            serMutex.unlock();
-            return true;
-        }
-
-        else if(command.get(0).asString() == "get" && 
-            command.get(1).asString() == "meminfo") 
-        {
-            serMutex.lock();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            pSerial->Write("getMemoryInfo\n");
-            reply.clear();
-            reply.addString(pSerial->ReadLine(5000));
-            serBusy = false;
-            serMutex.unlock();
-            return true;
-        }
-        else if(command.get(0).asString() == "get" && 
-            command.get(1).asString() == "battery") 
-        {
-            if(command.size() < 3 || 
-              (command.get(2).asString() != "volt" &&
-               command.get(2).asString() != "amp")) {
-                reply.clear();
-                reply.addString("[error]");
-                return true;
-            }
-            
-            serMutex.lock();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            char cmd[64];
-            if(command.get(2).asString() == "volt")
-                sprintf(cmd, "getBatteryVolt\n");
-            else
-                sprintf(cmd, "getBatteryCurrent\n");
-            pSerial->Write(cmd);
-            reply.clear();
-            reply.addString(pSerial->ReadLine(5000));
-            serBusy = false;
-            serMutex.unlock();
-            return true;
-        }
-        else if(command.get(0).asString() == "get" && 
-            command.get(1).asString() == "adc") 
-        {
-            if(command.size() < 5) {
-                reply.clear();
-                reply.addString("[error]");
-                return true;
-            }
-            serMutex.lock();
-            while(serBusy) Time::delay(0.1);
-            serBusy = true;
-            char cmd[64];
-            sprintf(cmd, "getADC %d %d %d\n", command.get(2).asInt(), 
-                    command.get(3).asInt(), command.get(4).asInt());
-            pSerial->Write(cmd);
-            reply.clear();
-            reply.addString(pSerial->ReadLine());
-            serBusy = false;
-            serMutex.unlock();
-            return true;
-        }
-        else
-        {
-            reply.addString("[error]");
-            return true;
-        }
-
-        return true;
-    }
-    */
-
     bool interruptModule() { 
         cmdPort.interrupt();             // interupt the blocking read 
         return true; 
@@ -807,12 +483,11 @@ public:
 
     bool close() {
         cmdPort.close(); 
-        //driver.close();
         if(fdDisplay)
             fclose(fdDisplay);
         printf("Stopping motors controller...\n");
-        pSerial->Write("stopControl\n");
-        std::string rep = pSerial->ReadLine(5000);
+        stopController();
+        driver.close();
         return true; 
     } 
 
@@ -825,13 +500,21 @@ public:
 	    }
     }
 
+    std::string getSerialData(char* cmd) {
+        char buff[128];
+        iSerial->send(cmd, strlen(cmd));
+        int len = iSerial->receiveLine(buff, 127);
+        if(len == 0)
+            return std::string("");
+        buff[len-1] = '\0'; 
+        return std::string(buff);
+    }
 
 private:
-	//PolyDriver driver;
-    //ISerialDevice *pSerial;
+	PolyDriver driver;
+    ISerialDevice *iSerial;
     yarp::os::Mutex serMutex;
     bool serBusy; 
-    SerialPort* pSerial; 
     FILE* fdDisplay;
     RpcServer cmdPort;
     bool bIsRT;

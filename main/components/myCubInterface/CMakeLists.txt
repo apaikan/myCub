@@ -20,8 +20,8 @@ set(IDL_GENERATED_CODE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/generated")
 yarp_idl_to_dir(${PROJECTNAME}.thrift ${IDL_GENERATED_CODE_DIR})
 
 
-file(GLOB folder_source *.cpp ./libserial/*.cpp)
-file(GLOB_RECURSE folder_header *.h ./libserial/*.h)
+file(GLOB folder_source *.cpp)
+file(GLOB_RECURSE folder_header *.h)
 source_group("Source Files" FILES ${folder_source})
 source_group("Header Files" FILES ${folder_header})
 
@@ -29,8 +29,7 @@ list(APPEND folder_source ${IDL_GENERATED_CODE_DIR}/src/${PROJECTNAME}_IDL.cpp)
 list(APPEND folder_header ${IDL_GENERATED_CODE_DIR}/include/${PROJECTNAME}_IDL.h)
 
 include_directories(${YARP_INCLUDE_DIRS} 
-                    ${IDL_GENERATED_CODE_DIR}/include
-                    ./libserial)
+                    ${IDL_GENERATED_CODE_DIR}/include)
 
 
 # Set up our main executable.
