@@ -385,6 +385,20 @@ public:
     }
 
     /**
+    * get motion status
+    * @return 1 if motion is detected otherwise 0
+    */
+    virtual int32_t getMotion() {
+        serMutex.lock();
+        while(serBusy) Time::delay(0.1);
+        serBusy = true;
+        int32_t motion = atoi(getSerialData("getMotion\n").c_str());
+        serBusy = false;
+        serMutex.unlock();
+        return motion;
+    }
+
+    /**
      * get digital compass value
      * @return true/false on success/failure
      */

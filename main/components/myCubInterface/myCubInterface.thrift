@@ -125,6 +125,12 @@ service myCubInterface_IDL
   i32 getBatteryCurrent();
 
   /**
+  * get motion status
+  * @return 1 if motion is detected otherwise 0
+  */
+  i32 getMotion();
+
+  /**
   * get all important status
   * @returna a vector of j0, j1, j2, j3, dist, heading, volt
   */

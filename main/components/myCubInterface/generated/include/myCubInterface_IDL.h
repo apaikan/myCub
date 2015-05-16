@@ -112,6 +112,11 @@ public:
  */
   virtual int32_t getBatteryCurrent();
 /**
+ * get motion status
+ * @return 1 if motion is detected otherwise 0
+ */
+  virtual int32_t getMotion();
+/**
  * get all important status
  * @returna a vector of j0, j1, j2, j3, dist, heading, volt
  */

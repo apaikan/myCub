@@ -400,6 +400,26 @@ public:
   }
 };
 
+class myCubInterface_IDL_getMotion : public yarp::os::Portable {
+public:
+  int32_t _return;
+  virtual bool write(yarp::os::ConnectionWriter& connection) {
+    yarp::os::idl::WireWriter writer(connection);
+    if (!writer.writeListHeader(1)) return false;
+    if (!writer.writeTag("getMotion",1,1)) return false;
+    return true;
+  }
+  virtual bool read(yarp::os::ConnectionReader& connection) {
+    yarp::os::idl::WireReader reader(connection);
+    if (!reader.readListReturn()) return false;
+    if (!reader.readI32(_return)) {
+      reader.fail();
+      return false;
+    }
+    return true;
+  }
+};
+
 class myCubInterface_IDL_getAll : public yarp::os::Portable {
 public:
   std::vector<int32_t>  _return;
@@ -585,6 +605,15 @@ int32_t myCubInterface_IDL::getBatteryCurrent() {
   myCubInterface_IDL_getBatteryCurrent helper;
   if (!yarp().canWrite()) {
     fprintf(stderr,"Missing server method '%s'?\n","int32_t myCubInterface_IDL::getBatteryCurrent()");
+  }
+  bool ok = yarp().write(helper,helper);
+  return ok?helper._return:_return;
+}
+int32_t myCubInterface_IDL::getMotion() {
+  int32_t _return = 0;
+  myCubInterface_IDL_getMotion helper;
+  if (!yarp().canWrite()) {
+    fprintf(stderr,"Missing server method '%s'?\n","int32_t myCubInterface_IDL::getMotion()");
   }
   bool ok = yarp().write(helper,helper);
   return ok?helper._return:_return;
@@ -896,6 +925,17 @@ bool myCubInterface_IDL::read(yarp::os::ConnectionReader& connection) {
       reader.accept();
       return true;
     }
+    if (tag == "getMotion") {
+      int32_t _return;
+      _return = getMotion();
+      yarp::os::idl::WireWriter writer(reader);
+      if (!writer.isNull()) {
+        if (!writer.writeListHeader(1)) return false;
+        if (!writer.writeI32(_return)) return false;
+      }
+      reader.accept();
+      return true;
+    }
     if (tag == "getAll") {
       std::vector<int32_t>  _return;
       _return = getAll();
@@ -965,6 +1005,7 @@ std::vector<std::string> myCubInterface_IDL::help(const std::string& functionNam
     helpString.push_back("getHeading");
     helpString.push_back("getBatteryVolt");
     helpString.push_back("getBatteryCurrent");
+    helpString.push_back("getMotion");
     helpString.push_back("getAll");
     helpString.push_back("help");
   }
@@ -1062,6 +1103,11 @@ std::vector<std::string> myCubInterface_IDL::help(const std::string& functionNam
       helpString.push_back("int32_t getBatteryCurrent() ");
       helpString.push_back("get battery current status ");
       helpString.push_back("@return true/false on success/failure ");
+    }
+    if (functionName=="getMotion") {
+      helpString.push_back("int32_t getMotion() ");
+      helpString.push_back("get motion status ");
+      helpString.push_back("@return 1 if motion is detected otherwise 0 ");
     }
     if (functionName=="getAll") {
       helpString.push_back("std::vector<int32_t>  getAll() ");
