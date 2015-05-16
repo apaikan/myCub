@@ -1,0 +1,20 @@
+V "GNAT Lib v2014"
+A -g
+A -gnatc
+A -mtune=generic
+A -march=x86-64
+P ZX
+
+RN
+RV NO_ELABORATION_CODE
+
+U lm4f%s		lm4f.ads		3f5dedc7 EE OO PK IU
+
+D lm4f.ads		20140913212618 3f5dedc7 lm4f%s
+D system.ads		20140406181354 90249111 system%s
+X 1 lm4f.ads
+35K9*LM4F 37l5 37e9
+FD 1 lm4f.ads
+FS .1 35K9 lm4f
+FD 2 system.ads
+

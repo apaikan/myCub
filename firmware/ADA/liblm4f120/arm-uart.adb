@@ -37,8 +37,7 @@ package body ARM.Uart is
     procedure Put_Line (S : ARM_String) is
     begin
       Put (S);
-      --New_Line;
-      CRLF;
+      New_Line;      
     end Put_Line;
 
 

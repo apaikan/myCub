@@ -194,6 +194,16 @@ package body MyCub.BoardInterface is
                 else
                     Stdio.Put_Line("[error]"); 
                 end if;
+
+            --
+            -- getMotion
+            --
+            elsif Commands(1).Str(1..Commands(1).Size) = "getMotion" then
+                if(getMotion = True) then
+                    Stdio.Put_Line("1");
+                else
+                    Stdio.Put_Line("0");
+                end if;
             --
             -- getHeading
             --

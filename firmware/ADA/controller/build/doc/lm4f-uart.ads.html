@@ -1,0 +1,506 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><head>
+  <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript"/>
+
+  <title>
+    Package: LM4F.Uart (abstract) (generic)
+  </title>
+  <link rel='stylesheet' href='support/docgen.css' type='text/css'/>
+  <link rel='stylesheet' href='support/tags.css' type='text/css'/>
+  <script src='support/docgen.js' type='text/javascript' charset='utf-8'></script>
+</head>
+<body onload="onloadDoc();">
+
+<div id='leftSide'>
+  <div id='leftSideInside'>
+  <div id='header'>
+    <h2 class="button">Documentation</h2>
+    <a href='toc.html'><div class="button2">Table of Contents</div></a>
+
+    <a href='tree.html'><div class="button2">Class Inheritance Tree</div></a>
+
+  </div>
+
+  <div id='navigation'>
+    <h2 class="button">Navigation</h2>
+    <a href='#Description'><div class="button2">Description</div></a>
+    <a href='#Constants'><div class="button2">Constants &amp; Global variables</div></a>
+    <a href='#Methods'><div class="button2">Subprograms &amp; Entries</div></a>
+  </div><!-- navigation -->
+  </div>
+</div> <!-- leftSide -->
+
+<div class='default' id='rightSide'>
+ <div id='rightSideInside'>
+ <div id='Index'>
+  <h2>Index</h2>
+  <script type="text/javascript">
+    var names = new Array (
+new Array ('UART0', 'lm4f-uart.ads:41:4', 'var-spec'),
+new Array ('UART1', 'lm4f-uart.ads:42:4', 'var-spec'),
+new Array ('UART2', 'lm4f-uart.ads:43:4', 'var-spec'),
+new Array ('UART3', 'lm4f-uart.ads:44:4', 'var-spec'),
+new Array ('UART4', 'lm4f-uart.ads:45:4', 'var-spec'),
+new Array ('UART5', 'lm4f-uart.ads:46:4', 'var-spec'),
+new Array ('UART6', 'lm4f-uart.ads:47:4', 'var-spec'),
+new Array ('UART7', 'lm4f-uart.ads:48:4', 'var-spec'),
+new Array ('INT_<wbr/>DMATX', 'lm4f-uart.ads:50:4', 'var-spec'),
+new Array ('INT_<wbr/>DMARX', 'lm4f-uart.ads:51:4', 'var-spec'),
+new Array ('INT_<wbr/>9BIT', 'lm4f-uart.ads:52:4', 'var-spec'),
+new Array ('INT_<wbr/>OE', 'lm4f-uart.ads:53:4', 'var-spec'),
+new Array ('INT_<wbr/>BE', 'lm4f-uart.ads:54:4', 'var-spec'),
+new Array ('INT_<wbr/>PE', 'lm4f-uart.ads:55:4', 'var-spec'),
+new Array ('INT_<wbr/>FE', 'lm4f-uart.ads:56:4', 'var-spec'),
+new Array ('INT_<wbr/>RT', 'lm4f-uart.ads:57:4', 'var-spec'),
+new Array ('INT_<wbr/>TX', 'lm4f-uart.ads:58:4', 'var-spec'),
+new Array ('INT_<wbr/>RX', 'lm4f-uart.ads:59:4', 'var-spec'),
+new Array ('INT_<wbr/>DSR', 'lm4f-uart.ads:60:4', 'var-spec'),
+new Array ('INT_<wbr/>DCD', 'lm4f-uart.ads:61:4', 'var-spec'),
+new Array ('INT_<wbr/>CTS', 'lm4f-uart.ads:62:4', 'var-spec'),
+new Array ('INT_<wbr/>RI', 'lm4f-uart.ads:63:4', 'var-spec'),
+new Array ('IntEnable', 'lm4f-uart.ads:65:14', 'subp-spec'),
+new Array ('IntDisable', 'lm4f-uart.ads:68:14', 'subp-spec'),
+new Array ('IntStatus', 'lm4f-uart.ads:71:13', 'subp-spec'),
+new Array ('IntClear', 'lm4f-uart.ads:74:14', 'subp-spec'),
+new Array ('CharsAvail', 'lm4f-uart.ads:77:13', 'subp-spec'),
+new Array ('SpaceAvail', 'lm4f-uart.ads:80:13', 'subp-spec'),
+new Array ('CharGet', 'lm4f-uart.ads:83:13', 'subp-spec'),
+new Array ('CharGetNonBlocking', 'lm4f-uart.ads:86:13', 'subp-spec'),
+new Array ('CharPut', 'lm4f-uart.ads:89:14', 'subp-spec'),
+new Array ('CharPutNonBlocking', 'lm4f-uart.ads:92:13', 'subp-spec'),
+new Array ('Busy', 'lm4f-uart.ads:95:13', 'subp-spec'),
+      new Array ('dummy', '', ''));
+    printIndexList (names);
+  </script>
+  <noscript>
+    <ul>
+      <li class='var-spec'><a href="#lm4f-uart.ads:41:4">UART0</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:42:4">UART1</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:43:4">UART2</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:44:4">UART3</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:45:4">UART4</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:46:4">UART5</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:47:4">UART6</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:48:4">UART7</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:50:4">INT_<wbr/>DMATX</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:51:4">INT_<wbr/>DMARX</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:52:4">INT_<wbr/>9BIT</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:53:4">INT_<wbr/>OE</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:54:4">INT_<wbr/>BE</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:55:4">INT_<wbr/>PE</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:56:4">INT_<wbr/>FE</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:57:4">INT_<wbr/>RT</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:58:4">INT_<wbr/>TX</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:59:4">INT_<wbr/>RX</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:60:4">INT_<wbr/>DSR</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:61:4">INT_<wbr/>DCD</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:62:4">INT_<wbr/>CTS</a></li>
+      <li class='var-spec'><a href="#lm4f-uart.ads:63:4">INT_<wbr/>RI</a></li>
+      <li class='subp-spec'><a href="#lm4f-uart.ads:65:14">IntEnable</a></li>
+      <li class='subp-spec'><a href="#lm4f-uart.ads:68:14">IntDisable</a></li>
+      <li class='subp-spec'><a href="#lm4f-uart.ads:71:13">IntStatus</a></li>
+      <li class='subp-spec'><a href="#lm4f-uart.ads:74:14">IntClear</a></li>
+      <li class='subp-spec'><a href="#lm4f-uart.ads:77:13">CharsAvail</a></li>
+      <li class='subp-spec'><a href="#lm4f-uart.ads:80:13">SpaceAvail</a></li>
+      <li class='subp-spec'><a href="#lm4f-uart.ads:83:13">CharGet</a></li>
+      <li class='subp-spec'><a href="#lm4f-uart.ads:86:13">CharGetNonBlocking</a></li>
+      <li class='subp-spec'><a href="#lm4f-uart.ads:89:14">CharPut</a></li>
+      <li class='subp-spec'><a href="#lm4f-uart.ads:92:13">CharPutNonBlocking</a></li>
+      <li class='subp-spec'><a href="#lm4f-uart.ads:95:13">Busy</a></li>
+    </ul>
+  </noscript>
+ </div>
+ </div>
+</div>
+
+<div class='default' id='documentation'>
+  <div class='title'>
+    Package:
+<span class="droplink"><i>LM4F.Uart (abstract) (generic)</i><ul>
+  <li><a href="src_lm4f-uart.ads.html">Goto spec source</a></li>
+</ul></span>
+  </div>
+  <div class='subprograms'>
+    <h1><a name='Description' id='Description'></a>Description</h1>
+    <div class="class">
+    <div class='details'><pre><span class="keyword">package</span> <span class="name_emphasis">LM4F.Uart</span> <span class="keyword">is</span></pre></div>
+    <div class='comment'>---------------------------------------------------------------------
+
+Copyright (C) 2014 Ali Paikan (ali.paikan@gmail.com).  
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+
+ Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the  
+ distribution.
+
+ Neither the name of Texas Instruments Incorporated nor the names of
+ its contributors may be used to endorse or promote products derived
+ from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+&quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-----------------------------------------------------------------------
+</div>
+    </div>
+  </div>
+
+
+
+
+
+  <div class='subprograms'>
+    <h1><a name='Constants' id='Constants'></a>Constants &amp; Global variables</h1>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:41:4' id='lm4f-uart.ads:41:4'></a>
+<span class="droplink">UART0<ul>
+  <li><a href="src_lm4f-uart.ads.html#l41">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">UART0</span> : <span class="keyword">constant</span> := 16#4000C000#;</pre></div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:42:4' id='lm4f-uart.ads:42:4'></a>
+<span class="droplink">UART1<ul>
+  <li><a href="src_lm4f-uart.ads.html#l42">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">UART1</span> : <span class="keyword">constant</span> := 16#4000D000#;</pre></div>
+      <div class='comment'>hw_memmap.h:65
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:43:4' id='lm4f-uart.ads:43:4'></a>
+<span class="droplink">UART2<ul>
+  <li><a href="src_lm4f-uart.ads.html#l43">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">UART2</span> : <span class="keyword">constant</span> := 16#4000E000#;</pre></div>
+      <div class='comment'>hw_memmap.h:66
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:44:4' id='lm4f-uart.ads:44:4'></a>
+<span class="droplink">UART3<ul>
+  <li><a href="src_lm4f-uart.ads.html#l44">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">UART3</span> : <span class="keyword">constant</span> := 16#4000F000#;</pre></div>
+      <div class='comment'>hw_memmap.h:67
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:45:4' id='lm4f-uart.ads:45:4'></a>
+<span class="droplink">UART4<ul>
+  <li><a href="src_lm4f-uart.ads.html#l45">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">UART4</span> : <span class="keyword">constant</span> := 16#40010000#;</pre></div>
+      <div class='comment'>hw_memmap.h:68
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:46:4' id='lm4f-uart.ads:46:4'></a>
+<span class="droplink">UART5<ul>
+  <li><a href="src_lm4f-uart.ads.html#l46">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">UART5</span> : <span class="keyword">constant</span> := 16#40011000#;</pre></div>
+      <div class='comment'>hw_memmap.h:69
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:47:4' id='lm4f-uart.ads:47:4'></a>
+<span class="droplink">UART6<ul>
+  <li><a href="src_lm4f-uart.ads.html#l47">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">UART6</span> : <span class="keyword">constant</span> := 16#40012000#;</pre></div>
+      <div class='comment'>hw_memmap.h:70
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:48:4' id='lm4f-uart.ads:48:4'></a>
+<span class="droplink">UART7<ul>
+  <li><a href="src_lm4f-uart.ads.html#l48">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">UART7</span> : <span class="keyword">constant</span> := 16#40013000#;</pre></div>
+      <div class='comment'>hw_memmap.h:71
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:50:4' id='lm4f-uart.ads:50:4'></a>
+<span class="droplink">INT_DMATX<ul>
+  <li><a href="src_lm4f-uart.ads.html#l50">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_DMATX</span> : <span class="keyword">constant</span> := 16#20000#;</pre></div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:51:4' id='lm4f-uart.ads:51:4'></a>
+<span class="droplink">INT_DMARX<ul>
+  <li><a href="src_lm4f-uart.ads.html#l51">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_DMARX</span> : <span class="keyword">constant</span> := 16#10000#;</pre></div>
+      <div class='comment'>uart.h:64
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:52:4' id='lm4f-uart.ads:52:4'></a>
+<span class="droplink">INT_9BIT<ul>
+  <li><a href="src_lm4f-uart.ads.html#l52">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_9BIT</span> : <span class="keyword">constant</span> := 16#1000#;</pre></div>
+      <div class='comment'>uart.h:65
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:53:4' id='lm4f-uart.ads:53:4'></a>
+<span class="droplink">INT_OE<ul>
+  <li><a href="src_lm4f-uart.ads.html#l53">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_OE</span> : <span class="keyword">constant</span> := 16#400#;</pre></div>
+      <div class='comment'>uart.h:66
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:54:4' id='lm4f-uart.ads:54:4'></a>
+<span class="droplink">INT_BE<ul>
+  <li><a href="src_lm4f-uart.ads.html#l54">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_BE</span> : <span class="keyword">constant</span> := 16#200#;</pre></div>
+      <div class='comment'>uart.h:67
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:55:4' id='lm4f-uart.ads:55:4'></a>
+<span class="droplink">INT_PE<ul>
+  <li><a href="src_lm4f-uart.ads.html#l55">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_PE</span> : <span class="keyword">constant</span> := 16#100#;</pre></div>
+      <div class='comment'>uart.h:68
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:56:4' id='lm4f-uart.ads:56:4'></a>
+<span class="droplink">INT_FE<ul>
+  <li><a href="src_lm4f-uart.ads.html#l56">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_FE</span> : <span class="keyword">constant</span> := 16#080#;</pre></div>
+      <div class='comment'>uart.h:69
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:57:4' id='lm4f-uart.ads:57:4'></a>
+<span class="droplink">INT_RT<ul>
+  <li><a href="src_lm4f-uart.ads.html#l57">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_RT</span> : <span class="keyword">constant</span> := 16#040#;</pre></div>
+      <div class='comment'>uart.h:70
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:58:4' id='lm4f-uart.ads:58:4'></a>
+<span class="droplink">INT_TX<ul>
+  <li><a href="src_lm4f-uart.ads.html#l58">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_TX</span> : <span class="keyword">constant</span> := 16#020#;</pre></div>
+      <div class='comment'>uart.h:71
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:59:4' id='lm4f-uart.ads:59:4'></a>
+<span class="droplink">INT_RX<ul>
+  <li><a href="src_lm4f-uart.ads.html#l59">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_RX</span> : <span class="keyword">constant</span> := 16#010#;</pre></div>
+      <div class='comment'>uart.h:72
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:60:4' id='lm4f-uart.ads:60:4'></a>
+<span class="droplink">INT_DSR<ul>
+  <li><a href="src_lm4f-uart.ads.html#l60">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_DSR</span> : <span class="keyword">constant</span> := 16#008#;</pre></div>
+      <div class='comment'>uart.h:73
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:61:4' id='lm4f-uart.ads:61:4'></a>
+<span class="droplink">INT_DCD<ul>
+  <li><a href="src_lm4f-uart.ads.html#l61">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_DCD</span> : <span class="keyword">constant</span> := 16#004#;</pre></div>
+      <div class='comment'>uart.h:74
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:62:4' id='lm4f-uart.ads:62:4'></a>
+<span class="droplink">INT_CTS<ul>
+  <li><a href="src_lm4f-uart.ads.html#l62">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_CTS</span> : <span class="keyword">constant</span> := 16#002#;</pre></div>
+      <div class='comment'>uart.h:75
+</div>
+    </div>
+    <div class="class">
+      <h3><a name='lm4f-uart.ads:63:4' id='lm4f-uart.ads:63:4'></a>
+<span class="droplink">INT_RI<ul>
+  <li><a href="src_lm4f-uart.ads.html#l63">Goto declaration in source</a></li>
+</ul></span>
+      </h3>
+      <div class='details'><pre><span class="name_emphasis">INT_RI</span> : <span class="keyword">constant</span> := 16#001#;</pre></div>
+      <div class='comment'>uart.h:76
+</div>
+    </div>
+  </div>
+
+    <div class='subprograms'>
+      <h1><a name='Methods' id='Methods'></a>Subprograms &amp; Entries</h1>
+      <div class="class">
+        <h3>
+          <a name='lm4f-uart.ads:65:14' id='lm4f-uart.ads:65:14'></a>
+<span class="droplink">IntEnable<ul>
+  <li><a href="src_lm4f-uart.ads.html#l65">Goto spec in source</a></li>
+  <li><a href="src_lm4f-uart.ads.html#l66">Goto body in source</a></li>
+</ul></span>
+        </h3>
+        <div class='details'><pre><span class="keyword">procedure</span> <span class="name_emphasis">IntEnable</span> <table><tr><td>(</td><td><span class="name"><a name="lm4f-uart.ads:65:25"></a>Base</span></td><td>: Integer;</td></tr><tr><td></td><td><span class="name"><a name="lm4f-uart.ads:65:41"></a>Flags</span></td><td>: Integer);</td></tr></table></pre></div>
+      </div>
+      <div class="class">
+        <h3>
+          <a name='lm4f-uart.ads:68:14' id='lm4f-uart.ads:68:14'></a>
+<span class="droplink">IntDisable<ul>
+  <li><a href="src_lm4f-uart.ads.html#l68">Goto spec in source</a></li>
+  <li><a href="src_lm4f-uart.ads.html#l69">Goto body in source</a></li>
+</ul></span>
+        </h3>
+        <div class='details'><pre><span class="keyword">procedure</span> <span class="name_emphasis">IntDisable</span> <table><tr><td>(</td><td><span class="name"><a name="lm4f-uart.ads:68:26"></a>Base</span></td><td>: Integer;</td></tr><tr><td></td><td><span class="name"><a name="lm4f-uart.ads:68:42"></a>Flags</span></td><td>: Integer);</td></tr></table></pre></div>
+      </div>
+      <div class="class">
+        <h3>
+          <a name='lm4f-uart.ads:71:13' id='lm4f-uart.ads:71:13'></a>
+<span class="droplink">IntStatus<ul>
+  <li><a href="src_lm4f-uart.ads.html#l71">Goto spec in source</a></li>
+  <li><a href="src_lm4f-uart.ads.html#l72">Goto body in source</a></li>
+</ul></span>
+        </h3>
+        <div class='details'><pre><span class="keyword">function</span> <span class="name_emphasis">IntStatus</span> <table><tr><td>(</td><td><span class="name"><a name="lm4f-uart.ads:71:24"></a>Base</span></td><td>: Integer;</td></tr><tr><td></td><td><span class="name"><a name="lm4f-uart.ads:71:40"></a>Masked</span></td><td>: Boolean) <span class="keyword">return</span> Integer;</td></tr></table></pre></div>
+      </div>
+      <div class="class">
+        <h3>
+          <a name='lm4f-uart.ads:74:14' id='lm4f-uart.ads:74:14'></a>
+<span class="droplink">IntClear<ul>
+  <li><a href="src_lm4f-uart.ads.html#l74">Goto spec in source</a></li>
+  <li><a href="src_lm4f-uart.ads.html#l75">Goto body in source</a></li>
+</ul></span>
+        </h3>
+        <div class='details'><pre><span class="keyword">procedure</span> <span class="name_emphasis">IntClear</span> <table><tr><td>(</td><td><span class="name"><a name="lm4f-uart.ads:74:24"></a>Base</span></td><td>: Integer;</td></tr><tr><td></td><td><span class="name"><a name="lm4f-uart.ads:74:40"></a>Flags</span></td><td>: Integer);</td></tr></table></pre></div>
+      </div>
+      <div class="class">
+        <h3>
+          <a name='lm4f-uart.ads:77:13' id='lm4f-uart.ads:77:13'></a>
+<span class="droplink">CharsAvail<ul>
+  <li><a href="src_lm4f-uart.ads.html#l77">Goto spec in source</a></li>
+  <li><a href="src_lm4f-uart.ads.html#l78">Goto body in source</a></li>
+</ul></span>
+        </h3>
+        <div class='details'><pre><span class="keyword">function</span> <span class="name_emphasis">CharsAvail</span> <table><tr><td>(</td><td><span class="name"><a name="lm4f-uart.ads:77:25"></a>Base</span></td><td>: Integer) <span class="keyword">return</span> Boolean;</td></tr></table></pre></div>
+      </div>
+      <div class="class">
+        <h3>
+          <a name='lm4f-uart.ads:80:13' id='lm4f-uart.ads:80:13'></a>
+<span class="droplink">SpaceAvail<ul>
+  <li><a href="src_lm4f-uart.ads.html#l80">Goto spec in source</a></li>
+  <li><a href="src_lm4f-uart.ads.html#l81">Goto body in source</a></li>
+</ul></span>
+        </h3>
+        <div class='details'><pre><span class="keyword">function</span> <span class="name_emphasis">SpaceAvail</span> <table><tr><td>(</td><td><span class="name"><a name="lm4f-uart.ads:80:25"></a>Base</span></td><td>: Integer) <span class="keyword">return</span> Boolean;</td></tr></table></pre></div>
+      </div>
+      <div class="class">
+        <h3>
+          <a name='lm4f-uart.ads:83:13' id='lm4f-uart.ads:83:13'></a>
+<span class="droplink">CharGet<ul>
+  <li><a href="src_lm4f-uart.ads.html#l83">Goto spec in source</a></li>
+  <li><a href="src_lm4f-uart.ads.html#l84">Goto body in source</a></li>
+</ul></span>
+        </h3>
+        <div class='details'><pre><span class="keyword">function</span> <span class="name_emphasis">CharGet</span> <table><tr><td>(</td><td><span class="name"><a name="lm4f-uart.ads:83:22"></a>Base</span></td><td>: Integer) <span class="keyword">return</span> Unsigned_8;</td></tr></table></pre></div>
+      </div>
+      <div class="class">
+        <h3>
+          <a name='lm4f-uart.ads:86:13' id='lm4f-uart.ads:86:13'></a>
+<span class="droplink">CharGetNonBlocking<ul>
+  <li><a href="src_lm4f-uart.ads.html#l86">Goto spec in source</a></li>
+  <li><a href="src_lm4f-uart.ads.html#l87">Goto body in source</a></li>
+</ul></span>
+        </h3>
+        <div class='details'><pre><span class="keyword">function</span> <span class="name_emphasis">CharGetNonBlocking</span> <table><tr><td>(</td><td><span class="name"><a name="lm4f-uart.ads:86:33"></a>Base</span></td><td>: Integer) <span class="keyword">return</span> Unsigned_8;</td></tr></table></pre></div>
+      </div>
+      <div class="class">
+        <h3>
+          <a name='lm4f-uart.ads:89:14' id='lm4f-uart.ads:89:14'></a>
+<span class="droplink">CharPut<ul>
+  <li><a href="src_lm4f-uart.ads.html#l89">Goto spec in source</a></li>
+  <li><a href="src_lm4f-uart.ads.html#l90">Goto body in source</a></li>
+</ul></span>
+        </h3>
+        <div class='details'><pre><span class="keyword">procedure</span> <span class="name_emphasis">CharPut</span> <table><tr><td>(</td><td><span class="name"><a name="lm4f-uart.ads:89:23"></a>Base</span></td><td>: Integer;</td></tr><tr><td></td><td><span class="name"><a name="lm4f-uart.ads:89:39"></a>Data</span></td><td>: Unsigned_8);</td></tr></table></pre></div>
+      </div>
+      <div class="class">
+        <h3>
+          <a name='lm4f-uart.ads:92:13' id='lm4f-uart.ads:92:13'></a>
+<span class="droplink">CharPutNonBlocking<ul>
+  <li><a href="src_lm4f-uart.ads.html#l92">Goto spec in source</a></li>
+  <li><a href="src_lm4f-uart.ads.html#l93">Goto body in source</a></li>
+</ul></span>
+        </h3>
+        <div class='details'><pre><span class="keyword">function</span> <span class="name_emphasis">CharPutNonBlocking</span> <table><tr><td>(</td><td><span class="name"><a name="lm4f-uart.ads:92:33"></a>Base</span></td><td>: Integer;</td></tr><tr><td></td><td><span class="name"><a name="lm4f-uart.ads:92:49"></a>Data</span></td><td>: Unsigned_8) <span class="keyword">return</span> Boolean;</td></tr></table></pre></div>
+      </div>
+      <div class="class">
+        <h3>
+          <a name='lm4f-uart.ads:95:13' id='lm4f-uart.ads:95:13'></a>
+<span class="droplink">Busy<ul>
+  <li><a href="src_lm4f-uart.ads.html#l95">Goto spec in source</a></li>
+  <li><a href="src_lm4f-uart.ads.html#l96">Goto body in source</a></li>
+</ul></span>
+        </h3>
+        <div class='details'><pre><span class="keyword">function</span> <span class="name_emphasis">Busy</span> <table><tr><td>(</td><td><span class="name"><a name="lm4f-uart.ads:95:19"></a>Base</span></td><td>: Integer) <span class="keyword">return</span> Boolean;</td></tr></table></pre></div>
+      </div>
+    </div>
+</div> <!-- documentation -->
+
+</body>
+</html>

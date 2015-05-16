@@ -1,0 +1,51 @@
+V "GNAT Lib v4.6"
+A -Os
+A --RTS=rts-raven
+A -g
+A -gnatA
+P
+R nnnnnnnnnnvnnnnnnnnnnnnnvnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnvnnnnnnnnnnnnnnnnnn
+
+U simplemath%b		simplemath.adb		4b60802f NE OO PK
+
+U simplemath%s		simplemath.ads		acb0b5e8 EE NE OO PK
+
+D simplemath.ads	20141014225420 acb0b5e8
+D simplemath.adb	20141014231538 e7d035c7
+D system.ads		20150515223946 72fb9d13
+X 1 simplemath.ads
+35K9*SimpleMath 43l5 43e15 2|2b14 98l5 98t15
+37N5*M_PI 2|82r40 84r40
+38N5*M_PI_OVER_TWO 2|90r36 92r36
+40V14*Atan{float} 40>19 2|7b14 68l9 68t13 79s23 88s23
+40f19 X{float} 2|7b19 33r18 64r12
+41V14*Atan2{float} 41>20 41>31 2|73b14 96l9 96t14
+41f20 V{float} 2|73b20 76r12 78r20 79r28 81r20 88r33 89r16
+41f31 U{float} 2|73b31 76r24 78r31 79r32 80r16 88r29
+X 2 simplemath.adb
+9V18 AtanR{float} 9b18 9>25 21l13 21t18 51s31
+9f25 g{float} 19r27 19r37 19r47 19r57 20r17 20r27 20r37 20r47
+10N13 p0 19r51
+11N13 p1 19r41
+12N13 p2 19r31
+13N13 p3 19r22
+14N13 q0 20r51
+15N13 q1 20r41
+16N13 q2 20r31
+17N13 q3 20r21
+23N9 sqrt_3 42r62
+24N9 sqrt_3_minus_1 42r21
+25N9 two_minus_sqrt_3 41r16
+26N9 pi_over_two 60r33
+27N9 pi_over_three 61r33
+28N9 pi_over_six 59r33
+29N9 FLT_EPSILON 48r16
+30f9 f{float} 33m9 34r12 35m13 35r24 41r12 42m13 42r38 42r56 42r71 46r14
+. 46r18 49r23 51r23 51r27
+30f12 g{float} 46m9 48r12 51r37
+30f15 result{float} 49m13 51m13 55m13 55r24 59m23 59r47 60m23 60r47 61m23
+. 61r49 65m13 65r24 67r16
+31i9 n{integer} 36m13 38m13 43m13 43r18 54r12 58r14
+74f9 Result{float} 77m13 79m13 82m21 82r31 84m21 84r31 88m13 90m17 90r27
+. 92m17 92r27 95r16
+

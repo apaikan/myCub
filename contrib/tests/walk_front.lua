@@ -39,10 +39,22 @@ function getDistance()
     return -1
 end
 
+function getMotion() 
+    local cmd = yarp.Bottle()
+    local rep = yarp.Bottle()
+    cmd:clear()
+    cmd:addString("getMotion")
+    sender:write(cmd, rep)
+    if rep:size() then
+        return rep:get(0):asInt()
+    end
+    return -1
+end
 
 
-speed_front = 1500
-speed_back = 1500
+
+speed_front = 1000
+speed_back = 1000
 
 steps_front = {
         "30 0  10  0",
@@ -78,19 +90,30 @@ end
 cmd = yarp.Bottle()
 rep = yarp.Bottle()
 
+
 while true do
-    front_obstacle = getDistance()
-    print("Front Obstacle:", front_obstacle, "\n")
-    if front_obstacle > 150 then
-        print("Moving forward...\n")
-        move(steps_front, speed_front)
-    else
-        print("Obstacle on the way! try to turn\n")
-        while getDistance() < 500 do
-            print("Turning... distance:", getDistance())
-            move(steps_back, speed_back)
+    motion = getMotion()
+    print("motion:", motion)
+    if motion == 1 then    
+        for i=1,5 do
+            front_obstacle = getDistance()
+            print("Front Obstacle:", front_obstacle, "\n")
+            if front_obstacle > 150 then
+                print("Moving forward...\n")
+                move(steps_front, speed_front)
+            else
+                print("Obstacle on the way! try to turn\n")
+                while getDistance() < 500 do
+                    print("Turning... distance:", getDistance())
+                    move(steps_back, speed_back)
+                end            
+            end    
         end
-        --yarp.Time_delay(1.0)
+        -- wait a bit and check again the motion
+        print("waiting for few seconds")
+        yarp.Time_delay(3.0)
+    else
+        yarp.Time_delay(0.5)
     end    
 end
 

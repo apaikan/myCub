@@ -37,15 +37,18 @@ while true do
     sender:write(cmd, rep)
     volt = rep:get(0):asInt()
 
+    --[[
     local cmd = yarp.Bottle()
     local rep = yarp.Bottle()
     cmd:clear()
     cmd:addString("getBatteryCurrent")
     sender:write(cmd, rep)
     current = rep:get(0):asInt()
-
     print(volt, current)
-    yarp.Time_delay(1.0)
+    --]]
+    print(volt)
+
+    yarp.Time_delay(0.1)
     --if (yarp.Time_now() - t_start > 600) or rep:toString() == "" then
     --    break
     --end

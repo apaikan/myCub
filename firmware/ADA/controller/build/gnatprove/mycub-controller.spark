@@ -1,0 +1,7 @@
+[
+{ "name" : "MyCub.Controller.SetPose", "file" :"mycub-controller.ads", "line" :  21, "spark" : "no" }
+, { "name" : "MyCub.Controller.GetPose", "file" :"mycub-controller.ads", "line" :  22, "spark" : "no" }
+, { "name" : "MyCub.Controller.GoToPose", "file" :"mycub-controller.ads", "line" :  24, "spark" : "no" }
+, { "name" : "MyCub.Controller.PositionController", "file" :"mycub-controller.ads", "line" :  89, "spark" : "no" }
+, { "name" : "MyCub.Controller", "file" :"mycub-controller.ads", "line" :  3, "spark" : "no" }
+]

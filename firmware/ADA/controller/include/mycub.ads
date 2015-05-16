@@ -63,7 +63,9 @@ package MyCub is
                                                   Period =>  RT.Seconds(10));
     CmpsTaskParam   : constant TaskParameters := (Priority => 122, 
                                                   Period =>  RT.Milliseconds(500));
-    SonarTaskParam  : constant TaskParameters := (Priority => 123, 
+    MotionTaskParam : constant TaskParameters := (Priority => 123, 
+                                                  Period =>  RT.Milliseconds(500));
+    SonarTaskParam  : constant TaskParameters := (Priority => 124, 
                                                   Period =>  RT.Milliseconds(100));
 end MyCub;
 

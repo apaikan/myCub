@@ -18,6 +18,7 @@ package MyCub.WorkingMemory is
     function GetBatteryCurrent return Integer; 
     function GetDistance return Integer; 
     function GetOrientation return Orientation;
+    function GetMotion return Boolean;
 
     protected BatteryRaw is
         procedure Put (Data : BatteryStatus);
@@ -40,6 +41,13 @@ package MyCub.WorkingMemory is
         Container : Orientation;
     end OrientationRaw;
 
+    protected MotionRaw is
+        procedure Put (Data : Boolean);
+        procedure Get (Data : out Boolean);
+    private
+        Container : Boolean;
+    end MotionRaw;
+
     -- tasks
     task BatteryStatusUpdater is
         pragma Priority (BatTaskParam.Priority);
@@ -50,6 +58,11 @@ package MyCub.WorkingMemory is
         pragma Priority (CmpsTaskParam.Priority);
         pragma Storage_Size (2*1024);
     end OrientationStatusUpdater;
+
+    task MotionStatusUpdater is
+        pragma Priority (MotionTaskParam.Priority);
+        pragma Storage_Size (2*1024);
+    end MotionStatusUpdater;
 
     task SonarStatusUpdater is
         pragma Priority (SonarTaskParam.Priority);

@@ -1,0 +1,101 @@
+V "GNAT Lib v4.6"
+A -Os
+A --RTS=rts-raven
+A -g
+A -gnatA
+P DB
+R nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnvnnnnnnvnnnnnnnnnnnnnnnnnn
+
+U arm.i2c%b		arm-i2c.adb		e61c45f2 NE OO PK GE IU
+W ada%s			ada.ads			ada.ali
+W ada.unchecked_conversion%s
+W arm%s			arm.adb			arm.ali
+W interfaces%s		interfac.ads		interfac.ali
+W interfaces.c%s	i-c.ads			i-c.ali
+W lm4f%s		lm4f.ads		lm4f.ali
+W lm4f.i2c%s		lm4f-i2c.ads		lm4f-i2c.ali
+
+U arm.i2c%s		arm-i2c.ads		86e5294d BN EE NE OO PK GE IU
+W ada%s			ada.ads			ada.ali
+W ada.unchecked_conversion%s
+W arm%s			arm.adb			arm.ali
+W interfaces%s		interfac.ads		interfac.ali
+W interfaces.c%s	i-c.ads			i-c.ali
+
+D ada.ads		20150515223946 3ffc8e18
+D a-unccon.ads		20150515223947 f9eb8f06
+D arm.ads		20140913211827 ed301679
+D arm.adb		20140913211827 ca494846
+D arm-i2c.ads		20141016191525 885685cf
+D arm-i2c.adb		20141016192825 3085a9ad
+D interfac.ads		20150515223946 f77d8799
+D i-c.ads		20150515223946 ed15b264
+D lm4f.ads		20140913212618 3f5dedc7
+D lm4f-i2c.ads		20141013201601 bd4cd36b
+D system.ads		20150515223946 72fb9d13
+D s-unstyp.ads		20150515223946 6ae15c76
+X 1 ada.ads
+16K9*Ada 19e8 5|37r6 6|4r6
+X 2 a-unccon.ads
+20v14*Unchecked_Conversion 5|37w10 6|4w10
+X 3 arm.ads
+26K9*ARM 103e8 5|43r9 67r5 6|6r14 216r5
+X 5 arm-i2c.ads
+40i5 Base{long_integer} 6|23r30 25r30 36r26 40r28 43r23 46r23 49r26 52r22
+. 57r23 60r23 63r26 66r22 71r23 74r26 77r22 92r26 96r28 99r23 102r23 105r26
+. 108r22 132r27 135r27 138r30 141r26 157r26 161r28 164r23 167r23 170r26 173r22
+. 180r28 202r27 205r30 208r26 212r43
+41i5 TickPerSec{long_integer} 6|23r36 25r36
+43k13*I2C 3|26k9 5|40z5 41z5 67l9 67e12 6|6b18 216l9 216t12
+47M12*Byte{7|51M9} 48r30 49r51 54r27 6|33r27 212r24
+48P9*Byte_Ptr(47M12)
+49A9*ByteVector(47M12)<integer> 53r27 55r31 6|88r27 152r31
+51U15*SetAddress 51>26 51>45 6|11b15 15l9 15t19
+51i26 Address{integer} 6|11b26 13r27
+51i45 Register{integer} 6|11b45 14r28
+52U15*SetFrequency 52>28 6|20b15 27l9 27t21
+52i28 Frequency{integer} 6|20b28 22r12
+53V14*Write{boolean} 53>20 53>39 6|88b14 147t8
+53a20 Data{49A9} 6|88b20 132r41
+53i39 Len{integer} 6|88b39 115r37 122r20 127r16
+54V14*Write{boolean} 54>20 6|33b14 82t8
+54m20 Data{47M12} 6|33b20 57r37
+55U15*Read 55<20 55=43 6|152b15 214t8
+55a20 Data{49A9} 6|152b20 212m13
+55i43 Len{integer} 6|152b43 174m13 185r37 192r20 197r16 209m17
+58R10 I2CDevice 62e15 65r14
+60i9 Address{integer} 6|13m16 40r41 96r41 161r41 180r41
+61i9 Register{integer} 6|14m16 43r36 99r36 164r36
+65r5 Device{58R10} 6|13m9 14m9 40r34 43r29 96r34 99r29 161r34 164r29 180r34
+X 6 arm-i2c.adb
+89i9 MasterOptionCommand{long_integer} 113m9 118m17 123m17 128m17 135r33
+115i13 I{integer} 117r16 122r16 132r46
+153i9 MasterOptionCommand{long_integer} 183m9 188m17 193m17 198m17 202r33
+185i13 I{integer} 187r16 192r16 212r18
+X 7 interfac.ads
+36K9*Interfaces 5|35w6 35r25 36r6 36r25 6|1w6 1r25 2r6 2r25 7|171e15
+51M9*Unsigned_8 5|47r23
+X 8 i-c.ads
+39K20*C 5|36w17 36r36 6|2w17 2r36 8|102e17
+X 9 lm4f.ads
+35K9*LM4F 6|3r6 3r25 9|37e9
+X 10 lm4f-i2c.ads
+39K14*I2C 6|3w11 3r30 10|207e13
+44N4*I2C_MASTER_CMD_SINGLE_SEND 6|128r40 167r29
+45N4*I2C_MASTER_CMD_SINGLE_RECEIVE 6|198r40
+46N4*I2C_MASTER_CMD_BURST_SEND_START 6|46r29 102r29
+47N4*I2C_MASTER_CMD_BURST_SEND_CONT 6|60r29 113r32 118r40
+48N4*I2C_MASTER_CMD_BURST_SEND_FINISH 6|71r29 123r40
+51N4*I2C_MASTER_CMD_BURST_RECEIVE_START 6|183r32
+52N4*I2C_MASTER_CMD_BURST_RECEIVE_CONT 6|188r40
+53N4*I2C_MASTER_CMD_BURST_RECEIVE_FINISH 6|193r40
+58N4*I2C_MASTER_ERR_NONE 6|52r31 66r31 77r31 108r31 141r35 173r31 208r35
+90V13*MasterBusy{integer} 6|36s15 49s15 63s15 74s15 92s15 105s15 138s19 157s15
+. 170s15 205s19
+93U14*MasterControl 6|46s9 60s9 71s9 102s9 135s13 167s9 202s13
+96V13*MasterDataGet{long_integer} 6|212s29
+99U14*MasterDataPut 6|43s9 57s9 99s9 132s13 164s9
+108V13*MasterErr{long_integer} 6|52s12 66s12 77s12 108s12 141s16 173s12 208s16
+111U14*MasterInitExpClk 6|23s13 25s13
+153U14*MasterSlaveAddrSet 6|40s9 96s9 161s9 180s9
+

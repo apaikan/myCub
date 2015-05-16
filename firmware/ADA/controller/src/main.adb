@@ -1,4 +1,4 @@
-pragma Task_Dispatching_Policy(FIFO_Within_Priorities);
+--pragma Task_Dispatching_Policy(FIFO_Within_Priorities);
 
 with Ada.Real_Time;     use Ada.Real_Time;
 with MyCub.BoardInterface;    use MyCub.BoardInterface;

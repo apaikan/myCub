@@ -1,0 +1,140 @@
+V "GNAT Lib v2014"
+A -g
+A -gnatc
+A -mtune=generic
+A -march=x86-64
+P ZX
+
+RN
+RV NO_ELABORATION_CODE
+
+U arm.strings%s		arm-strings.ads		5c9550ee EE OO PU PK IU
+W arm%s			arm.adb			arm.ali
+
+D ada.ads		20140406181354 3ffc8e18 ada%s
+D a-unccon.ads		20140406181359 f9eb8f06 ada.unchecked_conversion%s
+D arm.ads		20140913211827 ed301679 arm%s
+D arm-strings.ads	20140913211827 b1a54697 arm.strings%s
+D interfac.ads		20140406181359 69adb1b9 interfaces%s
+D system.ads		20140406181354 90249111 system%s
+D s-unstyp.ads		20140406181356 510692af system.unsigned_types%s
+X 3 arm.ads
+26K9*ARM 103e8 4|27r9 84r5
+X 4 arm-strings.ads
+27K13*Strings 3|26k9 4|84l9 84e16
+30e4*Space{character}
+33A9*ARM_String(character)<5|57M9> 40r22 41r22 42r22 43r22 44r22 45r22 46r22
+. 47r22 48r22 49r22 50r22 51r22 52r22 53r22 54r22 55r22 56r22 57r22 58r22
+. 59r23 66r31
+40A12*AStr2{33A9}<5|57M9>
+41A12*AStr3{33A9}<5|57M9>
+42A12*AStr4{33A9}<5|57M9>
+43A12*AStr5{33A9}<5|57M9>
+44A12*AStr6{33A9}<5|57M9>
+45A12*AStr7{33A9}<5|57M9>
+46A12*AStr8{33A9}<5|57M9>
+47A12*AStr9{33A9}<5|57M9>
+48A12*AStr10{33A9}<5|57M9>
+49A12*AStr11{33A9}<5|57M9>
+50A12*AStr12{33A9}<5|57M9>
+51A12*AStr13{33A9}<5|57M9>
+52A12*AStr14{33A9}<5|57M9>
+53A12*AStr15{33A9}<5|57M9>
+54A12*AStr16{33A9}<5|57M9>
+55A12*AStr17{33A9}<5|57M9>
+56A12*AStr18{33A9}<5|57M9>
+57A12*AStr19{33A9}<5|57M9>
+58A12*AStr20{33A9}<5|57M9>
+59A12*AStr128{33A9}<5|57M9>
+66A9*Progmem_String<33A9>(character)<5|57M9> 69r20
+69A12*PStr{66A9}(character)<5|57M9>
+75E9*Alignment 75e44
+75n24*Left{75E9}
+75n30*Right{75E9}
+75n37*Center{75E9}
+79E9*Truncation 79e36
+79n24*Left{79E9}
+79n30*Right{79E9}
+80E9*Membership 80e40
+80n24*Inside{80E9}
+80n32*Outside{80E9}
+81E9*Direction 81e42
+81n24*Forward{81E9}
+81n33*Backward{81E9}
+82E9*Trim_End 82e42
+82n24*Left{82E9}
+82n30*Right{82E9}
+82n37*Both{82E9}
+X 5 interfac.ads
+57M9*Unsigned_8 4|33r30
+FD 1 ada.ads
+FS .1 16K9 ada
+FD 2 a-unccon.ads
+FD 3 arm.ads
+FS .1 26K9 arm
+FS .2 57K4 arm__OaddGP2303
+FS .3 57V13 arm__OaddGP2303__OaddR
+FS .4 61K4 arm__OaddGP2436
+FS .5 61V13 arm__OaddGP2436__OaddR
+FS .6 83V13 arm__bn
+FS .7 93V13 arm__low_byte
+FS .8 99V13 arm__high_byte
+FD 4 arm-strings.ads
+FS .1 27K13 arm__strings
+FD 5 interfac.ads
+FS .1 38K9 interfaces
+FS .2 69V13 interfaces__shift_left
+FS .3 73V13 interfaces__shift_right
+FS .4 77V13 interfaces__shift_right_arithmetic
+FS .5 81V13 interfaces__rotate_left
+FS .6 85V13 interfaces__rotate_right
+FS .7 89V13 interfaces__shift_left__2
+FS .8 93V13 interfaces__shift_right__2
+FS .9 97V13 interfaces__shift_right_arithmetic__2
+FS .10 101V13 interfaces__rotate_left__2
+FS .11 105V13 interfaces__rotate_right__2
+FS .12 109V13 interfaces__shift_left__3
+FS .13 113V13 interfaces__shift_right__3
+FS .14 117V13 interfaces__shift_right_arithmetic__3
+FS .15 121V13 interfaces__rotate_left__3
+FS .16 125V13 interfaces__rotate_right__3
+FS .17 129V13 interfaces__shift_left__4
+FS .18 133V13 interfaces__shift_right__4
+FS .19 137V13 interfaces__shift_right_arithmetic__4
+FS .20 141V13 interfaces__rotate_left__4
+FS .21 145V13 interfaces__rotate_right__4
+FD 6 system.ads
+FS .1 37K9 system
+FS .2 74V13 system__Olt
+FS .3 75V13 system__Ole
+FS .4 76V13 system__Ogt
+FS .5 77V13 system__Oge
+FS .6 78V13 system__Oeq
+FD 7 s-unstyp.ads
+FS .1 40K16 system__unsigned_types
+FS .2 93V13 system__unsigned_types__shift_left
+FS .3 97V13 system__unsigned_types__shift_right
+FS .4 101V13 system__unsigned_types__shift_right_arithmetic
+FS .5 105V13 system__unsigned_types__rotate_left
+FS .6 109V13 system__unsigned_types__rotate_right
+FS .7 113V13 system__unsigned_types__shift_left__2
+FS .8 117V13 system__unsigned_types__shift_right__2
+FS .9 121V13 system__unsigned_types__shift_right_arithmetic__2
+FS .10 125V13 system__unsigned_types__rotate_left__2
+FS .11 129V13 system__unsigned_types__rotate_right__2
+FS .12 133V13 system__unsigned_types__shift_left__3
+FS .13 137V13 system__unsigned_types__shift_right__3
+FS .14 141V13 system__unsigned_types__shift_right_arithmetic__3
+FS .15 145V13 system__unsigned_types__rotate_left__3
+FS .16 149V13 system__unsigned_types__rotate_right__3
+FS .17 153V13 system__unsigned_types__shift_left__4
+FS .18 157V13 system__unsigned_types__shift_right__4
+FS .19 161V13 system__unsigned_types__shift_right_arithmetic__4
+FS .20 165V13 system__unsigned_types__rotate_left__4
+FS .21 169V13 system__unsigned_types__rotate_right__4
+FS .22 173V13 system__unsigned_types__shift_left__5
+FS .23 177V13 system__unsigned_types__shift_right__5
+FS .24 181V13 system__unsigned_types__shift_right_arithmetic__5
+FS .25 185V13 system__unsigned_types__rotate_left__5
+FS .26 189V13 system__unsigned_types__rotate_right__5
+

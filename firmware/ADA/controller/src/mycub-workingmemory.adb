@@ -57,6 +57,17 @@ package body MyCub.WorkingMemory is
     end GetOrientation;
 
     --
+    -- GetMotion
+    --
+    function GetMotion return Boolean 
+    is
+        RawData : Boolean;
+    begin
+        MotionRaw.Get(RawData);
+        return RawData;
+    end GetMotion;
+
+    --
     -- protected BatteryRaw
     -- 
     protected body BatteryRaw is
@@ -100,6 +111,21 @@ package body MyCub.WorkingMemory is
             Data := Container;
         end Get;
     end OrientationRaw;
+
+    --
+    -- protected MotionRaw
+    -- 
+    protected body MotionRaw is
+        procedure Put(Data : Boolean) is
+        begin
+            Container := Data;
+        end Put;
+
+        procedure Get(Data : out Boolean) is
+        begin
+            Data := Container;
+        end Get;
+    end MotionRaw;
 
     --
     -- BatteryStatusUpdater task
@@ -300,6 +326,28 @@ package body MyCub.WorkingMemory is
             end if;    
         end loop;
     end OrientationStatusUpdater;
+
+
+    --
+    -- MotionStatusUpdater task
+    --
+    task body MotionStatusUpdater is
+        Activation : Time := Clock;
+        Value : aliased Integer := 0;
+    begin
+        PinTypeInput (PORTB, PIN3);
+        loop
+            delay until Activation;
+            Activation := Activation + MotionTaskParam.Period;
+            Value := PinRead(PORTB, PIN3);
+            -- update Status
+            if Value /=0 then
+                MotionRaw.Put(True);
+            else
+                MotionRaw.Put(False);
+            end if;
+        end loop;
+    end MotionStatusUpdater;
 
 end MyCub.WorkingMemory;
 

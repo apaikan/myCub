@@ -1,0 +1,284 @@
+V "GNAT Lib v2014"
+A -g
+A -gnatc
+A -mtune=generic
+A -march=x86-64
+P ZX
+
+RN
+RV NO_ELABORATION_CODE
+
+U lm4f.i2c%s		lm4f-i2c.ads		46761188 EE OO PK IU
+W ada%s			ada.ads			ada.ali
+W ada.unchecked_conversion%s  a-unccon.ads	a-unccon.ali
+W interfaces%s		interfac.ads		interfac.ali
+W interfaces.c%s	i-c.adb			i-c.ali
+W lm4f%s		lm4f.ads		lm4f.ali
+
+D ada.ads		20140406181354 3ffc8e18 ada%s
+D a-unccon.ads		20140406181359 f9eb8f06 ada.unchecked_conversion%s
+D interfac.ads		20140406181359 69adb1b9 interfaces%s
+D i-c.ads		20140406181358 5421119b interfaces.c%s
+D lm4f.ads		20140913212618 3f5dedc7 lm4f%s
+D lm4f-i2c.ads		20141013201601 bd4cd36b lm4f.i2c%s
+D system.ads		20140406181354 90249111 system%s
+D s-parame.ads		20140406181358 06da98b2 system.parameters%s
+X 1 ada.ads
+16K9*Ada 19e8 6|37r6
+X 2 a-unccon.ads
+20v14*Unchecked_Conversion 6|37w10
+X 3 interfac.ads
+38K9*Interfaces 179e15 6|35w6 35r25 36r6 36r25
+X 4 i-c.ads
+18K20*C 230e17 6|36w17 36r36
+47M9*unsigned_char 6|162r60 171r62 176r19 177r21
+X 5 lm4f.ads
+35K9*LM4F 37e9 6|39r9 207r5
+X 6 lm4f-i2c.ads
+39K14*I2C 5|35k9 6|207l10 207e13
+41N4*I2C_INT_MASTER
+42N4*I2C_INT_SLAVE
+44N4*I2C_MASTER_CMD_SINGLE_SEND
+45N4*I2C_MASTER_CMD_SINGLE_RECEIVE
+46N4*I2C_MASTER_CMD_BURST_SEND_START
+47N4*I2C_MASTER_CMD_BURST_SEND_CONT
+48N4*I2C_MASTER_CMD_BURST_SEND_FINISH
+49N4*I2C_MASTER_CMD_BURST_SEND_STOP
+50N4*I2C_MASTER_CMD_BURST_SEND_ERROR_STOP
+51N4*I2C_MASTER_CMD_BURST_RECEIVE_START
+52N4*I2C_MASTER_CMD_BURST_RECEIVE_CONT
+53N4*I2C_MASTER_CMD_BURST_RECEIVE_FINISH
+54N4*I2C_MASTER_CMD_BURST_RECEIVE_ERROR_STOP
+55N4*I2C_MASTER_CMD_QUICK_COMMAND
+56N4*I2C_MASTER_CMD_HS_MASTER_CODE_SEND
+58N4*I2C_MASTER_ERR_NONE
+59N4*I2C_MASTER_ERR_ADDR_ACK
+60N4*I2C_MASTER_ERR_DATA_ACK
+61N4*I2C_MASTER_ERR_ARB_LOST
+62N4*I2C_MASTER_ERR_CLK_TOUT
+64N4*I2C_SLAVE_ACT_NONE
+65N4*I2C_SLAVE_ACT_RREQ
+66N4*I2C_SLAVE_ACT_TREQ
+67N4*I2C_SLAVE_ACT_RREQ_FBR
+68N4*I2C_SLAVE_ACT_OWN2SEL
+69N4*I2C_SLAVE_ACT_QCMD
+70N4*I2C_SLAVE_ACT_QCMD_DATA
+72N4*I2C_MASTER_MAX_RETRIES
+74N4*I2C_MASTER_INT_TIMEOUT
+75N4*I2C_MASTER_INT_DATA
+76N4*I2C_SLAVE_INT_STOP
+77N4*I2C_SLAVE_INT_START
+78N4*I2C_SLAVE_INT_DATA
+81U14*IntRegister 81>27 81^50 82b<c,I2CIntRegister>22
+81i27 ulBase{long_integer}
+81p50 fnHandler
+84U14*IntUnregister 84>29 85b<c,I2CIntUnregister>22
+84i29 ulBase{long_integer}
+87V13*MasterBusBusy{integer} 87>28 88b<c,I2CMasterBusBusy>22
+87i28 ulBase{long_integer}
+90V13*MasterBusy{integer} 90>25 91b<c,I2CMasterBusy>22
+90i25 ulBase{long_integer}
+93U14*MasterControl 93>29 93>52 94b<c,I2CMasterControl>22
+93i29 ulBase{long_integer}
+93i52 ulCmd{long_integer}
+96V13*MasterDataGet{long_integer} 96>28 97b<c,I2CMasterDataGet>22
+96i28 ulBase{long_integer}
+99U14*MasterDataPut 99>29 99>52 100b<c,I2CMasterDataPut>22
+99i29 ulBase{long_integer}
+99i52 ucData{integer}
+102U14*MasterDisable 102>29 103b<c,I2CMasterDisable>22
+102i29 ulBase{long_integer}
+105U14*MasterEnable 105>28 106b<c,I2CMasterEnable>22
+105i28 ulBase{long_integer}
+108V13*MasterErr{long_integer} 108>24 109b<c,I2CMasterErr>22
+108i24 ulBase{long_integer}
+111U14*MasterInitExpClk 112>7 113>7 114>7 115b<c,I2CMasterInitExpClk>22
+112i7 ulBase{long_integer}
+113i7 ulI2CClk{long_integer}
+114i7 bFast{integer}
+117U14*MasterIntClear 117>30 118b<c,I2CMasterIntClear>22
+117i30 ulBase{long_integer}
+120U14*MasterIntDisable 120>32 121b<c,I2CMasterIntDisable>22
+120i32 ulBase{long_integer}
+123U14*MasterIntEnable 123>31 124b<c,I2CMasterIntEnable>22
+123i31 ulBase{long_integer}
+126V13*MasterIntStatus{integer} 126>30 126>53 127b<c,I2CMasterIntStatus>22
+126i30 ulBase{long_integer}
+126i53 bMasked{integer}
+129U14*MasterIntEnableEx 129>33 129>56 130b<c,I2CMasterIntEnableEx>22
+129i33 ulBase{long_integer}
+129i56 ulIntFlags{long_integer}
+132U14*MasterIntDisableEx 132>34 132>57 133b<c,I2CMasterIntDisableEx>22
+132i34 ulBase{long_integer}
+132i57 ulIntFlags{long_integer}
+135V13*MasterIntStatusEx{long_integer} 135>32 135>55 136b<c,I2CMasterIntStatusEx>22
+135i32 ulBase{long_integer}
+135i55 bMasked{integer}
+138U14*MasterIntClearEx 138>32 138>55 139b<c,I2CMasterIntClearEx>22
+138i32 ulBase{long_integer}
+138i55 ulIntFlags{long_integer}
+141U14*MasterTimeoutSet 141>32 141>55 142b<c,I2CMasterTimeoutSet>22
+141i32 ulBase{long_integer}
+141i55 ulValue{long_integer}
+144U14*SlaveACKOverride 144>32 144>55 145b<c,I2CSlaveACKOverride>22
+144i32 ulBase{long_integer}
+144i55 bEnable{integer}
+147U14*SlaveACKValueSet 147>32 147>55 148b<c,I2CSlaveACKValueSet>22
+147i32 ulBase{long_integer}
+147i55 bACK{integer}
+150V13*MasterLineStateGet{long_integer} 150>33 151b<c,I2CMasterLineStateGet>22
+150i33 ulBase{long_integer}
+153U14*MasterSlaveAddrSet 154>7 155>7 156>7 157b<c,I2CMasterSlaveAddrSet>22
+154i7 ulBase{long_integer}
+155i7 ucSlaveAddr{integer}
+156i7 bReceive{integer}
+159V13*SlaveDataGet{long_integer} 159>27 160b<c,I2CSlaveDataGet>22
+159i27 ulBase{long_integer}
+162U14*SlaveDataPut 162>28 162>51 163b<c,I2CSlaveDataPut>22
+162i28 ulBase{long_integer}
+162m51 ucData{4|47M9}
+165U14*SlaveDisable 165>28 166b<c,I2CSlaveDisable>22
+165i28 ulBase{long_integer}
+168U14*SlaveEnable 168>27 169b<c,I2CSlaveEnable>22
+168i27 ulBase{long_integer}
+171U14*SlaveInit 171>25 171>48 172b<c,I2CSlaveInit>22
+171i25 ulBase{long_integer}
+171m48 ucSlaveAddr{4|47M9}
+174U14*SlaveAddressSet 175>7 176>7 177>7 178b<c,I2CSlaveAddressSet>22
+175i7 ulBase{long_integer}
+176m7 ucAddrNum{4|47M9}
+177m7 ucSlaveAddr{4|47M9}
+180U14*SlaveIntClear 180>29 181b<c,I2CSlaveIntClear>22
+180i29 ulBase{long_integer}
+183U14*SlaveIntDisable 183>31 184b<c,I2CSlaveIntDisable>22
+183i31 ulBase{long_integer}
+186U14*SlaveIntEnable 186>30 187b<c,I2CSlaveIntEnable>22
+186i30 ulBase{long_integer}
+189U14*SlaveIntClearEx 189>31 189>54 190b<c,I2CSlaveIntClearEx>22
+189i31 ulBase{long_integer}
+189i54 ulIntFlags{long_integer}
+192U14*SlaveIntDisableEx 192>33 192>56 193b<c,I2CSlaveIntDisableEx>22
+192i33 ulBase{long_integer}
+192i56 ulIntFlags{long_integer}
+195U14*SlaveIntEnableEx 195>32 195>55 196b<c,I2CSlaveIntEnableEx>22
+195i32 ulBase{long_integer}
+195i55 ulIntFlags{long_integer}
+198V13*SlaveIntStatus{integer} 198>29 198>52 199b<c,I2CSlaveIntStatus>22
+198i29 ulBase{long_integer}
+198i52 bMasked{integer}
+201V13*SlaveIntStatusEx{long_integer} 201>31 201>54 202b<c,I2CSlaveIntStatusEx>22
+201i31 ulBase{long_integer}
+201i54 bMasked{integer}
+204V13*SlaveStatus{long_integer} 204>26 205b<c,I2CSlaveStatus>22
+204i26 ulBase{long_integer}
+FD 1 ada.ads
+FS .1 16K9 ada
+FD 2 a-unccon.ads
+FD 3 interfac.ads
+FS .1 38K9 interfaces
+FS .2 69V13 interfaces__shift_left
+FS .3 73V13 interfaces__shift_right
+FS .4 77V13 interfaces__shift_right_arithmetic
+FS .5 81V13 interfaces__rotate_left
+FS .6 85V13 interfaces__rotate_right
+FS .7 89V13 interfaces__shift_left__2
+FS .8 93V13 interfaces__shift_right__2
+FS .9 97V13 interfaces__shift_right_arithmetic__2
+FS .10 101V13 interfaces__rotate_left__2
+FS .11 105V13 interfaces__rotate_right__2
+FS .12 109V13 interfaces__shift_left__3
+FS .13 113V13 interfaces__shift_right__3
+FS .14 117V13 interfaces__shift_right_arithmetic__3
+FS .15 121V13 interfaces__rotate_left__3
+FS .16 125V13 interfaces__rotate_right__3
+FS .17 129V13 interfaces__shift_left__4
+FS .18 133V13 interfaces__shift_right__4
+FS .19 137V13 interfaces__shift_right_arithmetic__4
+FS .20 141V13 interfaces__rotate_left__4
+FS .21 145V13 interfaces__rotate_right__4
+FD 4 i-c.ads
+FS .1 18K20 interfaces__c
+FS .2 76V13 interfaces__c__to_c
+FS .3 77V13 interfaces__c__to_ada
+FS .4 82V13 interfaces__c__is_nul_terminated
+FS .5 84V13 interfaces__c__to_c__2
+FS .6 88V13 interfaces__c__to_ada__2
+FS .7 92U14 interfaces__c__to_c__3
+FS .8 98U14 interfaces__c__to_ada__3
+FS .9 113V13 interfaces__c__to_c__4
+FS .10 114V13 interfaces__c__to_ada__4
+FS .11 118V13 interfaces__c__is_nul_terminated__2
+FS .12 120V13 interfaces__c__to_c__5
+FS .13 124V13 interfaces__c__to_ada__5
+FS .14 128U14 interfaces__c__to_c__6
+FS .15 134U14 interfaces__c__to_ada__6
+FS .16 152V13 interfaces__c__to_c__7
+FS .17 155V13 interfaces__c__to_ada__7
+FS .18 161V13 interfaces__c__is_nul_terminated__3
+FS .19 164V13 interfaces__c__to_c__8
+FS .20 169V13 interfaces__c__to_ada__8
+FS .21 174U14 interfaces__c__to_c__9
+FS .22 181U14 interfaces__c__to_ada__9
+FS .23 194V13 interfaces__c__to_c__10
+FS .24 197V13 interfaces__c__to_ada__10
+FS .25 203V13 interfaces__c__is_nul_terminated__4
+FS .26 206V13 interfaces__c__to_c__11
+FS .27 211V13 interfaces__c__to_ada__11
+FS .28 216U14 interfaces__c__to_c__12
+FS .29 223U14 interfaces__c__to_ada__12
+FD 5 lm4f.ads
+FS .1 35K9 lm4f
+FD 6 lm4f-i2c.ads
+FS .1 39K14 lm4f__i2c
+FS .2 81U14 lm4f__i2c__intregister
+FS .3 84U14 lm4f__i2c__intunregister
+FS .4 87V13 lm4f__i2c__masterbusbusy
+FS .5 90V13 lm4f__i2c__masterbusy
+FS .6 93U14 lm4f__i2c__mastercontrol
+FS .7 96V13 lm4f__i2c__masterdataget
+FS .8 99U14 lm4f__i2c__masterdataput
+FS .9 102U14 lm4f__i2c__masterdisable
+FS .10 105U14 lm4f__i2c__masterenable
+FS .11 108V13 lm4f__i2c__mastererr
+FS .12 111U14 lm4f__i2c__masterinitexpclk
+FS .13 117U14 lm4f__i2c__masterintclear
+FS .14 120U14 lm4f__i2c__masterintdisable
+FS .15 123U14 lm4f__i2c__masterintenable
+FS .16 126V13 lm4f__i2c__masterintstatus
+FS .17 129U14 lm4f__i2c__masterintenableex
+FS .18 132U14 lm4f__i2c__masterintdisableex
+FS .19 135V13 lm4f__i2c__masterintstatusex
+FS .20 138U14 lm4f__i2c__masterintclearex
+FS .21 141U14 lm4f__i2c__mastertimeoutset
+FS .22 144U14 lm4f__i2c__slaveackoverride
+FS .23 147U14 lm4f__i2c__slaveackvalueset
+FS .24 150V13 lm4f__i2c__masterlinestateget
+FS .25 153U14 lm4f__i2c__masterslaveaddrset
+FS .26 159V13 lm4f__i2c__slavedataget
+FS .27 162U14 lm4f__i2c__slavedataput
+FS .28 165U14 lm4f__i2c__slavedisable
+FS .29 168U14 lm4f__i2c__slaveenable
+FS .30 171U14 lm4f__i2c__slaveinit
+FS .31 174U14 lm4f__i2c__slaveaddressset
+FS .32 180U14 lm4f__i2c__slaveintclear
+FS .33 183U14 lm4f__i2c__slaveintdisable
+FS .34 186U14 lm4f__i2c__slaveintenable
+FS .35 189U14 lm4f__i2c__slaveintclearex
+FS .36 192U14 lm4f__i2c__slaveintdisableex
+FS .37 195U14 lm4f__i2c__slaveintenableex
+FS .38 198V13 lm4f__i2c__slaveintstatus
+FS .39 201V13 lm4f__i2c__slaveintstatusex
+FS .40 204V13 lm4f__i2c__slavestatus
+FD 7 system.ads
+FS .1 37K9 system
+FS .2 74V13 system__Olt
+FS .3 75V13 system__Ole
+FS .4 76V13 system__Ogt
+FS .5 77V13 system__Oge
+FS .6 78V13 system__Oeq
+FD 8 s-parame.ads
+FS .1 51K16 system__parameters
+FS .2 81V13 system__parameters__default_stack_size
+FS .3 84V13 system__parameters__minimum_stack_size
+FS .4 87V13 system__parameters__adjust_storage_size
+

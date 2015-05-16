@@ -1,0 +1,93 @@
+V "GNAT Lib v4.6"
+A -Os
+A --RTS=rts-raven
+A -g
+A -gnatA
+P
+R nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnvnnnnnnvnnnnnnnnnnnnnnnnnn
+
+U lm4f.htimer%b		lm4f-htimer.adb		d5149817 NE OO PK GE IU
+W ada%s			ada.ads			ada.ali
+W ada.unchecked_conversion%s
+W interfaces%s		interfac.ads		interfac.ali
+W interfaces.c%s	i-c.ads			i-c.ali
+W lm4f%s		lm4f.ads		lm4f.ali
+W lm4f.htimer%s		lm4f-htimer.adb		lm4f-htimer.ali
+
+U lm4f.htimer%s		lm4f-htimer.ads		48bbd76e BN EE NE OO PK GE IU
+W ada%s			ada.ads			ada.ali
+W ada.unchecked_conversion%s
+W interfaces%s		interfac.ads		interfac.ali
+W interfaces.c%s	i-c.ads			i-c.ali
+W lm4f%s		lm4f.ads		lm4f.ali
+
+D ada.ads		20150515223946 3ffc8e18
+D a-unccon.ads		20150515223947 f9eb8f06
+D interfac.ads		20150515223946 f77d8799
+D i-c.ads		20150515223946 ed15b264
+D lm4f.ads		20140913212618 3f5dedc7
+D lm4f-htimer.ads	20141017234701 94658052
+D lm4f-htimer.adb	20140913212645 369722ec
+D system.ads		20150515223946 72fb9d13
+X 1 ada.ads
+16K9*Ada 19e8 6|37r6 7|4r6
+X 2 a-unccon.ads
+20v14*Unchecked_Conversion 6|37w10 7|4w10
+X 3 interfac.ads
+36K9*Interfaces 171e15 6|35w6 35r25 36r6 36r25 7|1w6 1r25 2r6 2r25
+X 4 i-c.ads
+39K20*C 102e17 6|36w17 36r36 7|2w17 2r36
+X 5 lm4f.ads
+35K9*LM4F 37e9 6|43r9 89r5 7|3r6 6r14 83r5
+X 6 lm4f-htimer.ads
+40i5 Timer{integer} 7|32r24 33r21 38r34
+41i5 TickPerSec{long_integer} 7|50r51 56r47 62r40
+43k14*HTimer 5|35k9 6|40z5 41z5 89l10 89e16 7|3w11 6b19 83l10 83t16
+45N4*TIMER0
+46N4*TIMER1
+47N4*TIMER2
+48N4*TIMER3
+49N4*TIMER4
+50N4*TIMER5
+55U15*Init 7|30b15 34t8
+60V14*GetTick{long_integer} 7|36b14 39t8 67s33 69s34 76s33 78s34
+65V14*GetSpan{long_integer} 65>23 65>46 7|41b14 45t8 50s16 56s16 62s16
+65i23 StartT{long_integer} 7|41b23 44r36
+65i46 EndT{long_integer} 7|42b23 44r25
+70V14*GetSpanUsec{long_integer} 70>27 70>50 7|47b14 51t8 69s15
+70i27 StartT{long_integer} 7|47b28 50r24
+70i50 EndT{long_integer} 7|48b25 50r32
+75V14*GetSpanMsec{long_integer} 75>27 75>50 7|53b14 57t8 78s15
+75i27 StartT{long_integer} 7|53b28 56r24
+75i50 EndT{long_integer} 7|54b25 56r32
+80V14*GetSpanSec{long_integer} 80>26 80>49 7|59b14 63t8
+80i26 StartT{long_integer} 7|59b26 62r24
+80i49 EndT{long_integer} 7|60b25 62r32
+83U15*WaitUsec 83>24 7|66b15 72t8
+83i24 Duration{long_integer} 7|66b24 69r45
+86U15*WaitMsec 86>24 7|75b15 81t8
+86i24 Duration{long_integer} 7|75b24 78r45
+X 7 lm4f-htimer.adb
+8N5 TIMER_CFG_RTC
+9N5 TIMER_A 33r28 38r41
+10N5 TIMER_B
+11N5 TIMER_BOTH
+12N5 TIMER_CFG_A_PERIODIC_UP 32r31
+13N5 TIMER_CFG_B_PERIODIC_UP
+15V14 TimerValueGet{long_integer} 15>29 15>45 16b<c,TimerValueGet>23 38s20
+15i29 Base{integer}
+15i45 Timer{integer}
+18V14 TimerValueGet64{long_integer} 18>31 19b<c,TimerValueGet64>23
+18i31 Base{integer}
+21U15 EnableTimer 21>28 21>44 22b<c,TimerEnable>23 33s9
+21i28 Base{integer}
+21i44 Timer{integer}
+24U15 DisableTimer 24>29 24>45 25b<c,TimerDisable>23
+24i29 Base{integer}
+24i45 Timer{integer}
+27U15 ConfigureTimer 27>31 27>47 28b<c,TimerConfigure>23 32s9
+27i31 Base{integer}
+27i47 Config{integer}
+67i9 Stime{long_integer} 69r27
+76i9 Stime{long_integer} 78r27
+
