@@ -1,6 +1,0 @@
-warning_mode=TREAT_AS_ERROR
-flow_analysis_mode
-ide_mode
-single_file
-analyze_file=mycub-boardinterface.adb
-

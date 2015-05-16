@@ -1,5 +1,0 @@
-[
-{ "name" : "SimpleMath.Atan", "file" :"simplemath.ads", "line" :  40, "spark" : "no" }
-, { "name" : "SimpleMath.Atan2", "file" :"simplemath.ads", "line" :  41, "spark" : "no" }
-, { "name" : "SimpleMath", "file" :"simplemath.ads", "line" :  35, "spark" : "no" }
-]
